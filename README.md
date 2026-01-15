@@ -1,60 +1,143 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# **Mero Table – Multi-Restaurant Dine-In Order Management System**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Mero Table** is a modern, QR-based platform built with **Laravel** and **Laravel Sanctum**, designed to streamline operations for dine-in restaurants. It simplifies the transition from menu browsing to billing, reducing staff workload and eliminating table-service confusion.
 
-## About Laravel
+The platform allows multiple restaurants to register, undergo admin verification, and manage their daily business through a secure, centralized dashboard.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### **Flexible Ordering Modes**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+To maximize efficiency and cater to different service styles, Mero Table supports two primary ordering workflows:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **Self-Service QR Ordering:** Customers can simply scan a unique QR code located on their table to browse the digital menu and place orders directly from their own devices. This empowers guests and speeds up the ordering process.
+* **Waiter-Assisted Ordering:** Staff members can take orders traditionally using the system on their mobile devices. This allows waiters to remain mobile on the floor, instantly syncing table requests with the kitchen.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### **Key Benefits**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* **Centralized Management:** A single dashboard for restaurant owners to manage menus, staff, and analytics.
+* **Eliminated Table Confusion:** Orders are digitally mapped to specific tables, ensuring accuracy in delivery and billing.
+* **Optimized Operations:** Faster communication between the front-of-house and the kitchen via real-time data sync.
+* **Scalable Multi-Tenancy:** Designed to host numerous independent restaurant brands on one secure platform.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## **Core Concept**
 
-### Premium Partners
+Mero Table transforms traditional dine-in ordering into a **fast, efficient, and error-free experience** through **QR codes and table-based management**. Whether **customers place orders directly** from their phones or **waiters take orders** via mobile devices, the kitchen receives real-time updates instantly. This seamless integration ensures billing staff can accurately identify tables and manage orders, even during peak hours.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## **How Mero Table Works**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Restaurant Registration & Verification**
+* Restaurants register and submit business verification documents.
+* Super Admin verifies and activates the restaurant account.
+* Once verified, default tables (**T1–T15**) are automatically generated.
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Dual-Mode Ordering**
+* **Customer Self-Service:** Customers scan the table’s unique QR code to open the digital menu and place orders without needing to log in.
+* **Waiter-Led Ordering:** Staff can take orders directly at the table using the mobile-optimized dashboard, instantly assigning items to the correct table.
 
-## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Real-Time Order Flow**
+* Orders from both customers and waiters are instantly synced to the **Kitchen Display System**.
+* Kitchen staff updates order status in real-time (**Pending → Preparing → Ready**).
+* Staff receives notifications for new requests, ensuring no order is missed.
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# merotable
+4. **Smart Billing & Checkout**
+* Centralized billing tracks all items ordered per table, regardless of who placed the order.
+* Tables are cleared and marked as "Available" once the final bill is settled.
+* Supports multiple payment methods: **Cash, Card, and Online Payments**.
+
+
+---
+
+## **Key Feature: Item-Based Table Identification**
+
+Mero Table solves a common dine-in problem:
+
+> “The customer doesn’t remember their table number.”
+> 
+
+### **Solution**
+
+Billing staff can search tables based on ordered items.
+
+**Example:**
+
+- Customer says: *“We ordered 2 plates of Momo.”*
+- Staff selects **Momo** → system shows all tables that ordered Momo.
+- Staff adds quantity filter → tables narrow down.
+- Exact table is identified instantly.
+
+✔ Staff can selects mulitple items.
+
+✔ Faster checkout
+
+✔ No confusion
+
+✔ Better customer experience
+
+---
+
+### **User Roles & Permissions**
+
+| Role | Responsibility | Key Permissions |
+| --- | --- | --- |
+| **Super Admin** | Platform Oversight | Verify/Deactivate restaurants, manage subscription plans, view global analytics. |
+| **Restaurant Owner** | Business Management | Manage menu items, view revenue reports, manage staff accounts (Waiters/Kitchen). |
+| **Waiter** | Front-of-House Service | Place orders for customers, view table status, update order notes, request bill generation. |
+| **Kitchen Staff** | Order Fulfillment | View live order queue, update preparation status (**Preparing → Ready**). |
+| **Billing/Cashier** | Financial Settlement | Process payments, apply discounts, print invoices, and close/clear tables. |
+| **Customer** | Self-Service | Scan QR code, browse menu, place orders, and track live order status. |
+
+---
+
+### **Technical Specifications**
+
+Mero Table is built with a modern tech stack focused on high performance, security, and real-time updates.
+
+* **Core Framework:** **Laravel** (Robust, scalable PHP framework).
+* **Authentication:** **Laravel Sanctum** (Secure, token-based API authentication for mobile and web).
+* **Frontend:** **Tailwind CSS & Blade/Livewire** (For a responsive, mobile-first UI).
+* **Database:** **MySQL** (Structured data management for restaurants, menus, and orders).
+* **Real-Time Engine:** **Pusher / Laravel Reverb** (Ensures kitchen and billing screens update instantly without refreshing).
+* **QR System:** Dynamic **Table-Specific QR Generation** (Unique identifiers per table per restaurant).
+
+---
+
+### **System Features for Developers**
+
+* **Multi-Tenancy Architecture:** Data isolation ensures Restaurant A can never see Restaurant B's data.
+* **RESTful API:** Ready for future native mobile app integration.
+* **Optimized Database:** Efficient indexing for fast table-wise bill calculation.
+* **Scalable Table Management:** While T1–T15 are default, the system allows for custom table naming and expansion.
+
+---
+
+## **Future-Ready & Scalable**
+
+Mero Table is built with scalability in mind and supports:
+
+- Dynamic table management
+- Staff roles & permissions
+- POS integration
+- Online payment gateways
+- Order analytics & reports
+- Multi-branch restaurant support
+
+---
+
+## **Business Value**
+
+- Reduces manual order taking
+- Minimizes billing errors
+- Speeds up kitchen operations
+- Improves customer experience
+- Scales easily across multiple restaurants
+
+---
+
