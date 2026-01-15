@@ -1,4 +1,5 @@
 TODO
+docs/
 *.log
 .DS_Store
 .env
