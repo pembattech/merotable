@@ -34,7 +34,31 @@ return [
     |
     */
 
-    'guard' => ['web'],
+
+    'guards' => [
+    'user' => [
+        'driver' => 'sanctum',
+        'provider' => 'users',
+    ],
+
+    'restaurant' => [
+        'driver' => 'sanctum',
+        'provider' => 'restaurants',
+    ],
+],
+
+
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+
+    'restaurants' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Restaurant::class,
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------
