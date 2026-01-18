@@ -22,4 +22,10 @@ class Restaurant extends Authenticatable
     protected $hidden = [
         'password'
     ];
+
+
+    public function documents()
+{
+    return $this->hasMany(RestaurantDocuments::class);
+}
 }

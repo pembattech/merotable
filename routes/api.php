@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\V1\AuthController;
+use App\Http\Controllers\API\V1\RestaurantDocumentsController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -18,8 +19,17 @@ Route::prefix('v1/auth')->group(function () {
     // Users / Staff
     Route::post('user/login', [AuthController::class, 'loginUser']);
 
+
     Route::middleware('auth:sanctum')->group(function () {
+
+        // Restaurant
+        Route::post('/restaurant/documents', [RestaurantDocumentsController::class, 'storeMultiple']);
+
+
+        // Users / Staff
         Route::post('user/register', [AuthController::class, 'registerUser']);
+
+
         Route::post('logout', [AuthController::class, 'logout']);
     });
 });
