@@ -25,7 +25,14 @@ class Restaurant extends Authenticatable
 
 
     public function documents()
-{
-    return $this->hasMany(RestaurantDocuments::class);
-}
+    {
+        return $this->hasMany(RestaurantDocuments::class);
+    }
+
+    public function tables()
+    {
+        return $this->hasMany(Table::class);
+    }
+
+
 }

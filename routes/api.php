@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\V1\AuthController;
 use App\Http\Controllers\API\V1\RestaurantDocumentsController;
+use App\Http\Controllers\API\V1\AdminController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -32,4 +33,19 @@ Route::prefix('v1/auth')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout']);
     });
+
+
 });
+
+// Admin Routes
+Route::middleware('auth:sanctum')->prefix('v1/admin')->group(function () {
+
+    Route::get('/restaurants/pending', [AdminController::class, 'pending']);
+    Route::post('/restaurants/{id}/approve', [AdminController::class, 'approve']);
+    Route::post('/restaurants/{id}/reject', [AdminController::class, 'reject']);
+});
+
+
+
+
+
