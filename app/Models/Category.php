@@ -4,19 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Table extends Model
+class Category extends Model
 {
     protected $fillable = [
         'restaurant_id',
-        'table_number',
-        'status',
+        'name',
     ];
 
     /**
-     * A table belongs to a restaurant
+     * A category belongs to a restaurant
      */
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);
     }
+
+    public function menuItems()
+    {
+        return $this->hasMany(MenuItem::class);
+    }
+
 }

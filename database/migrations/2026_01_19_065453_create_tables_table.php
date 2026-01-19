@@ -15,6 +15,7 @@ return new class extends Migration {
                   ->cascadeOnDelete();
 
             $table->string('table_number', 5);
+            $table->enum('status', ['available', 'occupied', 'reserved'])->default('available');
 
             $table->timestamps();
 
