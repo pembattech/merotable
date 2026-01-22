@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
 class Restaurant extends Authenticatable
 {
@@ -15,6 +16,7 @@ class Restaurant extends Authenticatable
         'name',
         'email',
         'password',
+        'slug',
         'status'
     ];
 
@@ -22,6 +24,21 @@ class Restaurant extends Authenticatable
     protected $hidden = [
         'password'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($restaurant) {
+            $restaurant->slug = Str::slug($restaurant->name) . '-' . uniqid();
+        });
+    }
+
+    // Use slug for route model binding
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
 
     public function documents()

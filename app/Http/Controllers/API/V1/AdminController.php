@@ -25,19 +25,46 @@ class AdminController extends Controller
     /**
      * Approve a restaurant
      */
-    public function approve($id)
+    public function approve($slug)
     {
         // TODO: Understand transactions more deeply
-        DB::transaction(function () use ($id) {
+        DB::transaction(function () use ($slug) {
 
-            $restaurant = Restaurant::findOrFail($id);
+            $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
 
             // Prevent double approval
             if ($restaurant->status === 'active') {
                 return response()->json(['message' => 'Restaurant already approved.'], 400);
             }
 
-            // Active restaurant
+
+            $documents = RestaurantDocuments::where('restaurant_id', $restaurant->id);
+
+            $totalDocuments = $documents->count();
+
+            $approvedDocuments = RestaurantDocuments::where('restaurant_id', $restaurant->id)
+                ->where('status', 'approved')
+                ->count();
+
+            // Minimum required documents check
+            if ($totalDocuments < 2) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Insufficient documents uploaded.',
+                    'uploaded' => $totalDocuments
+                ], 422);
+            }
+
+            // All documents must be approved
+            if ($totalDocuments !== $approvedDocuments) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Some documents are still pending approval.',
+                    'approved' => $approvedDocuments,
+                    'total' => $totalDocuments
+                ], 422);
+            }
+
             $active_restaurant = $restaurant->update(attributes: [
                 'status' => 'active',
                 'approved_at' => Carbon::now(),
@@ -45,8 +72,7 @@ class AdminController extends Controller
 
 
             if ($active_restaurant) {
-                RestaurantDocuments::where('restaurant_id', $restaurant->id)
-                    ->update(['status' => 'approved']);
+                $documents->update(['status' => 'approved']);
             }
 
             /**

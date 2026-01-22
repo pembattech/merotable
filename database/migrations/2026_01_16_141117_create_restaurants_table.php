@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('name', 150);
             $table->string('email', 150)->unique();
             $table->string('password', 255);
+            $table->string('slug')->unique();
             $table->enum('status', ['pending', 'active', 'blocked', 'testing'])->default('pending');
+            $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });
     }
