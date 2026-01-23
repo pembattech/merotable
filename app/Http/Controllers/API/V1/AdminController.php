@@ -27,53 +27,54 @@ class AdminController extends Controller
      */
     public function approve($slug)
     {
+
+        $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
+
+        // Prevent double approval
+        if ($restaurant->status === 'active') {
+            return response()->json(['message' => 'Restaurant already approved.'], 400);
+        }
+
+
+
+
+
+        $documents = RestaurantDocuments::where('restaurant_id', $restaurant->id);
+
+        $totalDocuments = $documents->count();
+
+        $approvedDocuments = RestaurantDocuments::where('restaurant_id', $restaurant->id)
+            ->where('status', 'approved')
+            ->count();
+
+        // Minimum required documents check
+        if ($totalDocuments < 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Insufficient documents uploaded.',
+                'uploaded' => $totalDocuments
+            ], 422);
+        }
+
+        // All documents must be approved
+        if ($totalDocuments !== $approvedDocuments) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Some documents are still pending approval.',
+                'approved' => $approvedDocuments,
+                'total' => $totalDocuments
+            ], 422);
+        }
+
+
         // TODO: Understand transactions more deeply
-        DB::transaction(function () use ($slug) {
-
-            $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
-
-            // Prevent double approval
-            if ($restaurant->status === 'active') {
-                return response()->json(['message' => 'Restaurant already approved.'], 400);
-            }
-
-
-            $documents = RestaurantDocuments::where('restaurant_id', $restaurant->id);
-
-            $totalDocuments = $documents->count();
-
-            $approvedDocuments = RestaurantDocuments::where('restaurant_id', $restaurant->id)
-                ->where('status', 'approved')
-                ->count();
-
-            // Minimum required documents check
-            if ($totalDocuments < 2) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Insufficient documents uploaded.',
-                    'uploaded' => $totalDocuments
-                ], 422);
-            }
-
-            // All documents must be approved
-            if ($totalDocuments !== $approvedDocuments) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Some documents are still pending approval.',
-                    'approved' => $approvedDocuments,
-                    'total' => $totalDocuments
-                ], 422);
-            }
+        DB::transaction(function () use ($restaurant) {
 
             $active_restaurant = $restaurant->update(attributes: [
                 'status' => 'active',
-                'approved_at' => Carbon::now(),
+                'approved_at' => now(),
             ]);
 
-
-            if ($active_restaurant) {
-                $documents->update(['status' => 'approved']);
-            }
 
             /**
              * Create default tables (T1–T15)
@@ -127,6 +128,7 @@ class AdminController extends Controller
         return response()->json([
             'message' => 'Restaurant approved successfully'
         ]);
+
     }
 
     /**
@@ -154,6 +156,23 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'Restaurant rejected successfully'
+        ]);
+    }
+
+    public function approveDocuments($slug)
+    {
+        // TODO: Create a individual document approval function
+        $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
+
+        DB::transaction(function () use ($restaurant) {
+            $restaurant->documents()->update([
+                'status' => 'approved',
+                'verified_at' => now(),
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'All documents approved successfully'
         ]);
     }
 }

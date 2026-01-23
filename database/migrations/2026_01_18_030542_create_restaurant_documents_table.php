@@ -22,7 +22,7 @@ return new class extends Migration {
 
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('remarks')->nullable();
-            $table->timestamp('verified_at')->nullable();
+            $table->timestamp('verified_at');
 
             $table->timestamps();
         });

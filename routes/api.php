@@ -8,7 +8,6 @@ use App\Http\Controllers\API\V1\RestaurantController;
 use App\Http\Controllers\API\V1\RestaurantDocumentsController;
 use App\Http\Controllers\API\V1\AdminController;
 
-// 🔹 ->parameters(['restaurants' => 'restaurant:slug']) → makes all Restaurant resource routes use slugs.
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return response()->json([
@@ -35,6 +34,8 @@ Route::prefix('v1/auth')->group(function () {
         Route::apiResource('restaurants', RestaurantController::class)
                  ->parameters(['restaurants' => 'restaurant:slug']);
 
+        Route::get('restaurant/{restaurant:slug}/menu', [RestaurantController::class, 'getMenuItems']);
+
         // Users / Staff
         Route::post('user/register', [AuthController::class, 'registerUser']);
 
@@ -51,6 +52,8 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
     Route::get('/restaurants/pending', [AdminController::class, 'pending']);
     Route::post('/restaurants/{slug}/approve', [AdminController::class, 'approve']);
     Route::post('/restaurants/{slug}/reject', [AdminController::class, 'reject']);
+
+    Route::post('/restaurant/documents/{slug}/approve', [AdminController::class, 'approveDocuments']);
 });
 
 
