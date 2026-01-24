@@ -32,7 +32,7 @@ Route::prefix('v1/auth')->group(function () {
         Route::post('/restaurant/documents', [RestaurantDocumentsController::class, 'storeMultiple']);
 
         Route::apiResource('restaurants', RestaurantController::class)
-                 ->parameters(['restaurants' => 'restaurant:slug']);
+            ->parameters(['restaurants' => 'restaurant:slug']);
 
         Route::get('restaurant/{restaurant:slug}/menu', [RestaurantController::class, 'getMenuItems']);
 
@@ -44,7 +44,16 @@ Route::prefix('v1/auth')->group(function () {
     });
 
 
+
+
 });
+
+
+// Owner Routes
+Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner')->group(function () {
+    Route::post('/restaurant/staff', [RestaurantController::class, 'createStaff']);
+});
+
 
 // Admin Routes
 Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function () {
@@ -55,6 +64,9 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
 
     Route::post('/restaurant/documents/{slug}/approve', [AdminController::class, 'approveDocuments']);
 });
+
+
+
 
 
 

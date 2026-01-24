@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
           $middleware->alias([
             'admin' => \App\Http\Middleware\AdminOnly::class,
+            'isRestaurantVerified' => \App\Http\Middleware\IsRestaurantVerified::class,
+            'isRestaurantAuthenticated' => \App\Http\Middleware\IsRestaurantAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

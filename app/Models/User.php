@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'restaurant_id',
         'role',
+        'phone'
     ];
 
     /**
@@ -47,5 +48,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
     }
 }

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class RestaurantController extends Controller
 {
@@ -99,4 +101,34 @@ class RestaurantController extends Controller
             'data' => $menuItems
         ]);
     }
+
+    public function createStaff(Request $request)
+    {
+        $restaurant = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'role' => 'in:staff,waiter,kitchen,cashier,staff',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $staff = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'restaurant_id' => $restaurant->id,
+            'role' => $request->role ?? 'staff',
+            'phone' => $request->phone,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Staff created successfully',
+            'data' => $staff,
+        ], 201);
+    }
+
+
 }

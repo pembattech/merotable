@@ -41,10 +41,10 @@ return [
         'provider' => 'users',
     ],
 
-    'restaurant' => [
-        'driver' => 'sanctum',
-        'provider' => 'restaurants',
-    ],
+    // 'restaurant' => [
+    //     'driver' => 'sanctum',
+    //     'provider' => 'restaurants',
+    // ],
 ],
 
 
@@ -54,10 +54,10 @@ return [
         'model' => App\Models\User::class,
     ],
 
-    'restaurants' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\Restaurant::class,
-    ],
+    // 'restaurants' => [
+    //     'driver' => 'eloquent',
+    //     'model' => App\Models\Restaurant::class,
+    // ],
 ],
 
     /*
