@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
 
 class RestaurantController extends Controller
 {
@@ -128,6 +130,38 @@ class RestaurantController extends Controller
             'message' => 'Staff created successfully',
             'data' => $staff,
         ], 201);
+    }
+
+
+    public function loginStaff(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $staff = User::where('email', $request->email)->first();
+
+        if (!$staff || !Hash::check($request->password, $staff->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Invalid credentials.'],
+            ]);
+        }
+
+        if (!$staff->is_active) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Staff not active.'
+            ], 403);
+        }
+
+        $token = $staff->createToken('staff-token')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'staff' => $staff,
+            'token' => $token,
+        ]);
     }
 
 

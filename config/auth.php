@@ -45,6 +45,11 @@ return [
             'driver' => 'sanctum',
             'provider' => 'restaurants',
         ],
+
+        'staff' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
     ],
 
     /*
@@ -78,6 +83,11 @@ return [
         'restaurants' => [
             'driver' => 'eloquent',
             'model' => App\Models\Restaurant::class,
+        ],
+
+        'staff' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
     ],
 

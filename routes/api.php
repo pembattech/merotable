@@ -54,6 +54,13 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVer
     Route::post('/restaurant/staff', [RestaurantController::class, 'createStaff']);
 });
 
+// Staff Routes
+Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
+    Route::post('/login', [RestaurantController::class, 'loginStaff']);
+
+    // Route::get('/restaurant/orders', [RestaurantController::class, 'getOrders']);
+});
+
 
 // Admin Routes
 Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function () {
