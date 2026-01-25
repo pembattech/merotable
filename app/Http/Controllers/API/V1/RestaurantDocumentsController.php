@@ -42,7 +42,8 @@ class RestaurantDocumentsController extends Controller
             RestaurantDocuments::create([
                 'restaurant_id' => $request->user()->id,
                 'document_type' => $type,
-                'document_path' => $path
+                'document_path' => $path,
+                'verified_at' => now()
             ]);
         }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\API\V1\AuthController;
 use App\Http\Controllers\API\V1\RestaurantController;
 use App\Http\Controllers\API\V1\RestaurantDocumentsController;
 use App\Http\Controllers\API\V1\AdminController;
+use App\Http\Controllers\API\V1\OrdersController;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -57,8 +58,9 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVer
 // Staff Routes
 Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::post('/login', [RestaurantController::class, 'loginStaff']);
+    Route::post('/orders', [OrdersController::class, 'store']);
+    Route::get('/orders', [OrdersController::class, 'fetchOrders']);
 
-    // Route::get('/restaurant/orders', [RestaurantController::class, 'getOrders']);
 });
 
 
