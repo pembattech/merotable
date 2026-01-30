@@ -21,11 +21,6 @@ return new class extends Migration {
                 ->constrained('tables')
                 ->cascadeOnDelete();
 
-            $table->foreignId('staff_id')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
-
             $table->enum('status', ['open', 'completed', 'cancelled'])
                 ->default('open');
 

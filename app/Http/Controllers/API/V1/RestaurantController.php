@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\User;
+use App\Models\OrderActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
@@ -163,6 +164,21 @@ class RestaurantController extends Controller
             'token' => $token,
         ]);
     }
+
+    public function restaurantActivities(Request $request)
+    {
+        $restaurantId = Auth::user()->id;
+
+        return OrderActivity::with('staff:id,name')
+            ->whereHas(
+                'order',
+                fn($q) =>
+                $q->where('restaurant_id', $restaurantId)
+            )
+            ->latest()
+            ->paginate(50);
+    }
+
 
 
 }

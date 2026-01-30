@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Restaurant::class);
     }
+
+    public function orderActivities()
+    {
+        return $this->hasMany(OrderActivity::class);
+    }
 }

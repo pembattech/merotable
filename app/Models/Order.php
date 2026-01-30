@@ -22,6 +22,11 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function activities()
+    {
+        return $this->hasMany(OrderActivity::class);
+    }
     
     public function restaurant()
     {

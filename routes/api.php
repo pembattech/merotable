@@ -53,13 +53,17 @@ Route::prefix('v1/auth')->group(function () {
 // Owner Routes
 Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner')->group(function () {
     Route::post('/restaurant/staff', [RestaurantController::class, 'createStaff']);
+    Route::get('/restaurant/activities', [RestaurantController::class, 'restaurantActivities']);
 });
 
 // Staff Routes
 Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::post('/login', [RestaurantController::class, 'loginStaff']);
-    Route::post('/orders', [OrdersController::class, 'store']);
-    Route::get('/orders', [OrdersController::class, 'fetchOrders']);
+    Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
+    Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
+
+    Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
+
 
 });
 
