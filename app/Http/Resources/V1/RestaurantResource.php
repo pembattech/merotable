@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 use \App\Http\Resources\V1\CategoryResource;
-use \App\Http\Resources\V1\MenuItemResource;
+use \App\Http\Resources\V1\PublicMenuItemResource;
 
 class RestaurantResource extends JsonResource
 {
@@ -47,7 +47,7 @@ class RestaurantResource extends JsonResource
             'categories' => CategoryResource::collection(
                 $this->whenLoaded('categories')
             ),
-            'menuItems' => MenuItemResource::collection(
+            'menuItems' => PublicMenuItemResource::collection(
                 $this->whenLoaded('menuItems')
             ),
 
