@@ -1,7 +1,34 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::redirect('/', '/auth');
+// Route::group('', function () {
+
+Route::get('/auth', function () {
+    return view('authentication');
+})->name('auth')->middleware('redirectLoggedin');
+
+// Restaurant Routes
+Route::get('restaurant/dashboard', function () {
+    return view('restaurant/dashboard');
+})->name('restaurant.dashboard');
+
+Route::get('restaurant/menu', function () {
+    $a = Auth::guard('restaurant')->check();
+    dump($a);
+    return view('restaurant/menu');
+})->name('restaurant.menu');
+
+Route::get('restaurant/reports', function () {
+    return view('restaurant/reports');
+})->name('restaurant.reports');
+
+Route::get('staff/dashboard', function () {
+    return view('staff/dashboard');
+})->name('staff.dashboard');
+
+// });
+

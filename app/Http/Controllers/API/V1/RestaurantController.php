@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\AdminMenuItemResource;
+use App\Http\Resources\V1\PublicMenuItemResource;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\OrderActivity;
@@ -11,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+
 
 
 class RestaurantController extends Controller
@@ -97,11 +100,14 @@ class RestaurantController extends Controller
 
     public function getMenuItems(Restaurant $restaurant)
     {
-        $menuItems = $restaurant->menuItems()->get();
+        $menuItems = $restaurant->menuItems()->with('restaurant','category')->get();
 
         return response()->json([
             'success' => true,
-            'data' => $menuItems
+            'category_count' => $restaurant->categories()->count(),
+            'total_item_count' => $menuItems->count(),
+            'active_item_count' => $menuItems->where('is_available', 1)->count(),
+            'menu' => PublicMenuItemResource::collection($menuItems)
         ]);
     }
 

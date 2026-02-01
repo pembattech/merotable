@@ -13,7 +13,6 @@ use App\Http\Controllers\API\V1\OrdersController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return response()->json([
         'success' => true,
-        'user' => $request->user()
     ]);
 });
 

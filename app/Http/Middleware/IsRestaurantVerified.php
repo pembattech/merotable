@@ -18,9 +18,15 @@ class IsRestaurantVerified
     {
         $restaurant = Auth::guard('restaurant')->user();
 
-        if ($restaurant->status !== 'active') {
+        if ($restaurant->status !== 'pending') {
             return response()->json([
-                'message' => 'Restaurant not verified'
+                'status' => 'error',
+                'message' => 'Restaurant not verified yet.'
+            ], 403);
+        } elseif ($restaurant->status === 'blocked') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Restaurant is blocked. Contact support.'
             ], 403);
         }
 

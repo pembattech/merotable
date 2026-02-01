@@ -35,7 +35,6 @@ class PublicMenuItemResource extends JsonResource
             'restaurant' => [
                 'name' => $this->restaurant?->name,
             ],
-
         ];
     }
 }
