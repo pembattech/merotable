@@ -18,7 +18,7 @@ class IsRestaurantVerified
     {
         $restaurant = Auth::guard('restaurant')->user();
 
-        if ($restaurant->status !== 'pending') {
+        if ($restaurant->status === 'pending') {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Restaurant not verified yet.'

@@ -8,6 +8,7 @@ use App\Http\Controllers\API\V1\RestaurantController;
 use App\Http\Controllers\API\V1\RestaurantDocumentsController;
 use App\Http\Controllers\API\V1\AdminController;
 use App\Http\Controllers\API\V1\OrdersController;
+use App\Http\Controllers\API\V1\MenuController;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -53,6 +54,10 @@ Route::prefix('v1/auth')->group(function () {
 Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner')->group(function () {
     Route::post('/restaurant/staff', [RestaurantController::class, 'createStaff']);
     Route::get('/restaurant/activities', [RestaurantController::class, 'restaurantActivities']);
+
+    Route::post('/restaurant/add-menu', [MenuController::class, 'store']);
+    Route::patch('/restaurant/update-menu/{menuItem}', [MenuController::class, 'update']);
+    Route::patch('/restaurant/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
 });
 
 // Staff Routes
