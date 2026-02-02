@@ -5,7 +5,7 @@ namespace App\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AdminMenuItemResource extends JsonResource
+class AdminCategoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,28 +14,16 @@ class AdminMenuItemResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
         return [
-            // Menu item info
+            'id' => $this->id,
             'name' => $this->name,
-            'price' => (float) $this->price,
-
-            // Availability (cast to boolean for frontend clarity)
-            'isAvailable' => (bool) $this->is_available,
-
-            // Timestamps (camelCase for JS apps)
             'createdAt' => $this->created_at->toISOString(),
             'updatedAt' => $this->updated_at->toISOString(),
-
-            // Optional: related category (only if eager-loaded)
-            'category' => new PublicCategoryResource(
-                $this->whenLoaded('category')
-            ),
 
             'restaurant' => new PublicRestaurantResource(
                 $this->whenLoaded('restaurant')
             ),
-        ];
 
+        ];
     }
 }

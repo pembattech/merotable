@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\MenuItem;
+use App\Http\Resources\V1\AdminMenuItemResource;
 
 class MenuController extends Controller
 {
@@ -28,15 +29,15 @@ class MenuController extends Controller
         // Set default availability if not provided
         $validatedData['is_available'] = $validatedData['is_available'] ?? true;
 
-
-
         // Create menu item
         $menuItem = MenuItem::create($validatedData);
+
+        $menuItem->load(['restaurant', 'category']);
 
         return response()->json([
             'success' => true,
             'message' => 'Menu item created successfully',
-            'data' => $menuItem,
+            'data' => new AdminMenuItemResource($menuItem),
         ], 201);
     }
 
@@ -61,10 +62,12 @@ class MenuController extends Controller
 
         $menuItem->update($validatedData);
 
+        $menuItem->load(['restaurant', 'category']);
+
         return response()->json([
             'success' => true,
             'message' => 'Menu item updated successfully',
-            'data' => $menuItem
+            'data' => new AdminMenuItemResource($menuItem),
         ]);
     }
 
@@ -91,9 +94,30 @@ class MenuController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Menu availability updated successfully',
-            'data' => $menuItem
+            'data' => new AdminMenuItemResource($menuItem),
         ]);
     }
+
+    public function show(MenuItem $menuItem)
+    {
+        $restaurant = auth('restaurant')->user();
+
+        // 🔒 Ownership check: restaurant can only fetch its own items
+        if ($menuItem->restaurant_id !== $restaurant->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized action.'
+            ], 403);
+        }
+
+        $menuItem->load(['restaurant', 'category']);
+
+        return response()->json([
+            'success' => true,
+            'data' => new AdminMenuItemResource($menuItem),
+        ]);
+    }
+
 
 
 

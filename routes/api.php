@@ -9,6 +9,7 @@ use App\Http\Controllers\API\V1\RestaurantDocumentsController;
 use App\Http\Controllers\API\V1\AdminController;
 use App\Http\Controllers\API\V1\OrdersController;
 use App\Http\Controllers\API\V1\MenuController;
+use App\Http\Controllers\API\V1\CategoryController;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -51,13 +52,19 @@ Route::prefix('v1/auth')->group(function () {
 
 
 // Owner Routes
-Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner')->group(function () {
-    Route::post('/restaurant/staff', [RestaurantController::class, 'createStaff']);
-    Route::get('/restaurant/activities', [RestaurantController::class, 'restaurantActivities']);
+Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner/restaurant')->group(function () {
+    Route::post('/staff', [RestaurantController::class, 'createStaff']);
+    Route::get('/activities', [RestaurantController::class, 'restaurantActivities']);
 
-    Route::post('/restaurant/add-menu', [MenuController::class, 'store']);
-    Route::patch('/restaurant/update-menu/{menuItem}', [MenuController::class, 'update']);
-    Route::patch('/restaurant/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
+    Route::post('/add-menu', [MenuController::class, 'store']);
+    Route::patch('/update-menu/{menuItem}', [MenuController::class, 'update']);
+    Route::patch('/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
+    Route::get('/menu/{menuItem}', [MenuController::class, 'show']);
+
+    Route::post('/add-category', [CategoryController::class, 'store']);
+    Route::patch('/update-category/{category}', [CategoryController::class, 'update']);
+    Route::get('/category', [CategoryController::class, 'index']);
+
 });
 
 // Staff Routes

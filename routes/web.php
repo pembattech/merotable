@@ -17,8 +17,6 @@ Route::get('restaurant/dashboard', function () {
 })->name('restaurant.dashboard');
 
 Route::get('restaurant/menu', function () {
-    $a = Auth::guard('restaurant')->check();
-    dump($a);
     return view('restaurant/menu');
 })->name('restaurant.menu');
 
