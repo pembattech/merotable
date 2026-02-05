@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\AdminController;
 use App\Http\Controllers\API\V1\OrdersController;
 use App\Http\Controllers\API\V1\MenuController;
 use App\Http\Controllers\API\V1\CategoryController;
+use App\Http\Controllers\API\V1\TableController;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -20,33 +21,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::prefix('v1/auth')->group(function () {
-    // Restaurant
+
+    // AUTH
     Route::post('restaurant/register', [AuthController::class, 'registerRestaurant']);
     Route::post('restaurant/login', [AuthController::class, 'loginRestaurant']);
-
-    // Users / Staff
+    Route::post('user/register', [AuthController::class, 'registerUser']);
     Route::post('user/login', [AuthController::class, 'loginUser']);
 
+    Route::post('logout', [AuthController::class, 'logout']);
 
+
+    // Common Routes
     Route::middleware('auth:sanctum')->group(function () {
-
-        // Restaurant
         Route::post('/restaurant/documents', [RestaurantDocumentsController::class, 'storeMultiple']);
-
-        Route::apiResource('restaurants', RestaurantController::class)
-            ->parameters(['restaurants' => 'restaurant:slug']);
 
         Route::get('restaurant/{restaurant:slug}/menu', [RestaurantController::class, 'getMenuItems']);
 
-        // Users / Staff
-        Route::post('user/register', [AuthController::class, 'registerUser']);
-
-
-        Route::post('logout', [AuthController::class, 'logout']);
     });
-
-
-
 
 });
 
@@ -61,9 +52,16 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVer
     Route::patch('/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
     Route::get('/menu/{menuItem}', [MenuController::class, 'show']);
 
+    // Not Implement!
     Route::post('/add-category', [CategoryController::class, 'store']);
     Route::patch('/update-category/{category}', [CategoryController::class, 'update']);
     Route::get('/category', [CategoryController::class, 'index']);
+
+    // Not Implement!
+    Route::get('/tables', [TableController::class, 'fetchTables']);
+    Route::get('/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
+
+
 
 });
 
