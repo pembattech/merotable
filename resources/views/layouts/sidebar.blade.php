@@ -6,42 +6,55 @@
     <nav class="flex-1 px-4 space-y-2">
         <a href="{{ route('restaurant.dashboard') }}" class="flex items-center p-3 bg-blue-600 rounded-lg font-semibold">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                </path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4a2 2 0 01-2-2V12H9v8a2 2 0 01-2 2H3z" />
             </svg>
             Dashboard
         </a>
-        <a href="{{ route('restaurant.table') }}" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+        <a href="{{ route('restaurant.table') }}"
+            class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M4 6h16M4 12h16M4 18h7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 10h16M6 10v10M18 10v10M9 3h6v4H9z" />
             </svg>
             Active Tables
         </a>
-        <a href="{{ route('restaurant.menu') }}" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+        <a href="{{ route('restaurant.menu') }}"
+            class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                </path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6M12 3v18" />
             </svg>
             Menu Items
         </a>
-        <a href="{{ route('restaurant.reports') }}" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+        <a href="{{ route('restaurant.reports') }}"
+            class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                </path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-3.866 0-7 1.343-7 3s3.134 3 7 3 7-1.343 7-3-3.134-3-7-3z
+             M5 11v4c0 1.657 3.134 3 7 3s7-1.343 7-3v-4" />
             </svg>
             Sales Reports
         </a>
-        <a href="{{ route('restaurant.staff') }}" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+        <a href="{{ route('restaurant.staff') }}"
+            class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                </path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-4-4h-1
+                 M9 20H4v-2a4 4 0 014-4h1
+                 M16 3.13a4 4 0 010 7.75
+                 M8 3.13a4 4 0 000 7.75
+                 M12 7a4 4 0 110 8 4 4 0 010-8z" />
             </svg>
             Staff Management
         </a>
+        <a href="javascript:void(0)" onclick="logout()"
+            class="flex items-center p-3 text-red-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5" />
+            </svg>
+            Logout
+        </a>
+
     </nav>
     <div class="p-6 border-t border-gray-800">
         <p class="text-xs text-gray-500 uppercase font-bold">Logged in as</p>
@@ -54,5 +67,26 @@
     let userName = localStorage.getItem('user_name');
     if (userName) {
         document.querySelector('.user-name').textContent = userName;
+    }
+
+
+    async function logout() {
+        const token = localStorage.getItem('auth_token');
+
+        try {
+            await fetch('/api/v1/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (e) {
+            console.warn('Logout request failed, clearing session anyway');
+        }
+
+        localStorage.clear()
+
+        window.location.href = '/auth';
     }
 </script>
