@@ -119,7 +119,7 @@ class RestaurantController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'in:staff,waiter,kitchen,cashier,staff',
+            'role' => 'in:staff,waiter,kitchen,cashier,staff,manager',
             'phone' => 'required|string|max:20',
         ]);
 
@@ -168,6 +168,17 @@ class RestaurantController extends Controller
             'status' => 'success',
             'staff' => $staff,
             'token' => $token,
+        ]);
+    }
+
+    public function fetchStaff()
+    {
+        $restaurantId = Auth::user()->id;
+        $staffMembers = User::where('restaurant_id', $restaurantId)->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $staffMembers
         ]);
     }
 

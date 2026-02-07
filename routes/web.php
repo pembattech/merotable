@@ -28,6 +28,10 @@ Route::get('restaurant/reports', function () {
     return view('restaurant/reports');
 })->name('restaurant.reports');
 
+Route::get('restaurant/staff', function () {
+    return view('restaurant/staff');
+})->name('restaurant.staff');
+
 Route::get('staff/dashboard', function () {
     return view('staff/dashboard');
 })->name('staff.dashboard');

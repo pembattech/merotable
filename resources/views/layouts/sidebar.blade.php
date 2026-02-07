@@ -34,6 +34,14 @@
             </svg>
             Sales Reports
         </a>
+        <a href="{{ route('restaurant.staff') }}" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+            </svg>
+            Staff Management
+        </a>
     </nav>
     <div class="p-6 border-t border-gray-800">
         <p class="text-xs text-gray-500 uppercase font-bold">Logged in as</p>
