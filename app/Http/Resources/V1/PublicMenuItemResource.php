@@ -16,7 +16,7 @@ class PublicMenuItemResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            // Menu item info
+            'id' => $this->id,
             'name' => $this->name,
             'price' => (float) $this->price,
 

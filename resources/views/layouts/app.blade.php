@@ -9,13 +9,13 @@
     <script>
         apiTest();
     </script>
-    
+
     <style>
         body {
             display: none;
         }
     </style>
-        
+
 
     <script src="{{ asset('js/auth-guard.js') }}"></script>
     <script>
@@ -38,6 +38,8 @@
     </main>
 
     {{-- @include('layouts.footer') --}}
+
+    {{-- <script src="{{ asset('js/CategoryService.js') }}"></script> --}}
 
 </body>
 

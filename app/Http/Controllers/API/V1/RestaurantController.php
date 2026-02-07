@@ -107,7 +107,7 @@ class RestaurantController extends Controller
             'category_count' => $restaurant->categories()->count(),
             'total_item_count' => $menuItems->count(),
             'active_item_count' => $menuItems->where('is_available', 1)->count(),
-            'menu' => PublicMenuItemResource::collection($menuItems)
+            'menu' => AdminMenuItemResource::collection($menuItems)
         ]);
     }
 

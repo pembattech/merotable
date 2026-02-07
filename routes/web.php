@@ -9,12 +9,16 @@ Route::redirect('/', '/auth');
 
 Route::get('/auth', function () {
     return view('authentication');
-})->name('auth')->middleware('redirectLoggedin');
+})->name('auth');
 
 // Restaurant Routes
 Route::get('restaurant/dashboard', function () {
     return view('restaurant/dashboard');
 })->name('restaurant.dashboard');
+
+Route::get('restaurant/table', function () {
+    return view('restaurant/table');
+})->name('restaurant.table');
 
 Route::get('restaurant/menu', function () {
     return view('restaurant/menu');

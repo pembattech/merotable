@@ -12,7 +12,7 @@
             </svg>
             Dashboard
         </a>
-        <a href="#" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
+        <a href="{{ route('restaurant.table') }}" class="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg transition">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M4 6h16M4 12h16M4 18h7"></path>
             </svg>

@@ -16,7 +16,7 @@ class AdminMenuItemResource extends JsonResource
     {
 
         return [
-            // Menu item info
+            'id' => $this->id,
             'name' => $this->name,
             'price' => (float) $this->price,
 

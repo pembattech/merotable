@@ -5,7 +5,7 @@ namespace App\Http\Resources\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-use \App\Http\Resources\V1\CategoryResource;
+use \App\Http\Resources\V1\PublicCategoryResource;
 use \App\Http\Resources\V1\PublicMenuItemResource;
 
 class RestaurantResource extends JsonResource
@@ -44,7 +44,7 @@ class RestaurantResource extends JsonResource
             'menuCount' => $this->menuItems()->count(),
 
             // Relationships (optional, eager load in controller to avoid N+1)
-            'categories' => CategoryResource::collection(
+            'categories' => PublicCategoryResource::collection(
                 $this->whenLoaded('categories')
             ),
             'menuItems' => PublicMenuItemResource::collection(
