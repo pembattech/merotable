@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\AdminMenuItemResource;
 use App\Http\Resources\V1\PublicMenuItemResource;
+use App\Http\Resources\V1\PublicStaffResource;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\OrderActivity;
@@ -147,7 +148,7 @@ class RestaurantController extends Controller
             'password' => 'required|string',
         ]);
 
-        $staff = User::where('email', $request->email)->first();
+        $staff = User::with('restaurant')->where('email', $request->email)->first();
 
         if (!$staff || !Hash::check($request->password, $staff->password)) {
             throw ValidationException::withMessages([
@@ -166,7 +167,7 @@ class RestaurantController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'staff' => $staff,
+            'staff' => new PublicStaffResource($staff),
             'token' => $token,
         ]);
     }

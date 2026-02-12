@@ -679,7 +679,7 @@
             if (currentUserType === 'restaurant') {
                 endpoint = `${API_BASE_URL}/restaurant/login`;
             } else if (currentUserType === 'staff') {
-                endpoint = `${API_BASE_URL}/user/login`;
+                endpoint = `${API_BASE_URL}/staff/login`;
             }
 
             setButtonLoading('loginBtn', true);
@@ -701,14 +701,20 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    console.log(data.data);
 
-                    // TODO: Refactor as the response coming from Resources
-                    // Store token and user info
-                    localStorage.setItem('auth_token', data.token);
-                    localStorage.setItem('user_type', currentUserType);
-                    localStorage.setItem('user_name', data.data.name);
-                    localStorage.setItem('restro_url', data.data.slug);
+                    if (currentUserType === 'restaurant') {
+                        localStorage.setItem('auth_token', data.token);
+                        localStorage.setItem('user_type', currentUserType);
+                        localStorage.setItem('user_name', data.data.name);
+                        localStorage.setItem('restro_url', data.data.slug);
+                    } else{
+                        localStorage.setItem('auth_token', data.token);
+                        localStorage.setItem('user_type', currentUserType);
+                        localStorage.setItem('user_name', data.staff.name);
+                        localStorage.setItem('user_role', data.staff.role);
+                        localStorage.setItem('restro_name', data.staff.restaurant.name);
+                        localStorage.setItem('restro_url', data.staff.restaurant.slug);
+                    }
 
                     showAlert('loginAlert', `Login successful! Welcome ${currentUserType}`, 'success');
 

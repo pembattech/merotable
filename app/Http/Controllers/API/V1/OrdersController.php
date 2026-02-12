@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\MenuItem;
 use App\Models\OrderActivity;
+use App\Models\Table;
 use Illuminate\Support\Facades\DB;
 
 class OrdersController extends Controller
@@ -17,14 +18,31 @@ class OrdersController extends Controller
         $staff = auth('staff')->user();
 
 
-        $request->validate([
+        $validated = $request->validate([
             'table_id' => 'required|integer|exists:tables,id',
             'items' => 'required|array|min:1',
             'items.*.menu_item_id' => 'required|integer|exists:menu_items,id',
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
+
         return DB::transaction(function () use ($request, $staff) {
+
+            $occupiedTable = Table::where('id', $request->table_id)
+                ->where('restaurant_id', $staff->restaurant_id)
+                ->where('status', 'occupied')
+                ->lockForUpdate()
+                ->first();
+
+            if ($occupiedTable) {
+                return response()->json([
+                    'message' => 'This table already has an active order',
+                    'table_name' => $occupiedTable->table_name ?? $occupiedTable->id,
+
+                ], 409);
+            }
+
+
 
             // Create order
             $order = Order::create([
@@ -35,12 +53,27 @@ class OrdersController extends Controller
 
             $total = 0;
 
+
             foreach ($request->items as $item) {
 
                 $menuItem = MenuItem::where('id', $item['menu_item_id'])
-                    ->where('restaurant_id', $staff->restaurant_id) // 🔒 safety
-                    ->where('is_available', 1)
-                    ->firstOrFail();
+                    ->where('restaurant_id', $staff->restaurant_id)
+                    ->first();
+
+                if (!$menuItem) {
+                    return response()->json([
+                        'message' => 'Menu item not found',
+                        'item_name' => 'Unknown item'
+                    ], 404);
+                }
+
+                if (!$menuItem->is_available) {
+                    return response()->json([
+                        'message' => 'Menu item is currently unavailable',
+                        'item_name' => $menuItem->name
+                    ], 422);
+                }
+
 
                 $lineTotal = $menuItem->price * $item['quantity'];
                 $total += $lineTotal;
@@ -58,12 +91,18 @@ class OrdersController extends Controller
                 'staff_id' => $staff->id,
                 'action' => 'created',
                 'meta' => '{
-                    "table_id": ' . $request->table_id . ',
-                    "items_count": ' . count($request->items) . '
-                }',
+                "table_id": ' . $request->table_id . ',
+                "items_count": ' . count($request->items) . '
+            }',
             ]);
 
             $order->update(['total_amount' => $total]);
+
+            $order->table()->update([
+                'status' => 'occupied'
+            ]);
+
+
 
             return response()->json([
                 'message' => 'Order placed successfully',
@@ -71,6 +110,43 @@ class OrdersController extends Controller
                 'total' => $total
             ], 201);
         });
+    }
+
+    public function getOrderByTable(Request $request)
+    {
+        $staff = auth('staff')->user();
+        $tableId = $request->tableId;
+
+        $order = Order::with('orderItems.menuItem', 'table')
+            ->where('table_id', $tableId)
+            ->where('restaurant_id', $staff->restaurant_id)
+            ->where('status', 'open') // only active orders
+            ->first();
+
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'No active order for this table',
+                'items' => 0,
+            ], 200);
+        }
+
+        return response()->json([
+            'order_id' => $order->id,
+            'table_name' => $order->table->table_number ?? null,
+            'items' => $order->orderItems->map(function ($item) {
+                return [
+                    'menu_item_id' => $item->menu_item_id,
+                    'name' => $item->menuItem->name ?? 'Unknown',
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'item_status'=> $item->status,
+                    'line_total' => $item->quantity * $item->price,
+                ];
+            }),
+            'total' => $order->total_amount,
+            'status' => $order->status,
+        ]);
     }
 
 
@@ -88,17 +164,17 @@ class OrdersController extends Controller
         ], 200);
     }
 
-//     public function addItem(Request $request, Order $order)
+    //     public function addItem(Request $request, Order $order)
 // {
 //     $request->validate([
 //         'menu_item_id' => 'required|exists:menu_items,id',
 //         'qty' => 'required|integer|min:1',
 //     ]);
 
-//     $staff = auth()->user();
+    //     $staff = auth()->user();
 //     $menuItem = MenuItem::findOrFail($request->menu_item_id);
 
-//     // 1️⃣ Update current state
+    //     // 1️⃣ Update current state
 //     $item = $order->items()->updateOrCreate(
 //         ['menu_item_id' => $menuItem->id],
 //         [
@@ -107,12 +183,12 @@ class OrdersController extends Controller
 //         ]
 //     );
 
-//     // 2️⃣ Recalculate order total
+    //     // 2️⃣ Recalculate order total
 //     $order->update([
 //         'total_amount' => $order->items()->sum(DB::raw('qty * price')),
 //     ]);
 
-//     // 3️⃣ Log activity
+    //     // 3️⃣ Log activity
 //     OrderActivity::create([
 //         'order_id' => $order->id,
 //         'staff_id' => $staff->id,
@@ -125,33 +201,33 @@ class OrdersController extends Controller
 //         ],
 //     ]);
 
-//     return response()->json(['message' => 'Item added']);
+    //     return response()->json(['message' => 'Item added']);
 // }
 
 
-// public function updateItem(Request $request, Order $order)
+    // public function updateItem(Request $request, Order $order)
 // {
 //     $request->validate([
 //         'menu_item_id' => 'required|exists:menu_items,id',
 //         'qty' => 'required|integer|min:1',
 //     ]);
 
-//     $staff = auth()->user();
+    //     $staff = auth()->user();
 
-//     $item = $order->items()
+    //     $item = $order->items()
 //         ->where('menu_item_id', $request->menu_item_id)
 //         ->firstOrFail();
 
-//     $oldQty = $item->qty;
+    //     $oldQty = $item->qty;
 
-//     // 1️⃣ Update state
+    //     // 1️⃣ Update state
 //     $item->update(['qty' => $request->qty]);
 
-//     $order->update([
+    //     $order->update([
 //         'total_amount' => $order->items()->sum(DB::raw('qty * price')),
 //     ]);
 
-//     // 2️⃣ Log history
+    //     // 2️⃣ Log history
 //     OrderActivity::create([
 //         'order_id' => $order->id,
 //         'staff_id' => $staff->id,
@@ -163,20 +239,20 @@ class OrdersController extends Controller
 //         ],
 //     ]);
 
-//     return response()->json(['message' => 'Item updated']);
+    //     return response()->json(['message' => 'Item updated']);
 // }
 
-// public function cancel(Request $request, Order $order)
+    // public function cancel(Request $request, Order $order)
 // {
 //     $request->validate([
 //         'reason' => 'required|string',
 //     ]);
 
-//     $staff = auth()->user();
+    //     $staff = auth()->user();
 
-//     $order->update(['status' => 'cancelled']);
+    //     $order->update(['status' => 'cancelled']);
 
-//     OrderActivity::create([
+    //     OrderActivity::create([
 //         'order_id' => $order->id,
 //         'staff_id' => $staff->id,
 //         'action' => 'cancelled',
@@ -186,22 +262,22 @@ class OrdersController extends Controller
 //         ],
 //     ]);
 
-//     return response()->json(['message' => 'Order cancelled']);
+    //     return response()->json(['message' => 'Order cancelled']);
 // }
 
 
-// public function updateStatus(Request $request, Order $order)
+    // public function updateStatus(Request $request, Order $order)
 // {
 //     $request->validate([
 //         'status' => 'required|in:preparing,served,closed,paid',
 //     ]);
 
-//     $staff = auth()->user();
+    //     $staff = auth()->user();
 //     $oldStatus = $order->status;
 
-//     $order->update(['status' => $request->status]);
+    //     $order->update(['status' => $request->status]);
 
-//     OrderActivity::create([
+    //     OrderActivity::create([
 //         'order_id' => $order->id,
 //         'staff_id' => $staff->id,
 //         'action' => 'status_changed',
@@ -211,47 +287,47 @@ class OrdersController extends Controller
 //         ],
 //     ]);
 
-//     return response()->json(['message' => 'Status updated']);
+    //     return response()->json(['message' => 'Status updated']);
 // }
 
-public function activityTimeline(Order $order)
-{
-    $timeline = $order->activities()
-        ->with('staff:id,name,role')
-        ->orderBy('created_at')
-        ->get()
-        ->map(function ($activity) {
+    public function activityTimeline(Order $order)
+    {
+        $timeline = $order->activities()
+            ->with('staff:id,name,role')
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($activity) {
 
-            $time = $activity->created_at->format('H:i');
+                $time = $activity->created_at->format('H:i');
 
-            $name = $activity->staff?->name ?? 'System';
-            $role = $activity->staff?->role
-                ? ' (' . ucfirst($activity->staff->role) . ')'
-                : '';
+                $name = $activity->staff?->name ?? 'System';
+                $role = $activity->staff?->role
+                    ? ' (' . ucfirst($activity->staff->role) . ')'
+                    : '';
 
-            $text = match ($activity->action) {
+                $text = match ($activity->action) {
 
-                'created' =>
+                    'created' =>
                     "created order",
 
-                'item_added' =>
+                    'item_added' =>
                     "added {$activity->meta['name']} x{$activity->meta['qty']}",
 
-                'item_updated' =>
+                    'item_updated' =>
                     "updated {$activity->meta['name']} qty ({$activity->meta['old_qty']} → {$activity->meta['new_qty']})",
 
-                'cancelled' =>
+                    'cancelled' =>
                     "cancelled order ({$activity->meta['reason']})",
 
-                default =>
+                    default =>
                     $activity->action,
-            };
+                };
 
-            return "{$time} — {$name}{$role} {$text}";
-        });
+                return "{$time} — {$name}{$role} {$text}";
+            });
 
-    return response()->json($timeline);
-}
+        return response()->json($timeline);
+    }
 
 
 }

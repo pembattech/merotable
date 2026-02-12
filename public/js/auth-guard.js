@@ -25,7 +25,7 @@
             window.location.replace(redirectTo);
             return;
         }
-        document.body.style.display = 'block';
+        showBody();
     };
 
     window.requireAuth = function (redirectTo = '/auth') {

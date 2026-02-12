@@ -10,6 +10,7 @@ use App\Http\Controllers\API\V1\AdminController;
 use App\Http\Controllers\API\V1\OrdersController;
 use App\Http\Controllers\API\V1\MenuController;
 use App\Http\Controllers\API\V1\CategoryController;
+use App\Http\Controllers\API\V1\StaffController;
 use App\Http\Controllers\API\V1\TableController;
 
 
@@ -25,8 +26,9 @@ Route::prefix('v1/auth')->group(function () {
     // AUTH
     Route::post('restaurant/register', [AuthController::class, 'registerRestaurant']);
     Route::post('restaurant/login', [AuthController::class, 'loginRestaurant']);
-    Route::post('user/register', [AuthController::class, 'registerUser']);
-    Route::post('user/login', [AuthController::class, 'loginUser']);
+    // Route::post('user/register', [AuthController::class, 'registerUser']);
+    // Route::post('user/login', [AuthController::class, 'loginUser']);
+    Route::post('staff/login', [RestaurantController::class, 'loginStaff']);
 
     Route::post('logout', [AuthController::class, 'logout']);
 
@@ -68,11 +70,18 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVer
 
 // Staff Routes
 Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
-    Route::post('/login', [RestaurantController::class, 'loginStaff']);
     Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
     Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
 
     Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
+
+    Route::get('/{restaurant:slug}/menu',[StaffController::class, 'getStaffMenu']);
+    Route::get('/{restaurant:slug}/categories', [StaffController::class, 'fetchPublicCategories']);
+
+    Route::get('/{restaurant:slug}/tables', [StaffController::class, 'fetchTables']);
+
+    Route::post('/{restaurant:slug}/orders', [OrdersController::class, 'store']);
+    Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
 
 
 });

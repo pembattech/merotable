@@ -11,6 +11,7 @@ use App\Models\Restaurant;
 
 use App\Http\Resources\V1\RestaurantResource;
 use App\Http\Resources\V1\UserAuthResource;
+use App\Http\Resources\V1\PublicStaffResource;
 
 class AuthController extends Controller
 {
@@ -108,7 +109,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('restaurant')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -130,9 +131,8 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'user' => $user,
-            'role' => $user->role,
             'token' => $token,
+            'data' => new PublicStaffResource($user),
         ]);
     }
 
