@@ -11,6 +11,7 @@ use App\Models\OrderActivity;
 use App\Models\Table;
 use Illuminate\Support\Facades\DB;
 
+
 class OrdersController extends Controller
 {
     public function store(Request $request)
@@ -142,6 +143,7 @@ class OrdersController extends Controller
                     'price' => $item->price,
                     'item_status'=> $item->status,
                     'line_total' => $item->quantity * $item->price,
+                    'time' => $item->created_at->diffForHumans(),
                 ];
             }),
             'total' => $order->total_amount,

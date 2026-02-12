@@ -3,812 +3,7 @@
 @section('title', 'Take Order | ' . config('app.name'))
 
 @section('content')
-<div class="min-h-screen bg-gray-50 p-4 md:p-6">
-    <div class="max-w-7xl mx-auto">
-        
-        <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Take Order</h1>
-            <p class="text-gray-600 mt-1">Select items and assign to a table</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- LEFT: Menu & Categories (2/3 width) -->
-            <div class="lg:col-span-2 space-y-4">
-
-                <!-- Search Bar -->
-                <div class="bg-white rounded-lg shadow-sm p-4">
-                    <div class="relative">
-                        <input
-                            id="searchInput"
-                            type="text"
-                            placeholder="Search menu items..."
-                            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            onkeyup="filterMenu()"
-                        >
-                        <svg class="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Categories -->
-                <div class="bg-white rounded-lg shadow-sm p-4">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3">Categories</h3>
-                    <div class="flex gap-2 overflow-x-auto pb-2" id="categories"></div>
-                </div>
-
-                <!-- Menu Items -->
-                <div class="bg-white rounded-lg shadow-sm p-4">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Menu Items</h3>
-                    <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
-                </div>
-            </div>
-
-            <!-- RIGHT: Cart (1/3 width) -->
-            <div class="lg:col-span-1 space-y-4">
-                <!-- Current Order Card -->
-                <div class="bg-white rounded-lg shadow-sm p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">Current Order</h3>
-                        <span id="cartCount" class="bg-blue-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full">0</span>
-                    </div>
-
-                    <!-- Table Selection -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Table</label>
-                        <select id="tableSelect" onchange="onTableChange()" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Choose a table...</option>
-                        </select>
-                    </div>
-
-                    <!-- Cart Items -->
-                    <div class="border-t border-b border-gray-200 py-4 mb-4">
-                        <div id="cart" class="space-y-3 max-h-96 overflow-y-auto">
-                            <div class="text-center py-8 text-gray-400">
-                                <svg class="mx-auto h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                                <p class="text-sm">No items added</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order Summary -->
-                    <div class="space-y-2 mb-4">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Subtotal</span>
-                            <span id="subtotal" class="font-semibold">Rs. 0</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Items</span>
-                            <span id="totalItems" class="font-semibold">0</span>
-                        </div>
-                        <div class="flex justify-between text-base font-bold pt-2 border-t">
-                            <span>Total</span>
-                            <span id="total" class="text-blue-600">Rs. 0</span>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="space-y-2">
-                        <button 
-                            onclick="submitOrder()" 
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Place Order
-                        </button>
-                        <button 
-                            onclick="clearCart()" 
-                            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition duration-200">
-                            Clear Cart
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Previously Ordered Items Card -->
-                <div id="previousOrdersCard" class="bg-white rounded-lg shadow-sm p-5 hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">Previous Orders</h3>
-                        <span class="text-xs text-gray-500">Table <span id="selectedTableNumber">-</span></span>
-                    </div>
-
-                    <div id="previousOrders" class="space-y-3 max-h-80 overflow-y-auto">
-                        <!-- Previous orders will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- ====== CANCEL ORDER MODAL ======  -->
-<div id="cancelModal" class="fixed inset-0 z-50 hidden items-center justify-center">
-    <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCancelModal()"></div>
-
-    <!-- Modal Box -->
-    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-modal">
-
-        <!-- Red top bar -->
-        <div class="bg-red-500 px-6 py-5">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/20 rounded-full p-2">
-                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-white font-bold text-lg">Cancel Order</h2>
-                    <p class="text-red-100 text-sm" id="cancelModalSubtitle">Order item</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="p-6">
-
-            <!-- Cancellation Reason -->
-            <div class="mb-5">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Why is this order being cancelled?</label>
-                <div class="grid grid-cols-2 gap-2" id="reasonButtons">
-                    <button onclick="selectReason(this, 'Customer changed mind')"
-                        class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                        😕 Changed mind
-                    </button>
-                    <button onclick="selectReason(this, 'Item unavailable')"
-                        class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                        🚫 Item unavailable
-                    </button>
-                    <button onclick="selectReason(this, 'Wrong item ordered')"
-                        class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                        ❌ Wrong item
-                    </button>
-                    <button onclick="selectReason(this, 'Customer leaving')"
-                        class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                        🚶 Customer leaving
-                    </button>
-                    <button onclick="selectReason(this, 'Long waiting time')"
-                        class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                        ⏱️ Long wait time
-                    </button>
-                    <button onclick="selectReason(this, 'Other')"
-                        class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                        📝 Other
-                    </button>
-                </div>
-            </div>
-
-            <!-- Additional Notes -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Additional notes <span class="text-gray-400 font-normal">(optional)</span></label>
-                <textarea
-                    id="cancelNotes"
-                    rows="3"
-                    placeholder="Add any extra details about the cancellation..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none"
-                ></textarea>
-            </div>
-
-            <!-- Error message -->
-            <p id="cancelError" class="text-red-500 text-xs mb-3 hidden">Please select a reason before cancelling.</p>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-3">
-                <button onclick="closeCancelModal()"
-                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition duration-200">
-                    Go Back
-                </button>
-                <button onclick="confirmCancel()"
-                    class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Confirm Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ====== SUCCESS TOAST ====== -->
-<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
-    <div id="toastBox" class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px]">
-        <span id="toastIcon" class="text-lg"></span>
-        <span id="toastMsg"></span>
-    </div>
-</div>
-
-<style>
-@keyframes modalIn {
-    from { opacity: 0; transform: scale(0.95) translateY(10px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-.animate-modal { animation: modalIn 0.2s ease-out forwards; }
-</style>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<script>
-let cart = [];
-let allMenuItems = [];
-let activeCategory = '';
-let selectedTableId = null;
-
-// ================= SAMPLE DATA =================
-const SAMPLE_CATEGORIES = [
-    { id: 1, name: 'Appetizers' },
-    { id: 2, name: 'Main Course' },
-    { id: 3, name: 'Desserts' },
-    { id: 4, name: 'Beverages' },
-    { id: 5, name: 'Specials' }
-];
-
-const SAMPLE_MENU_ITEMS = [
-    // Appetizers
-    { id: 1, name: 'Spring Rolls', price: 250, category_id: 1, isAvailable: true },
-    { id: 2, name: 'Chicken Wings', price: 350, category_id: 1, isAvailable: true },
-    { id: 3, name: 'Momo (Veg)', price: 200, category_id: 1, isAvailable: true },
-    { id: 4, name: 'Momo (Chicken)', price: 250, category_id: 1, isAvailable: true },
-    { id: 5, name: 'French Fries', price: 180, category_id: 1, isAvailable: false },
-    
-    // Main Course
-    { id: 6, name: 'Chicken Biryani', price: 450, category_id: 2, isAvailable: true },
-    { id: 7, name: 'Butter Chicken', price: 500, category_id: 2, isAvailable: true },
-    { id: 8, name: 'Dal Bhat Set', price: 350, category_id: 2, isAvailable: true },
-    { id: 9, name: 'Chowmein (Veg)', price: 200, category_id: 2, isAvailable: true },
-    { id: 10, name: 'Chowmein (Chicken)', price: 250, category_id: 2, isAvailable: true },
-    { id: 11, name: 'Fried Rice', price: 280, category_id: 2, isAvailable: true },
-    { id: 12, name: 'Pizza Margherita', price: 550, category_id: 2, isAvailable: true },
-    
-    // Desserts
-    { id: 13, name: 'Ice Cream Sundae', price: 200, category_id: 3, isAvailable: true },
-    { id: 14, name: 'Chocolate Brownie', price: 250, category_id: 3, isAvailable: true },
-    { id: 15, name: 'Gulab Jamun', price: 150, category_id: 3, isAvailable: true },
-    { id: 16, name: 'Cheesecake', price: 350, category_id: 3, isAvailable: false },
-    
-    // Beverages
-    { id: 17, name: 'Coca Cola', price: 80, category_id: 4, isAvailable: true },
-    { id: 18, name: 'Fresh Lime Soda', price: 100, category_id: 4, isAvailable: true },
-    { id: 19, name: 'Mango Lassi', price: 150, category_id: 4, isAvailable: true },
-    { id: 20, name: 'Masala Tea', price: 50, category_id: 4, isAvailable: true },
-    { id: 21, name: 'Coffee', price: 100, category_id: 4, isAvailable: true },
-    
-    // Specials
-    { id: 22, name: 'Chef Special Thali', price: 650, category_id: 5, isAvailable: true },
-    { id: 23, name: 'Grilled Fish', price: 700, category_id: 5, isAvailable: true },
-    { id: 24, name: 'Tandoori Platter', price: 850, category_id: 5, isAvailable: true }
-];
-
-const SAMPLE_TABLES = [
-    { id: 1, table_number: 'T-01', status: 'occupied' },
-    { id: 2, table_number: 'T-02', status: 'available' },
-    { id: 3, table_number: 'T-03', status: 'occupied' },
-    { id: 4, table_number: 'T-04', status: 'available' },
-    { id: 5, table_number: 'T-05', status: 'available' },
-    { id: 6, table_number: 'T-06', status: 'occupied' },
-    { id: 7, table_number: 'T-07', status: 'available' },
-    { id: 8, table_number: 'T-08', status: 'available' }
-];
-
-// Previous orders for tables
-const PREVIOUS_ORDERS = {
-    1: [ // Table T-01
-        { id: 1, name: 'Chicken Biryani', qty: 2, price: 450, status: 'preparing', time: '10 mins ago' },
-        { id: 2, name: 'Mango Lassi', qty: 2, price: 150, status: 'served', time: '10 mins ago' },
-        { id: 3, name: 'Spring Rolls', qty: 1, price: 250, status: 'served', time: '15 mins ago' }
-    ],
-    3: [ // Table T-03
-        { id: 6, name: 'Dal Bhat Set', qty: 1, price: 350, status: 'preparing', time: '5 mins ago' },
-        { id: 17, name: 'Coca Cola', qty: 1, price: 80, status: 'served', time: '5 mins ago' }
-    ],
-    6: [ // Table T-06
-        { id: 7, name: 'Butter Chicken', qty: 1, price: 500, status: 'served', time: '20 mins ago' },
-        { id: 8, name: 'Dal Bhat Set', qty: 1, price: 350, status: 'served', time: '20 mins ago' },
-        { id: 19, name: 'Mango Lassi', qty: 2, price: 150, status: 'served', time: '20 mins ago' },
-        { id: 15, name: 'Gulab Jamun', qty: 2, price: 150, status: 'preparing', time: '2 mins ago' }
-    ]
-};
-
-// ================= CATEGORY LOGIC =================
-function loadCategories() {
-    let html = `
-        <button id="cat-all"
-            onclick="setActiveCategory('')"
-            class="cat-btn px-4 py-2 rounded-lg bg-blue-600 text-white font-medium text-sm whitespace-nowrap transition duration-200">
-            All Items
-        </button>
-    `;
-
-    SAMPLE_CATEGORIES.forEach(cat => {
-        html += `
-            <button id="cat-${cat.id}"
-                onclick="setActiveCategory(${cat.id})"
-                class="cat-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium text-sm whitespace-nowrap hover:bg-gray-200 transition duration-200">
-                ${cat.name}
-            </button>`;
-    });
-
-    document.getElementById('categories').innerHTML = html;
-}
-
-function setActiveCategory(id = '') {
-    activeCategory = id;
-
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('bg-blue-600', 'text-white');
-        btn.classList.add('bg-gray-100', 'text-gray-700');
-    });
-
-    const activeBtn = document.getElementById(`cat-${id || 'all'}`);
-    if (activeBtn) {
-        activeBtn.classList.remove('bg-gray-100', 'text-gray-700');
-        activeBtn.classList.add('bg-blue-600', 'text-white');
-    }
-
-    loadMenu(id);
-}
-
-// ================= MENU LOGIC =================
-function loadMenu(categoryId = '') {
-    if (categoryId === '') {
-        allMenuItems = [...SAMPLE_MENU_ITEMS];
-    } else {
-        allMenuItems = SAMPLE_MENU_ITEMS.filter(item => item.category_id === categoryId);
-    }
-
-    renderMenu(allMenuItems);
-}
-
-function getCartQty(id) {
-    const item = cart.find(i => i.id === id);
-    return item ? item.qty : 0;
-}
-
-function renderMenu(items) {
-    let html = '';
-
-    if (items.length === 0) {
-        html = `
-            <div class="col-span-2 text-center py-12 text-gray-400">
-                <svg class="mx-auto h-16 w-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
-                <p class="font-medium">No items found</p>
-                <p class="text-sm mt-1">Try adjusting your search or category filter</p>
-            </div>
-        `;
-    } else {
-        items.forEach(item => {
-            const qty = getCartQty(item.id);
-
-            html += `
-            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200 ${!item.isAvailable ? 'opacity-60' : ''}">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800 mb-1">${item.name}</h4>
-                        <p class="text-blue-600 font-bold text-lg">Rs. ${item.price}</p>
-                    </div>
-                    ${!item.isAvailable ? `
-                        <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
-                    ` : qty > 0 ? `
-                        <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
-                    ` : ''}
-                </div>
-
-                ${
-                    !item.isAvailable
-                    ? `<button disabled
-                            class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
-                            Unavailable
-                       </button>`
-                    : qty === 0
-                    ? `<button
-                            class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center gap-2"
-                            onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Add to Cart
-                       </button>`
-                    : `<div class="flex items-center justify-between gap-2">
-                            <button onclick="updateQty(${item.id}, -1)"
-                                class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
-                                −
-                            </button>
-
-                            <span class="font-bold text-lg px-4">${qty}</span>
-
-                            <button onclick="updateQty(${item.id}, 1)"
-                                class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
-                                +
-                            </button>
-                       </div>`
-                }
-            </div>`;
-        });
-    }
-
-    document.getElementById('menu').innerHTML = html;
-}
-
-// ================= CART LOGIC =================
-function addToCart(id, name, price) {
-    const found = cart.find(i => i.id === id);
-    if (found) {
-        found.qty++;
-    } else {
-        cart.push({ id, name, price, qty: 1 });
-    }
-
-    renderCart();
-    renderMenu(allMenuItems);
-}
-
-function updateQty(id, change) {
-    const item = cart.find(i => i.id === id);
-    if (!item) return;
-
-    item.qty += change;
-
-    if (item.qty <= 0) {
-        cart = cart.filter(i => i.id !== id);
-    }
-
-    renderCart();
-    renderMenu(allMenuItems);
-}
-
-function renderCart() {
-    let html = '';
-    let subtotal = 0;
-    let totalItems = 0;
-
-    if (cart.length === 0) {
-        document.getElementById('cart').innerHTML = `
-            <div class="text-center py-8 text-gray-400">
-                <svg class="mx-auto h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                <p class="text-sm">No items added</p>
-            </div>
-        `;
-    } else {
-        cart.forEach(i => {
-            const itemTotal = i.price * i.qty;
-            subtotal += itemTotal;
-            totalItems += i.qty;
-
-            html += `
-            <div class="flex justify-between items-start gap-3 pb-3 border-b border-gray-100 last:border-0">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800 text-sm">${i.name}</p>
-                    <p class="text-xs text-gray-500 mt-1">Rs. ${i.price} × ${i.qty}</p>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1 bg-gray-100 rounded-lg">
-                        <button onclick="updateQty(${i.id}, -1)"
-                            class="px-2 py-1 hover:bg-gray-200 rounded-l-lg transition">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                            </svg>
-                        </button>
-                        <span class="px-2 font-semibold text-sm min-w-[24px] text-center">${i.qty}</span>
-                        <button onclick="updateQty(${i.id}, 1)"
-                            class="px-2 py-1 hover:bg-gray-200 rounded-r-lg transition">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" />
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="font-bold text-sm text-gray-800 min-w-[60px] text-right">Rs. ${itemTotal}</p>
-                </div>
-            </div>`;
-        });
-
-        document.getElementById('cart').innerHTML = html;
-    }
-
-    document.getElementById('cartCount').textContent = totalItems;
-    document.getElementById('subtotal').textContent = `Rs. ${subtotal}`;
-    document.getElementById('total').textContent = `Rs. ${subtotal}`;
-    document.getElementById('totalItems').textContent = totalItems;
-}
-
-function clearCart() {
-    if (cart.length === 0) return;
-    
-    if (confirm('Are you sure you want to clear the cart?')) {
-        cart = [];
-        renderCart();
-        renderMenu(allMenuItems);
-    }
-}
-
-// ================= SEARCH BAR =================
-function filterMenu() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allMenuItems.filter(i => i.name.toLowerCase().includes(q));
-    renderMenu(filtered);
-}
-
-// ================= TABLES =================
-function loadTables() {
-    let html = '<option value="">Choose a table...</option>';
-    SAMPLE_TABLES.forEach(t => {
-        const statusBadge = t.status === 'occupied' ? '🔴' : '🟢';
-        html += `<option value="${t.id}">${statusBadge} Table ${t.table_number}</option>`;
-    });
-    document.getElementById('tableSelect').innerHTML = html;
-}
-
-// ================= TABLE CHANGE HANDLER =================
-function onTableChange() {
-    const tableId = parseInt(document.getElementById('tableSelect').value);
-    selectedTableId = tableId;
-
-    if (!tableId) {
-        document.getElementById('previousOrdersCard').classList.add('hidden');
-        return;
-    }
-
-    // Get table info
-    const table = SAMPLE_TABLES.find(t => t.id === tableId);
-    if (table) {
-        document.getElementById('selectedTableNumber').textContent = table.table_number;
-    }
-
-    // Load previous orders for this table
-    loadPreviousOrders(tableId);
-}
-
-function loadPreviousOrders(tableId) {
-    const previousOrders = PREVIOUS_ORDERS[tableId];
-
-    if (!previousOrders || previousOrders.length === 0) {
-        document.getElementById('previousOrdersCard').classList.add('hidden');
-        return;
-    }
-
-    document.getElementById('previousOrdersCard').classList.remove('hidden');
-    renderPreviousOrders(tableId);
-}
-
-function renderPreviousOrders(tableId) {
-    const orders = PREVIOUS_ORDERS[tableId];
-    if (!orders) return;
-
-    let html = '';
-    orders.forEach((order, index) => {
-        if (order.cancelled) {
-            html += `
-            <div class="border border-gray-200 rounded-lg p-3 bg-gray-50 opacity-60">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-500 text-sm line-through">${order.name}</p>
-                        <p class="text-xs text-gray-400 mt-1">Rs. ${order.price} × ${order.qty}</p>
-                    </div>
-                    <span class="bg-red-100 text-red-500 text-xs font-semibold px-2 py-1 rounded">Cancelled</span>
-                </div>
-                ${order.cancelReason ? `<p class="text-xs text-gray-400 mt-2 italic">Reason: ${order.cancelReason}</p>` : ''}
-            </div>`;
-            return;
-        }
-
-        const statusClass = order.status === 'served'
-            ? 'bg-green-100 text-green-700'
-            : 'bg-orange-100 text-orange-700';
-
-        // Only allow cancellation for non-served items
-        const canCancel = order.status !== 'served';
-
-        html += `
-        <div id="order-item-${index}" class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition">
-            <div class="flex justify-between items-start mb-2">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800 text-sm">${order.name}</p>
-                    <p class="text-xs text-gray-500 mt-1">Rs. ${order.price} × ${order.qty} = <span class="font-semibold">Rs. ${order.price * order.qty}</span></p>
-                </div>
-                <span class="${statusClass} text-xs font-semibold px-2 py-1 rounded capitalize ml-2">
-                    ${order.status}
-                </span>
-            </div>
-            <div class="flex justify-between items-center">
-                <p class="text-xs text-gray-400">${order.time}</p>
-                <div class="flex items-center gap-2">
-                    <button
-                        onclick="reorderItem(${order.id}, '${order.name.replace(/'/g, "\\'")}', ${order.price}, this)"
-                        class="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition">
-                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Reorder
-                    </button>
-                    ${canCancel ? `
-                    <span class="text-gray-300">|</span>
-                    <button
-                        onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
-                        class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
-                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Cancel
-                    </button>` : ''}
-                </div>
-            </div>
-        </div>`;
-    });
-
-    document.getElementById('previousOrders').innerHTML = html;
-}
-
-function reorderItem(id, name, price, btn) {
-    addToCart(id, name, price);
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = `<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-    </svg> Added!`;
-    btn.classList.add('text-green-600');
-    btn.classList.remove('text-blue-600');
-    setTimeout(() => {
-        btn.innerHTML = originalHTML;
-        btn.classList.remove('text-green-600');
-        btn.classList.add('text-blue-600');
-    }, 1200);
-}
-
-// ================= CANCEL ORDER MODAL =================
-let cancelContext = { tableId: null, orderIndex: null };
-let selectedReason = '';
-
-function openCancelModal(tableId, orderIndex, itemName) {
-    cancelContext = { tableId, orderIndex };
-    selectedReason = '';
-
-    document.getElementById('cancelModalSubtitle').textContent = itemName;
-    document.getElementById('cancelNotes').value = '';
-    document.getElementById('cancelError').classList.add('hidden');
-
-    // Reset reason buttons
-    document.querySelectorAll('.reason-btn').forEach(btn => {
-        btn.classList.remove('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
-        btn.classList.add('border-gray-200', 'text-gray-700');
-    });
-
-    const modal = document.getElementById('cancelModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-}
-
-function closeCancelModal() {
-    const modal = document.getElementById('cancelModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    cancelContext = { tableId: null, orderIndex: null };
-    selectedReason = '';
-}
-
-function selectReason(btn, reason) {
-    selectedReason = reason;
-    document.getElementById('cancelError').classList.add('hidden');
-
-    document.querySelectorAll('.reason-btn').forEach(b => {
-        b.classList.remove('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
-        b.classList.add('border-gray-200', 'text-gray-700');
-    });
-
-    btn.classList.add('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
-    btn.classList.remove('border-gray-200', 'text-gray-700');
-}
-
-function confirmCancel() {
-    if (!selectedReason) {
-        document.getElementById('cancelError').classList.remove('hidden');
-        return;
-    }
-
-    const notes = document.getElementById('cancelNotes').value.trim();
-    const fullReason = notes ? `${selectedReason} — ${notes}` : selectedReason;
-
-    const { tableId, orderIndex } = cancelContext;
-    if (tableId && orderIndex !== null && PREVIOUS_ORDERS[tableId]) {
-        PREVIOUS_ORDERS[tableId][orderIndex].cancelled = true;
-        PREVIOUS_ORDERS[tableId][orderIndex].cancelReason = fullReason;
-    }
-
-    closeCancelModal();
-    renderPreviousOrders(tableId);
-    showToast('Order item cancelled', 'error');
-}
-
-// ================= SUBMIT ORDER =================
-function submitOrder() {
-    const tableId = document.getElementById('tableSelect').value;
-
-    if (!tableId) {
-        showToast('Please select a table', 'warning');
-        return;
-    }
-
-    if (cart.length === 0) {
-        showToast('Cart is empty. Please add items first.', 'warning');
-        return;
-    }
-
-    const table = SAMPLE_TABLES.find(t => t.id == tableId);
-    const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-    // Add to previous orders (simulate placing)
-    if (!PREVIOUS_ORDERS[tableId]) PREVIOUS_ORDERS[tableId] = [];
-    cart.forEach(i => {
-        PREVIOUS_ORDERS[tableId].unshift({
-            id: i.id, name: i.name, qty: i.qty,
-            price: i.price, status: 'preparing', time: 'Just now'
-        });
-    });
-
-    cart = [];
-    renderCart();
-    renderMenu(allMenuItems);
-    loadPreviousOrders(parseInt(tableId));
-
-    showToast(`Order placed for ${table.table_number}! Total: Rs. ${total}`, 'success');
-}
-
-// ================= TOAST =================
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    const box = document.getElementById('toastBox');
-    const icon = document.getElementById('toastIcon');
-    const msg = document.getElementById('toastMsg');
-
-    const styles = {
-        success: { bg: 'bg-green-600', icon: '✓' },
-        error:   { bg: 'bg-red-500',   icon: '✕' },
-        warning: { bg: 'bg-orange-500', icon: '!' },
-    };
-    const s = styles[type] || styles.success;
-
-    box.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px] ${s.bg}`;
-    icon.textContent = s.icon;
-    msg.textContent = message;
-
-    toast.classList.remove('hidden');
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
-}
-
-// ================= INITIAL LOAD =================
-document.addEventListener('DOMContentLoaded', () => {
-    loadCategories();
-    loadMenu();
-    loadTables();
-});
-
-// Fallback for immediate execution
-loadCategories();
-loadMenu();
-loadTables();
-</script>
-@endsection
-
-
-
-
-
-@extends('layouts.staff')
-
-@section('title', 'Take Order | ' . config('app.name'))
-
-@section('content')
-    <div class="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div class="">
         <div class="max-w-7xl mx-auto">
 
             <!-- Header -->
@@ -826,7 +21,7 @@ loadTables();
                     <div class="bg-white rounded-lg shadow-sm p-4">
                         <div class="relative">
                             <input id="searchInput" type="text" placeholder="Search menu items..."
-                                class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full pl-10 pr-4 py-2.5 outline-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 onkeyup="filterMenu()">
                             <svg class="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -863,7 +58,7 @@ loadTables();
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Select Table</label>
                             <select id="tableSelect" onchange="onTableChange()"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-0">
                                 <option value="">Choose a table...</option>
                             </select>
                         </div>
@@ -930,6 +125,126 @@ loadTables();
 
             </div>
         </div>
+    </div>
+
+    <!-- ====== CANCEL ORDER MODAL ======  -->
+    <div id="cancelModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCancelModal()"></div>
+
+        <!-- Modal Box -->
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-modal">
+
+            <!-- Red top bar -->
+            <div class="bg-red-500 px-6 py-5">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 rounded-full p-2">
+                        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-bold text-lg">Cancel Order</h2>
+                        <p class="text-red-100 text-sm" id="cancelModalSubtitle">Order item</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+
+                <!-- Cancellation Reason -->
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Why is this order being
+                        cancelled?</label>
+                    <div class="grid grid-cols-2 gap-2" id="reasonButtons">
+                        <button onclick="selectReason(this, 'Customer changed mind')"
+                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
+                            😕 Changed mind
+                        </button>
+                        <button onclick="selectReason(this, 'Item unavailable')"
+                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
+                            🚫 Item unavailable
+                        </button>
+                        <button onclick="selectReason(this, 'Wrong item ordered')"
+                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
+                            ❌ Wrong item
+                        </button>
+                        <button onclick="selectReason(this, 'Customer leaving')"
+                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
+                            🚶 Customer leaving
+                        </button>
+                        <button onclick="selectReason(this, 'Long waiting time')"
+                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
+                            ⏱️ Long wait time
+                        </button>
+                        <button onclick="selectReason(this, 'Other')"
+                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
+                            📝 Other
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Additional notes <span
+                            class="text-gray-400 font-normal">(optional)</span></label>
+                    <textarea id="cancelNotes" rows="3" placeholder="Add any extra details about the cancellation..."
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none"></textarea>
+                </div>
+
+                <!-- Error message -->
+                <p id="cancelError" class="text-red-500 text-xs mb-3 hidden">Please select a reason before cancelling.</p>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3">
+                    <button onclick="closeCancelModal()"
+                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition duration-200">
+                        Go Back
+                    </button>
+                    <button onclick="confirmCancel()"
+                        class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Confirm Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== SUCCESS TOAST ====== -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+        <div id="toastBox"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px]">
+            <span id="toastIcon" class="text-lg"></span>
+            <span id="toastMsg"></span>
+        </div>
+    </div>
+
+    <style>
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .animate-modal {
+            animation: modalIn 0.2s ease-out forwards;
+        }
+    </style>
+    </div>
+
+    </div>
+    </div>
     </div>
 
     <script>
@@ -1061,40 +376,40 @@ loadTables();
                         <p class="text-blue-600 font-bold text-lg">Rs. ${item.price}</p>
                     </div>
                     ${!item.isAvailable ? `
-                                                <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
-                                            ` : qty > 0 ? `
-                                                <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
-                                            ` : ''}
+                                                                        <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
+                                                                    ` : qty > 0 ? `
+                                                                        <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
+                                                                    ` : ''}
                 </div>
 
                 ${
                     !item.isAvailable
                     ? `<button disabled
-                                                    class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
-                                                    Unavailable
-                                               </button>`
+                                                                            class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
+                                                                            Unavailable
+                                                                       </button>`
                     : qty === 0
                     ? `<button
-                                                    class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center gap-2"
-                                                    onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                    </svg>
-                                                    Add to Cart
-                                               </button>`
+                                                                            class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center gap-2"
+                                                                            onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
+                                                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                                            </svg>
+                                                                            Add to Cart
+                                                                       </button>`
                     : `<div class="flex items-center justify-between gap-2">
-                                                    <button onclick="updateQty(${item.id}, -1)"
-                                                        class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
-                                                        −
-                                                    </button>
+                                                                            <button onclick="updateQty(${item.id}, -1)"
+                                                                                class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
+                                                                                −
+                                                                            </button>
 
-                                                    <span class="font-bold text-lg px-4">${qty}</span>
+                                                                            <span class="font-bold text-lg px-4">${qty}</span>
 
-                                                    <button onclick="updateQty(${item.id}, 1)"
-                                                        class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
-                                                        +
-                                                    </button>
-                                               </div>`
+                                                                            <button onclick="updateQty(${item.id}, 1)"
+                                                                                class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
+                                                                                +
+                                                                            </button>
+                                                                       </div>`
                 }
             </div>`;
                 });
@@ -1273,14 +588,32 @@ loadTables();
 
 
                 let html = '';
-                data.items.forEach(order => {
+                data.items.forEach((order, index) => {
+                    if (order.item_status === 'cancelled') {
+
+                        html += `
+            <div class="border border-gray-200 rounded-lg p-3 bg-gray-50 opacity-60">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-500 text-sm line-through">${order.name}</p>
+                        <p class="text-xs text-gray-400 mt-1">Rs. ${order.price} × ${order.quantity}</p>
+                    </div>
+                    <span class="bg-red-100 text-red-500 text-xs font-semibold px-2 py-1 rounded">Cancelled</span>
+                </div>
+                ${order.cancelReason ? `<p class="text-xs text-gray-400 mt-2 italic">Reason: ${order.cancelReason}</p>` : ''}
+            </div>`;
+                        return;
+                    }
 
                     // TODO: add more status color
-                    const statusClass = order.item_status === 'served' ?
+                    order.item_status === 'served' ?
                         'bg-green-100 text-green-700' :
                         'bg-orange-100 text-orange-700';
 
-                    console.log(statusClass);
+
+                    // Only allow cancellation for non-served items
+                    const canCancel = order.item_status !== 'served';
+
 
                     html += `
         <div class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition">
@@ -1289,20 +622,32 @@ loadTables();
                     <p class="font-medium text-gray-800 text-sm">${order.name}</p>
                     <p class="text-xs text-gray-500 mt-1">Rs. ${order.price} × ${order.quantity} = Rs. ${order.price * order.quantity}</p>
                 </div>
-                <span class="${statusClass} text-xs font-semibold px-2 py-1 rounded capitalize">
+                <span class="${order.item_status} text-xs font-semibold px-2 py-1 rounded capitalize">
                     ${order.item_status}
                 </span>
             </div>
             <div class="flex justify-between items-center">
                 <p class="text-xs text-gray-400">${order.time}</p>
-                <button 
-                    onclick="reorderItem(${order.id}, '${order.name.replace(/'/g, "\\'")}', ${order.price})"
-                    class="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-                    <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Reorder
-                </button>
+                <div class="flex items-center gap-2">
+                    <button
+                        onclick="reorderItem(${order.id}, '${order.name.replace(/'/g, "\\'")}', ${order.price}, this)"
+                        class="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition">
+                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Reorder
+                    </button>
+                    ${canCancel ? `
+                                            <span class="text-gray-300">|</span>
+                                            <button
+                                                onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
+                                                class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
+                                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                Cancel
+                                            </button>` : ''}
+                </div>
             </div>
         </div>`;
                 });
@@ -1330,6 +675,83 @@ loadTables();
             }, 500);
         }
 
+
+        // ================= CANCEL ORDER MODAL =================
+        let cancelContext = {
+            tableId: null,
+            orderIndex: null
+        };
+        let selectedReason = '';
+
+        function openCancelModal(tableId, orderIndex, itemName) {
+            cancelContext = {
+                tableId,
+                orderIndex
+            };
+            selectedReason = '';
+
+            document.getElementById('cancelModalSubtitle').textContent = itemName;
+            document.getElementById('cancelNotes').value = '';
+            document.getElementById('cancelError').classList.add('hidden');
+
+            // Reset reason buttons
+            document.querySelectorAll('.reason-btn').forEach(btn => {
+                btn.classList.remove('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
+                btn.classList.add('border-gray-200', 'text-gray-700');
+            });
+
+            const modal = document.getElementById('cancelModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCancelModal() {
+            const modal = document.getElementById('cancelModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            cancelContext = {
+                tableId: null,
+                orderIndex: null
+            };
+            selectedReason = '';
+        }
+
+        function selectReason(btn, reason) {
+            selectedReason = reason;
+            document.getElementById('cancelError').classList.add('hidden');
+
+            document.querySelectorAll('.reason-btn').forEach(b => {
+                b.classList.remove('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
+                b.classList.add('border-gray-200', 'text-gray-700');
+            });
+
+            btn.classList.add('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
+            btn.classList.remove('border-gray-200', 'text-gray-700');
+        }
+
+        function confirmCancel() {
+            if (!selectedReason) {
+                document.getElementById('cancelError').classList.remove('hidden');
+                return;
+            }
+
+            const notes = document.getElementById('cancelNotes').value.trim();
+            const fullReason = notes ? `${selectedReason} — ${notes}` : selectedReason;
+
+            const {
+                tableId,
+                orderIndex
+            } = cancelContext;
+            if (tableId && orderIndex !== null && PREVIOUS_ORDERS[tableId]) {
+                PREVIOUS_ORDERS[tableId][orderIndex].cancelled = true;
+                PREVIOUS_ORDERS[tableId][orderIndex].cancelReason = fullReason;
+            }
+
+            closeCancelModal();
+            renderPreviousOrders(tableId);
+            showToast('Order item cancelled', 'error');
+        }
+
         // ================= SUBMIT ORDER =================
         async function submitOrder() {
             const tableId = document.getElementById('tableSelect').value;
@@ -1343,6 +765,8 @@ loadTables();
                 alert('Cart is empty. Please add items before placing order.');
                 return;
             }
+
+            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
             try {
                 const res = await fetch(`/api/v1/staff/${slug}/orders`, {
@@ -1362,6 +786,8 @@ loadTables();
 
                 if (!res.ok) {
                     throw new Error('Failed to place order');
+                    showToast(`Failed to place order for T${tableId}!`, 'error');
+
                 }
 
                 // Success
@@ -1370,12 +796,48 @@ loadTables();
                 renderMenu(allMenuItems);
                 document.getElementById('tableSelect').value = '';
 
-                alert('✓ Order placed successfully!');
+                showToast(`Order placed for T${tableId}! Total: Rs. ${total}`, 'success');
+
             } catch (error) {
+
+                showToast(`Failed to place order for T${tableId}!`, 'error');
                 console.error('Order error:', error);
-                alert('Failed to place order. Please try again.');
             }
         }
+
+        // ================= TOAST =================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const box = document.getElementById('toastBox');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMsg');
+
+            const styles = {
+                success: {
+                    bg: 'bg-green-600',
+                    icon: '✓'
+                },
+                error: {
+                    bg: 'bg-red-500',
+                    icon: '✕'
+                },
+                warning: {
+                    bg: 'bg-orange-500',
+                    icon: '!'
+                },
+            };
+            const s = styles[type] || styles.success;
+
+            box.className =
+                `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px] ${s.bg}`;
+            icon.textContent = s.icon;
+            msg.textContent = message;
+
+            toast.classList.remove('hidden');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
 
         // ================= INITIAL LOAD =================
         document.addEventListener('DOMContentLoaded', () => {

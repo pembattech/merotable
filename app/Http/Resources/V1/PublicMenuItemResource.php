@@ -24,7 +24,7 @@ class PublicMenuItemResource extends JsonResource
             'isAvailable' => (bool) $this->is_available,
 
             // // Timestamps (camelCase for JS apps)
-            // 'createdAt' => $this->created_at->toISOString(),
+            'createdAt' => $this->created_at->toISOString(),
             // 'updatedAt' => $this->updated_at->toISOString(),
 
             // expose category as object

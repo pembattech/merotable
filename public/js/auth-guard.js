@@ -1,11 +1,19 @@
 (function () {
 
-    function showBody() {
+    function showBody(user_type) {
         if (document.body) {
-            document.body.style.display = 'flex';
+            if (userType !== 'staff') {
+                document.body.style.display = 'flex';
+            } else {
+                document.body.style.display = 'block';
+            }
         } else {
             document.addEventListener('DOMContentLoaded', function () {
-                document.body.style.display = 'flex';
+                if (userType !== 'staff') {
+                    document.body.style.display = 'flex';
+                } else {
+                    document.body.style.display = 'block';
+                }
             });
         }
     }
@@ -25,7 +33,7 @@
             window.location.replace(redirectTo);
             return;
         }
-        showBody();
+        showBody(user_type = userType);
     };
 
     window.requireAuth = function (redirectTo = '/auth') {
@@ -35,7 +43,8 @@
             return;
         }
 
-        showBody();
+        showBody(user_type = userType);
+
     };
 
 })();
