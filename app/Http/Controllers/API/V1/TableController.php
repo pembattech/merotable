@@ -6,9 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Http\Resources\V1\TableResource;
+use App\Models\Table;
+use App\Models\Restaurant;
 
 class TableController extends Controller
 {
+
+    public function tableStatus(Restaurant $restaurant, $tableId)
+    {
+        $staff = auth('staff')->user();
+
+
+        $tables = Table::where('id', $tableId)
+        // ->where('restaurant_id', $staff->restaurant_id)
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'tableStatus' => $tables->status,
+        ]);
+    }
+
     public function fetchTables(Request $request)
     {
         $restaurant = auth('restaurant')->user();

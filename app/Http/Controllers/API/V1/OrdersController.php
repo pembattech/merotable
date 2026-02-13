@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\MenuItem;
 use App\Models\OrderActivity;
+use App\Models\Restaurant;
 use App\Models\Table;
 use Illuminate\Support\Facades\DB;
 
@@ -135,13 +136,14 @@ class OrdersController extends Controller
         return response()->json([
             'order_id' => $order->id,
             'table_name' => $order->table->table_number ?? null,
+            'table_status' => $order->table->status ?? null,
             'items' => $order->orderItems->map(function ($item) {
                 return [
                     'menu_item_id' => $item->menu_item_id,
                     'name' => $item->menuItem->name ?? 'Unknown',
                     'quantity' => $item->quantity,
                     'price' => $item->price,
-                    'item_status'=> $item->status,
+                    'item_status' => $item->status,
                     'line_total' => $item->quantity * $item->price,
                     'time' => $item->created_at->diffForHumans(),
                 ];
@@ -166,45 +168,81 @@ class OrdersController extends Controller
         ], 200);
     }
 
-    //     public function addItem(Request $request, Order $order)
-// {
-//     $request->validate([
-//         'menu_item_id' => 'required|exists:menu_items,id',
-//         'qty' => 'required|integer|min:1',
-//     ]);
+    public function addItem(Request $request)
+    {
+        $validated = $request->validate([
+            'table_id' => 'required|integer|exists:tables,id',
+            'items' => 'required|array|min:1',
+            'items.*.menu_item_id' => 'required|integer|exists:menu_items,id',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
 
-    //     $staff = auth()->user();
-//     $menuItem = MenuItem::findOrFail($request->menu_item_id);
+        $staff = auth('staff')->user();
+        $restaurantId =$staff->restaurant->id;
 
-    //     // 1️⃣ Update current state
-//     $item = $order->items()->updateOrCreate(
-//         ['menu_item_id' => $menuItem->id],
-//         [
-//             'qty' => DB::raw("qty + {$request->qty}"),
-//             'price' => $menuItem->price,
-//         ]
-//     );
+        $order = Order::where('table_id', $validated['table_id'])
+        ->where('restaurant_id', $restaurantId)
+        ->first();
 
-    //     // 2️⃣ Recalculate order total
-//     $order->update([
-//         'total_amount' => $order->items()->sum(DB::raw('qty * price')),
-//     ]);
+        $orderId = $order->id;
 
-    //     // 3️⃣ Log activity
-//     OrderActivity::create([
-//         'order_id' => $order->id,
-//         'staff_id' => $staff->id,
-//         'action' => 'item_added',
-//         'meta' => [
-//             'menu_item_id' => $menuItem->id,
-//             'name' => $menuItem->name,
-//             'qty' => $request->qty,
-//             'price' => $menuItem->price,
-//         ],
-//     ]);
 
-    //     return response()->json(['message' => 'Item added']);
-// }
+        DB::transaction(function () use ($validated, $order, $staff) {
+
+            foreach ($validated['items'] as $itemData) {
+
+                $menuItem = MenuItem::findOrFail($itemData['menu_item_id']);
+
+                // 1️⃣ Add or update item
+                $orderItem = $order->orderItems()
+                    ->where('menu_item_id', $menuItem->id)
+                    ->first();
+
+
+                if ($orderItem) {
+                    $orderItem->increment('quantity', $itemData['quantity']);
+                } else {
+                    $orderItem = $order->orderItems()->create([
+                        'order_id' => $order->id,
+                        'menu_item_id' => $menuItem->id,
+                        'quantity' => $itemData['quantity'],
+                        'price' => $menuItem->price,
+                        'status' => 'pending',
+
+                    ]);
+                }
+
+
+                // 2️⃣ Log activity
+                OrderActivity::create([
+                    'order_id' => $order->id,
+                    'staff_id' => $staff->id,
+                    'action' => 'item_added',
+                    'meta' => [
+                        'menu_item_id' => $menuItem->id,
+                        'name' => $menuItem->name,
+                        'quantity' => $itemData['quantity'],
+                        'price' => $menuItem->price,
+                    ],
+                ]);
+            }
+
+            // 3️⃣ Recalculate total
+            $order->update([
+                'total_amount' => $order->orderItems()
+                    ->selectRaw('SUM(quantity * price) as total')
+                    ->value('total'),
+            ]);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Items added successfully',
+        ]);
+
+
+    }
+
 
 
     // public function updateItem(Request $request, Order $order)

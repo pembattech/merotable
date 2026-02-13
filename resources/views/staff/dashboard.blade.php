@@ -376,40 +376,40 @@
                         <p class="text-blue-600 font-bold text-lg">Rs. ${item.price}</p>
                     </div>
                     ${!item.isAvailable ? `
-                                                                        <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
-                                                                    ` : qty > 0 ? `
-                                                                        <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
-                                                                    ` : ''}
+                                                                                                <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
+                                                                                            ` : qty > 0 ? `
+                                                                                                <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
+                                                                                            ` : ''}
                 </div>
 
                 ${
                     !item.isAvailable
                     ? `<button disabled
-                                                                            class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
-                                                                            Unavailable
-                                                                       </button>`
+                                                                                                    class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
+                                                                                                    Unavailable
+                                                                                               </button>`
                     : qty === 0
                     ? `<button
-                                                                            class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center gap-2"
-                                                                            onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                                                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                                            </svg>
-                                                                            Add to Cart
-                                                                       </button>`
+                                                                                                    class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center gap-2"
+                                                                                                    onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
+                                                                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                                                                    </svg>
+                                                                                                    Add to Cart
+                                                                                               </button>`
                     : `<div class="flex items-center justify-between gap-2">
-                                                                            <button onclick="updateQty(${item.id}, -1)"
-                                                                                class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
-                                                                                −
-                                                                            </button>
+                                                                                                    <button onclick="updateQty(${item.id}, -1)"
+                                                                                                        class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
+                                                                                                        −
+                                                                                                    </button>
 
-                                                                            <span class="font-bold text-lg px-4">${qty}</span>
+                                                                                                    <span class="font-bold text-lg px-4">${qty}</span>
 
-                                                                            <button onclick="updateQty(${item.id}, 1)"
-                                                                                class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
-                                                                                +
-                                                                            </button>
-                                                                       </div>`
+                                                                                                    <button onclick="updateQty(${item.id}, 1)"
+                                                                                                        class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
+                                                                                                        +
+                                                                                                    </button>
+                                                                                               </div>`
                 }
             </div>`;
                 });
@@ -638,15 +638,15 @@
                         Reorder
                     </button>
                     ${canCancel ? `
-                                            <span class="text-gray-300">|</span>
-                                            <button
-                                                onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
-                                                class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
-                                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                                Cancel
-                                            </button>` : ''}
+                                                                    <span class="text-gray-300">|</span>
+                                                                    <button
+                                                                        onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
+                                                                        class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
+                                                                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                        </svg>
+                                                                        Cancel
+                                                                    </button>` : ''}
                 </div>
             </div>
         </div>`;
@@ -748,13 +748,15 @@
             }
 
             closeCancelModal();
-            renderPreviousOrders(tableId);
+            loadPreviousOrders(tableId);
             showToast('Order item cancelled', 'error');
         }
 
         // ================= SUBMIT ORDER =================
         async function submitOrder() {
             const tableId = document.getElementById('tableSelect').value;
+
+
 
             if (!tableId) {
                 alert('Please select a table');
@@ -768,6 +770,76 @@
 
             const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
+            const res = await fetch(`/api/v1/staff/${slug}/table/${tableId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!res.ok) {
+                throw new Error(`Failed to retrieve T${tableId} status`);
+                showToast(`Failed to retrieve T${tableId} status!`, 'error');
+
+            }
+
+            const data = await res.json();
+            console.log(data)
+
+            if (data.tableStatus === 'occupied') {
+                // Table has active order → find that order id, then call addItem
+                await addItemsToExistingOrder(tableId, total);
+            } else if (data.tableStatus === 'available') {
+                // Fresh table → call store
+                await createNewOrder(tableId, total);
+            } else {
+                alert('reserved');
+            }
+
+            loadPreviousOrders(tableId);
+        }
+
+        async function addItemsToExistingOrder(tableId, total) {
+            try {
+                const res = await fetch(`/api/v1/staff/${slug}/add-items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        table_id: tableId,
+                        items: cart.map(i => ({
+                            menu_item_id: i.id,
+                            quantity: i.qty
+                        }))
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to place order');
+                    showToast(`Failed to place order for T${tableId}!`, 'error');
+
+                }
+
+                // Success
+                cart = [];
+                renderCart();
+                renderMenu(allMenuItems);
+                document.getElementById('tableSelect').value = '';
+
+                showToast(`Order placed for T${tableId}! Total: Rs. ${total}`, 'success');
+
+            } catch (error) {
+
+                showToast(`Failed to place order for T${tableId}!`, 'error');
+                console.error('Order error:', error);
+            }
+        }
+
+
+        async function createNewOrder(tableId, total) {
             try {
                 const res = await fetch(`/api/v1/staff/${slug}/orders`, {
                     method: 'POST',

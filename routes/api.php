@@ -79,8 +79,11 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::get('/{restaurant:slug}/categories', [StaffController::class, 'fetchPublicCategories']);
 
     Route::get('/{restaurant:slug}/tables', [StaffController::class, 'fetchTables']);
+    Route::get('/{restaurant:slug}/table/{tableId}', [TableController::class, 'tableStatus']);
+
 
     Route::post('/{restaurant:slug}/orders', [OrdersController::class, 'store']);
+    Route::post('/{restaurant:slug}/add-items', [OrdersController::class, 'addItem']);
     Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
 
 
