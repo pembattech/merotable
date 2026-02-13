@@ -432,6 +432,8 @@
                 });
             }
 
+            console.log(id, name, price)
+
             renderCart();
             renderMenu(allMenuItems); // Re-render menu to show updated quantities
         }
@@ -586,7 +588,6 @@
 
                 document.getElementById('previousOrdersCard').classList.remove('hidden');
 
-
                 let html = '';
                 data.items.forEach((order, index) => {
                     if (order.item_status === 'cancelled') {
@@ -630,7 +631,7 @@
                 <p class="text-xs text-gray-400">${order.time}</p>
                 <div class="flex items-center gap-2">
                     <button
-                        onclick="reorderItem(${order.id}, '${order.name.replace(/'/g, "\\'")}', ${order.price}, this)"
+                        onclick="reorderItem(${order.menu_item_id}, '${order.name.replace(/'/g, "\\'")}', ${order.price}, this)"
                         class="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition">
                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
