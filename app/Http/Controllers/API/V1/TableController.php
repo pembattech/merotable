@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 use App\Http\Resources\V1\TableResource;
 use App\Models\Table;
@@ -18,7 +19,7 @@ class TableController extends Controller
 
 
         $tables = Table::where('id', $tableId)
-        // ->where('restaurant_id', $staff->restaurant_id)
+            // ->where('restaurant_id', $staff->restaurant_id)
             ->first();
 
         return response()->json([
@@ -31,7 +32,41 @@ class TableController extends Controller
     {
         $restaurant = auth('restaurant')->user();
 
-        $tables = $restaurant->tables;
+        // Eager load today's orders (completed + open for real-time tracking)
+        // $tables = $restaurant->tables()
+        //     // ->with([
+        //     //     'orders' => function ($query) {
+        //     //         $query->whereDate('created_at', Carbon::today());
+        //     //             // ->whereIn('status', ['open', 'completed']);
+        //     //     }
+        //     // ])
+        //     ->get();
+
+        $tables = $restaurant->tables()
+            ->with([
+                'orders' => function ($query) {
+                    $query->whereDate('created_at', Carbon::today());
+                }
+            ])
+            ->get();
+        // return response()->json([
+        //     'tables' => $tables,
+        //     'order' => $orders,
+        // ]);
+
+        // Map tables with today total amount
+        $tablesData = $tables->map(function ($table) {
+            $todayTotalAmount = $table->orders->sum('total_amount');
+
+            return [
+                'id' => $table->id,
+                'table_number' => $table->table_number,
+                'status' => $table->status,
+                'today_total_amount' => $todayTotalAmount,
+            ];
+        });
+
+        // Counts
         $occupiedTablesCount = $tables->where('status', 'occupied')->count();
         $availableTablesCount = $tables->where('status', 'available')->count();
         $reservedTablesCount = $tables->where('status', 'reserved')->count();
@@ -40,7 +75,7 @@ class TableController extends Controller
             'success' => true,
             'message' => 'Tables fetched successfully',
             'data' => [
-                'tables' => TableResource::collection($tables),
+                'tables' => $tablesData,
                 'occupied_tables_count' => $occupiedTablesCount,
                 'available_tables_count' => $availableTablesCount,
                 'reserved_tables_count' => $reservedTablesCount,
@@ -56,7 +91,14 @@ class TableController extends Controller
             ->where('id', $tableId)
             ->with([
                 'orders' => function ($q) {
-                    $q->whereIn('status', ['completed', 'paid']);
+                    $q->whereIn('status', ['open', 'completed', 'paid'])
+                        ->with([
+                            'orderItems.menuItem:id,name',
+                            'activities' => function ($q) {  // activities relation
+                                $q->select('id', 'order_id', 'staff_id', 'action', 'meta', 'created_at')
+                                    ->with('staff:id,name,role');     // nested staff name
+                            }
+                        ]);
                 }
             ])
             ->first();
