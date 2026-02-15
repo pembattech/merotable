@@ -267,6 +267,10 @@
             });
 
             const data = await res.json();
+            if (!data.success) {
+                    showToast(data.message || 'Something went wrong ❌', 'error');
+                    return;
+                }
 
             let html = `
         <button id="cat-all"
@@ -334,12 +338,12 @@
                 }
             });
 
-            if (!res.ok) {
-                console.error('Failed to load menu');
-                return;
-            }
-
             const data = await res.json();
+            if (!data.success) {
+                    showToast(data.message || 'Something went wrong ❌', 'error');
+                    return;
+                }
+                
             allMenuItems = data.data;
 
             renderMenu(allMenuItems);
@@ -390,7 +394,7 @@
                                                                                                </button>`
                     : qty === 0
                     ? `<button
-                                                                                                    class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center gap-2"
+                                                                                                    class="w-full bg-gradient-to-br from-indigo-600 to-blue-600 text-white py-2.5 rounded-lg hover:ring-2 hover:ring-indigo-400 transition duration-200 font-medium flex items-center justify-center gap-2"
                                                                                                     onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
                                                                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -536,6 +540,10 @@
                 }
             });
             const data = await res.json();
+            if (!data.success) {
+                    showToast(data.message || 'Something went wrong ❌', 'error');
+                    return;
+                }
 
             let html = '<option value="">Choose a table...</option>';
             data.data.forEach(t => {

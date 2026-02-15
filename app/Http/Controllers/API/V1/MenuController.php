@@ -20,7 +20,7 @@ class MenuController extends Controller
             'category_id' => 'nullable|exists:categories,id',
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'is_available' => 'sometimes|boolean',
+            'is_available' => 'nullable|boolean',
         ]);
 
         // Attach restaurant_id securely
@@ -28,6 +28,18 @@ class MenuController extends Controller
 
         // Set default availability if not provided
         $validatedData['is_available'] = $validatedData['is_available'] ?? true;
+
+
+        $exists = MenuItem::where('restaurant_id', $restaurant->id)
+            ->where('name', $validatedData['name'])
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A menu item with this name already exists.',
+            ], 422);
+        }
 
         // Create menu item
         $menuItem = MenuItem::create($validatedData);
@@ -59,6 +71,21 @@ class MenuController extends Controller
             'price' => 'sometimes|numeric|min:0',
             'is_available' => 'sometimes|boolean',
         ]);
+
+        if (!empty($validatedData['name'])) {
+            $exists = MenuItem::where('restaurant_id', $restaurant->id)
+                ->where('name', $validatedData['name'])
+                ->where('id', '!=', $menuItem->id)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A menu item with this name already exists.',
+                ], 422);
+            }
+        }
+
 
         $menuItem->update($validatedData);
 

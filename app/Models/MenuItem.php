@@ -14,6 +14,10 @@ class MenuItem extends Model
         'is_available',
     ];
 
+    protected $casts = [
+        'is_available' => 'boolean',
+    ];
+
     /**
      * A menu item belongs to a restaurant
      */

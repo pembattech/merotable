@@ -199,7 +199,7 @@
                         bg: 'bg-gradient-to-br from-amber-400 to-orange-400 text-white',
                         border: 'border-amber-500',
                         badge: 'bg-white/20 text-white',
-                        ring: ''
+                        ring: 'ring-2 ring-amber-300'
                     }
                 };
 
@@ -255,6 +255,10 @@
                 });
 
                 const data = await res.json();
+                if (!data.success) {
+                    showToast(data.message || 'Something went wrong ❌', 'error');
+                    return;
+                }
 
                 document.getElementById('orderContent').innerHTML = orderHTML(data.data);
             }
