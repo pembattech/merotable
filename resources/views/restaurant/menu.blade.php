@@ -82,7 +82,7 @@
 
     <header class="flex justify-between items-center mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Menu Management</h1>
+            <h1 class="text-2xl font-extrabold text-gray-800">Menu Management</h1>
             <p class="text-sm text-gray-500">
                 Manage <span id="activeItemCount" class="font-bold"></span> active items across
                 <span id="categoryCount" class="font-bold"></span> categories
@@ -231,7 +231,7 @@
                             <span
                                 class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold select-none">Rs.</span>
                             <input id="menuPrice" type="number" name="price" min="0" placeholder="0"
-                                class="field-input pl-10" />
+                                class="field-input pl-10" style="padding-left: 40px;" />
                         </div>
                     </div>
                     <div>
@@ -685,193 +685,5 @@
         }
     </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    {{-- 
-    <!-- SCRIPT -->
-    <script>
-        const categoryService = new CategoryService();
-        const categorySelect = document.getElementById('categorySelect');
-        // console.log(categoryService);
-
-        async function loadCategories() {
-            const token = localStorage.getItem('auth_token');
-
-            try {
-                const response = await fetch(
-                    '/api/v1/owner/restaurant/categories', {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw result;
-                }
-
-                const select = document.getElementById('categorySelect');
-
-                select.innerHTML = '<option value="">Select category</option>';
-
-                result.data.forEach(category => {
-                    const option = document.createElement('option');
-                    option.value = category.id;
-                    option.textContent = category.name;
-                    select.appendChild(option);
-                });
-
-            } catch (error) {
-                console.error('Failed to load categories', error);
-
-                document.getElementById('categorySelect').innerHTML =
-                    '<option value="">Failed to load</option>';
-            }
-        }
-
-        const drawer = document.getElementById('drawer');
-        const overlay = document.getElementById('overlay');
-        const openBtn = document.getElementById('openAddDrawer');
-        const closeBtn = document.getElementById('closeAddDrawer');
-        const form = document.getElementById('menuAddForm');
-
-        // Open drawer
-        openBtn.addEventListener('click', () => {
-            drawer.classList.remove('translate-x-full');
-            overlay.classList.remove('hidden');
-
-            await loadCategories();
-        });
-
-        // Close drawer
-        function closeDrawer() {
-            drawer.classList.add('translate-x-full');
-            overlay.classList.add('hidden');
-        }
-
-        closeBtn.addEventListener('click', closeDrawer);
-        overlay.addEventListener('click', closeDrawer);
-
-        // Submit form using async fetch
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const token = localStorage.getItem('auth_token');
-
-            const payload = {
-                category_id: Number(form.category_id.value),
-                name: form.name.value,
-                price: Number(form.price.value),
-                is_available: form.is_available.checked
-            };
-
-            try {
-                const response = await fetch(
-                    '/api/v1/owner/restaurant/add-menu', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(payload)
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw data;
-                }
-
-                console.log('Menu added:', data);
-
-                alert('Menu added successfully ✅');
-                form.reset();
-                closeDrawer();
-
-                // OPTIONAL:
-                // refreshMenuList();
-
-            } catch (error) {
-                console.error(error);
-                alert('Something went wrong ❌');
-            }
-        });
-    </script>
- --}}
 
 @endsection

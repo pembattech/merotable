@@ -7,15 +7,6 @@
 
 @section('content')
 
-    <style>
-        .filterBtn {
-            @apply px-4 py-1.5 text-sm rounded-lg font-medium text-gray-600 transition;
-        }
-
-        .filterBtn.active {
-            @apply bg-white shadow text-blue-600;
-        }
-    </style>
 
     <style>
         @keyframes slideUp {
@@ -32,6 +23,23 @@
 
         .animate-slide-up {
             animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .table-status-btn {
+            padding: 6px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.15s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+
+        .table-status-btn.active {
+            background: #1e293b;
+            color: #fff;
         }
 
         .status-pending {
@@ -77,20 +85,65 @@
             background: #e2e8f0;
             border-radius: 2px;
         }
+
+        .filter-wrapper {
+            position: relative;
+            display: flex;
+            gap: 4px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 4px;
+            width: fit-content;
+        }
+
+        /* Sliding background */
+        .slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            width: 0;
+            background: #1e293b;
+            border-radius: 8px;
+            transition: transform 0.3s ease, width 0.3s ease;
+            z-index: 0;
+        }
+
+        .table-status-btn {
+            position: relative;
+            z-index: 1;
+            padding: 6px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: color 0.2s ease;
+        }
+
+        .table-status-btn.active {
+            color: #fff;
+        }
     </style>
 
 
 
 
 
-    <header class="flex justify-between items-center mb-6UIA8">
-        <h1 class="text-2xl font-bold text-gray-800">Table Overview</h1>
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-extrabold text-gray-800">Table Overview</h1>
 
-        <div class="flex gap-2 bg-gray-100 p-1 rounded-xl">
-            <button onclick="setFilter('all')" class="filterBtn active">All</button>
-            <button onclick="setFilter('available')" class="filterBtn">Available</button>
-            <button onclick="setFilter('occupied')" class="filterBtn">Occupied</button>
+        <div class="filter-wrapper">
+            <div class="slider" id="filterSlider"></div>
+
+            <button onclick="setFilter('all', this)" class="table-status-btn active">All</button>
+            <button onclick="setFilter('available', this)" class="table-status-btn">Available</button>
+            <button onclick="setFilter('occupied', this)" class="table-status-btn">Occupied</button>
         </div>
+
 
     </header>
 
@@ -174,12 +227,31 @@
                 });
             }
 
-            function setFilter(filter) {
+            function setFilter(filter, btn) {
                 currentFilter = filter;
-                document.querySelectorAll('.filterBtn').forEach(btn => btn.classList.remove('active'));
-                event.target.classList.add('active');
+
+                document.querySelectorAll('.table-status-btn').forEach(b =>
+                    b.classList.remove('active')
+                );
+
+                btn.classList.add('active');
+                moveSlider(btn);
                 renderTables();
             }
+
+            function moveSlider(btn) {
+                const slider = document.getElementById('filterSlider');
+
+                slider.style.width = btn.offsetWidth + 'px';
+                slider.style.transform = `translateX(${btn.offsetLeft}px)`;
+            }
+
+            // Initialize on load
+            window.addEventListener('load', () => {
+                const activeBtn = document.querySelector('.table-status-btn.active');
+                moveSlider(activeBtn);
+            });
+
 
             function tableCard(table) {
                 const statusStyles = {
@@ -222,13 +294,13 @@
             </div>
 
             ${table.status === 'occupied' ? `
-                                                                                                                                                    <div class="mt-4">
-                                                                                                                                                        <p class="text-xs opacity-80">Current Bill</p>
-                                                                                                                                                        <p class="text-lg font-bold">Rs. ${table.today_total_amount}</p>
-                                                                                                                                                    </div>
-                                                                                                                                                ` : `
-                                                                                                                                                    <div class="mt-6 h-6"></div>
-                                                                                                                                                `}
+                                                                                                                                                                                    <div class="mt-4">
+                                                                                                                                                                                        <p class="text-xs opacity-80">Current Bill</p>
+                                                                                                                                                                                        <p class="text-lg font-bold">Rs. ${table.today_total_amount}</p>
+                                                                                                                                                                                    </div>
+                                                                                                                                                                                ` : `
+                                                                                                                                                                                    <div class="mt-6 h-6"></div>
+                                                                                                                                                                                `}
         </div>
     `;
             }
@@ -340,7 +412,7 @@
 
             function orderHTML(order) {
 
-                
+
                 if (!order) {
                     return `<p class="text-gray-400 text-center mt-10">No active order</p>`;
                 }
@@ -350,7 +422,7 @@
                 const tableStatus = capitalize(order.table.status);
                 const activities = currentOrder.activities;
                 const totalEarning = order.total_earning;
-                
+
 
                 let orderSection = '';
 
@@ -412,29 +484,29 @@
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items Ordered</p>
                 <div id="modal-items" class="space-y-2">
                     ${currentOrder.order_items.map((item, i) => `
-                                                                                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-4 py-3 transition group"
-                                                                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
-                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                <div class="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 group-hover:border-blue-300 transition">
-                                                                                                                    ${item.menu_item_id}
-                                                                                                                </div>
-                                                                                                                <div>
-                                                                                                                    <p class="font-semibold text-gray-800 text-sm">${item.menu_item.name}</p>
-                                                                                                                    <p class="text-xs text-gray-400 mt-0.5">
-                                                                                                                        Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}
-                                                                                                                    </p>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full status-${item.status}">
-                                                                                                                    ${capitalize(item.status)}
-                                                                                                                </span>
-                                                                                                                <p class="font-bold text-gray-800 text-sm min-w-[68px] text-right">
-                                                                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
-                                                                                                                </p>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                            `).join('')}
+                                                                                                                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-4 py-3 transition group"
+                                                                                                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
+                                                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                                                <div class="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 group-hover:border-blue-300 transition">
+                                                                                                                                                    ${item.menu_item_id}
+                                                                                                                                                </div>
+                                                                                                                                                <div>
+                                                                                                                                                    <p class="font-semibold text-gray-800 text-sm">${item.menu_item.name}</p>
+                                                                                                                                                    <p class="text-xs text-gray-400 mt-0.5">
+                                                                                                                                                        Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}
+                                                                                                                                                    </p>
+                                                                                                                                                </div>
+                                                                                                                                            </div>
+                                                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full status-${item.status}">
+                                                                                                                                                    ${capitalize(item.status)}
+                                                                                                                                                </span>
+                                                                                                                                                <p class="font-bold text-gray-800 text-sm min-w-[68px] text-right">
+                                                                                                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
+                                                                                                                                                </p>
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                            `).join('')}
                 </div>
             </div>
 

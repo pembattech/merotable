@@ -25,6 +25,15 @@
 
     <title>@yield('title', 'My Laravel App')</title>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-sizing: border-box;
+        }
+    </style>
+
     {{-- Assets (Vite) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

@@ -6,7 +6,7 @@
 
 
     <header class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-bold text-gray-800">Restaurant Overview</h1>
+        <h1 class="text-2xl font-extrabold text-gray-800">Restaurant Overview</h1>
         <div class="flex items-center space-x-4">
             <span
                 class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold ring-1 ring-green-600">RESTAURANT
