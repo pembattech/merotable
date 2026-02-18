@@ -304,8 +304,8 @@
 
 
     <!-- ══════════════════════════════════════════════
-                                     ADD / EDIT STAFF MODAL
-                                ══════════════════════════════════════════════ -->
+                                                                 ADD / EDIT STAFF MODAL
+                                                            ══════════════════════════════════════════════ -->
     <div id="staffModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
         <div
@@ -336,112 +336,123 @@
             <!-- body -->
             <div class="overflow-y-auto modal-scroll flex-1 px-5 py-5 space-y-4">
 
-                <!-- avatar preview -->
-                <div class="flex justify-center mb-2">
-                    <div id="modalAvatar"
-                        class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-extrabold av-0">?</div>
-                </div>
+                <form>
 
-                <!-- name -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
-                    <input id="fName" type="text" placeholder="e.g. Pemba Tamang" class="field-input"
-                        oninput="updateAvatar(); clearErr('fName')" />
-                    <p class="field-error text-red-500 text-sm" id="err-fName">
-                        <span></span>
-                    </p>
-                </div>
-
-                <!-- email -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-                    <input id="fEmail" type="email" placeholder="staff@example.com" class="field-input"
-                        oninput="clearErr('fEmail')" />
-                    <p class="field-error text-red-500 text-sm" id="err-fEmail">
-                        <span></span>
-                    </p>
-                </div>
-
-                <!-- role -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Role</label>
-                    <div class="relative">
-                        <select id="fRole" class="field-input appearance-none pr-10" onchange="clearErr('fRole')">
-                            <option value="" disabled selected>Select a role</option>
-                            <option value="waiter">Waiter</option>
-                            <option value="cashier">Cashier</option>
-                            <option value="kitchen">Kitchen</option>
-                            <option value="captain">Captain</option>
-                            <option value="manager">Manager</option>
-                        </select>
-                        <svg class="pointer-events-none absolute right-3 top-2.5 h-4 w-4 text-gray-400" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
+                    <!-- avatar preview -->
+                    <div class="flex justify-center mb-2">
+                        <div id="modalAvatar"
+                            class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-extrabold av-0">?
+                        </div>
                     </div>
-                    <p class="field-error text-red-500 text-sm" id="err-fRole">
-                        <span></span>
-                    </p>
-                </div>
 
-                <!-- phone -->
-                <div class="grid grid-cols-2 gap-3">
+                    <!-- name -->
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
-                        <input id="fPhone" type="tel" placeholder="98XXXXXXXX" class="field-input"
-                            oninput="clearErr('fPhone')" />
-                        <p class="field-error text-red-500 text-sm" id="err-fPhone">
-                            <span></span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- password section — only shown when adding new staff -->
-                <div id="passwordSection">
-                    <div class="flex items-center gap-3 my-1">
-                        <div class="flex-1 h-px bg-gray-100"></div>
-                        <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Login Credentials</span>
-                        <div class="flex-1 h-px bg-gray-100"></div>
-                    </div>
-
-                    <!-- password -->
-                    <div class="mt-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
-                        <div class="pw-wrap">
-                            <input id="fPassword" type="password" placeholder="Min. 8 characters" class="field-input" />
-                        </div>
-
-                        <p class="field-error text-red-500 text-sm" id="err-fPassword">
-                            <span></span>
+                        <label for="fName" class="block text-sm font-semibold text-gray-700 mb-1.5">Full Name</label>
+                        <input id="fName" type="text" placeholder="e.g. Pemba Tamang" class="field-input"
+                            oninput="updateAvatar(); clearErr('fName')" />
+                        <p class="field-error text-red-500 text-sm" id="err-fName">
+                            {{-- <span></span> --}}
                         </p>
                     </div>
 
-                    <!-- confirm password -->
-                    <div class="mt-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password</label>
-                        <div class="pw-wrap">
-                            <input id="fPasswordConfirm" type="password" placeholder="Re-enter password"
-                                class="field-input" />
-                        </div>
-                        <p class="field-error text-red-500 text-sm" id="err-fPasswordConfirm">
-                            <span></span>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- status toggle -->
-                <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                    <!-- email -->
                     <div>
-                        <p class="text-sm font-semibold text-gray-700">Active Status</p>
-                        <p class="text-xs text-gray-400">Staff can log in and take orders</p>
+                        <label for="fEmail" class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                        <input id="fEmail" type="email" placeholder="staff@example.com" class="field-input"
+                            oninput="clearErr('fEmail')" />
+                        <p class="field-error text-red-500 text-sm" id="err-fEmail">
+                            {{-- <span></span> --}}
+                        </p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div id="fStatusTog" class="tog-track on" onclick="toggleStatus()">
-                            <div class="tog-thumb"></div>
+
+                    <!-- role -->
+                    <div>
+                        <label for="fRole" class="block text-sm font-semibold text-gray-700 mb-1.5">Role</label>
+                        <div class="relative">
+                            <select id="fRole" class="field-input appearance-none pr-10"
+                                onchange="clearErr('fRole')">
+                                <option value="" disabled selected>Select a role</option>
+                                <option value="waiter">Waiter</option>
+                                <option value="cashier">Cashier</option>
+                                <option value="kitchen">Kitchen</option>
+                                <option value="captain">Captain</option>
+                                <option value="manager">Manager</option>
+                            </select>
+                            <svg class="pointer-events-none absolute right-3 top-2.5 h-4 w-4 text-gray-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
                         </div>
-                        <span id="fStatusLabel" class="text-sm font-semibold text-blue-600">Active</span>
+                        <p class="field-error text-red-500 text-sm" id="err-fRole">
+                            {{-- <span></span> --}}
+                        </p>
                     </div>
-                </div>
+
+                    <!-- phone -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="fPhone" class="block text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
+                            <input id="fPhone" type="tel" placeholder="98XXXXXXXX" class="field-input"
+                                oninput="clearErr('fPhone')" />
+                            <p class="field-error text-red-500 text-sm" id="err-fPhone">
+                                {{-- <span></span> --}}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- password section — only shown when adding new staff -->
+                    <div id="passwordSection">
+                        <div class="flex items-center gap-3 my-1">
+                            <div class="flex-1 h-px bg-gray-100"></div>
+                            <span class="text-xs text-gray-400 font-semibold uppercase tracking-wide">Login
+                                Credentials</span>
+                            <div class="flex-1 h-px bg-gray-100"></div>
+                        </div>
+
+                        <!-- password -->
+                        <div class="mt-4">
+                            <label for ="fPassword"
+                                class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+                            <div class="pw-wrap">
+                                <input id="fPassword" type="password" placeholder="Min. 8 characters"
+                                    class="field-input" />
+                            </div>
+
+                            <p class="field-error text-red-500 text-sm" id="err-fPassword">
+                                {{-- <span></span> --}}
+                            </p>
+                        </div>
+
+                        <!-- confirm password -->
+                        <div class="mt-4">
+                            <label for="fPasswordConfirm" class="block text-sm font-semibold text-gray-700 mb-1.5">Confirm
+                                Password</label>
+                            <div class="pw-wrap">
+                                <input id="fPasswordConfirm" type="password" placeholder="Re-enter password"
+                                    class="field-input" />
+                            </div>
+                            <p class="field-error text-red-500 text-sm" id="err-fPasswordConfirm">
+                                {{-- <span></span> --}}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- status toggle -->
+                    <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-700">Active Status</p>
+                            <p class="text-xs text-gray-400">Staff can log in and take orders</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div id="fStatusTog" class="tog-track on" onclick="toggleStatus()">
+                                <div class="tog-thumb"></div>
+                            </div>
+                            <span id="fStatusLabel" class="text-sm font-semibold text-blue-600">Active</span>
+                        </div>
+                    </div>
+
+                </form>
 
             </div>
 
@@ -501,7 +512,7 @@
     </div>
 
 
-    <div id="staffModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+    {{-- <div id="staffModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800">Add Staff</h3>
@@ -559,7 +570,7 @@
 
             </form>
         </div>
-    </div>
+    </div> --}}
 
 
     <script>
@@ -604,7 +615,6 @@
             });
 
             const data = await res.json();
-            console.log(typeof data.data)
 
             STAFF = data.data; // source of truth
             FILTERED_STAFF = [...STAFF]; // working copy
@@ -626,7 +636,6 @@
             empty.classList.add('hidden');
 
             grid.innerHTML = staffList.map((s, i) => {
-                console.log(s);
                 const initials = s.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
                 const avClass = AV_COLORS[s.id % AV_COLORS.length];
                 const rc = ROLE_COLORS[s.role] || {
@@ -714,8 +723,8 @@
 
         // ── MODAL ─────────────────────────────────────────────────────
         function openModal(id) {
+            clearAllErrors()
 
-            alert(id)
             editingId = id || null;
             fStatusOn = true;
 
@@ -783,25 +792,27 @@
 
         // ── VALIDATION HELPERS ────────────────────────────────────────
         function showErr(fieldId, msg) {
-            const el = document.getElementById(fieldId);
             const errEl = document.getElementById('err-' + fieldId);
-            if (el) el.classList.add('error');
             if (errEl) {
-                errEl.querySelector('span').textContent = msg;
+                errEl.textContent = msg;
                 errEl.classList.add('show');
             }
         }
 
         function clearErr(fieldId) {
-            const el = document.getElementById(fieldId);
             const errEl = document.getElementById('err-' + fieldId);
-            if (el) el.classList.remove('error');
-            if (errEl) errEl.classList.remove('show');
+            if (errEl) {
+                errEl.classList.remove('show');
+                errEl.textContent = '';
+            }
         }
 
         function clearAllErrors() {
-            document.querySelectorAll('.field-input').forEach(el => el.classList.remove('error'));
-            document.querySelectorAll('.field-error').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.field-error')
+                .forEach(el => {
+                    el.classList.remove('show');
+                    el.textContent = '';
+                });
         }
 
 
@@ -881,13 +892,8 @@
             if (!valid) return;
 
             if (editingId) {
-                console.log(editingId)
-
                 // pull from already-loaded list instead of a second API call
-                const s = STAFF.find(x => x.id === id);
-                console.log('-')
-                console.log(s)
-                console.log('-')
+                const s = STAFF.find(x => x.id === editingId);
 
                 document.getElementById('fName').value = s.name || '';
                 document.getElementById('fEmail').value = s.email || '';
@@ -901,26 +907,31 @@
                     role: role,
                 };
 
-                console.log(payload)
+                const res = await fetch(`/api/v1/owner/restaurant/staff/${editingId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(payload),
+                });
 
+                if (!res.ok) {
+                    const err = await res.json();
+                    showToast(err.message || 'Failed to update staff', 'error');
+                    return;
+                }
 
-                // // TODO: change url
-                // const res = await fetch(`/api/v1/staff/${editingId}`, {
-                //     method: 'PUT',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         'Authorization': `Bearer ${token}`,
-                //     },
-                //     body: JSON.stringify(payload),
-                // });
+                const updated = await res.json();
 
-                // if (!res.ok) {
-                //     const err = await res.json();
-                //     showToast(err.message || 'Failed to update staff', 'error');
-                //     return;
-                // }
+                // replace item inside STAFF array
+                const index = STAFF.findIndex(s => s.id === editingId);
+                if (index !== -1) {
+                    STAFF[index] = updated.data;
+                }
 
-                // showToast(`${name} updated`, 'success');
+                showToast(`${name} updated`, 'success');
             } else {
                 const payload = {
                     name: name,
@@ -936,6 +947,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(payload)
@@ -956,6 +968,12 @@
                     return;
                 }
 
+
+                const created = await res.json();
+
+                // add new staff to array
+                STAFF.push(created.data);
+
                 showToast(`${name} added`, 'success');
             }
 
@@ -967,7 +985,6 @@
         // ── DETAIL DRAWER ─────────────────────────────────────────────
         function openDrawer(id) {
             viewingId = id;
-            alert(viewingId)
             const s = STAFF.find(x => x.id === id);
             const initials = s.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
             const avClass = AV_COLORS[s.id % AV_COLORS.length];
@@ -1029,79 +1046,40 @@
         }
 
         function closeDrawer() {
+            clearAllErrors();
             document.getElementById('detailDrawer').classList.replace('flex', 'hidden');
             viewingId = null;
         }
 
         function editFromDrawer() {
-            const id = viewingId; // ← grab it first
-            closeDrawer(); // ← now this can reset viewingId safely
+            const id = viewingId;
+            closeDrawer();
             openModal(id);
         }
 
-        // function toggleActiveFromDrawer() {
-        //     const s = STAFF.find(x => x.id === viewingId);
-        //     s.active = !s.active;
-        //     showToast(`${s.name} ${s.active?'activated':'deactivated'}`, s.active ? 'success' : 'warning');
-        //     closeDrawer();
-        //     renderGrid(STAFF);
-        // }
+        function toggleActiveFromDrawer() {
+            // const s = STAFF.find(x => x.id === viewingId);
+            // s.active = !s.active;
+            // showToast(`${s.name} ${s.active?'activated':'deactivated'}`, s.active ? 'success' : 'warning');
+            // closeDrawer();
+            // renderGrid(STAFF);
 
-        // function deleteStaff() {
-        //     const s = STAFF.find(x => x.id === viewingId);
-        //     if (!confirm(`Remove ${s.name} from staff?`)) return;
-        //     STAFF = STAFF.filter(x => x.id !== viewingId);
-        //     showToast(`${s.name} removed`, 'error');
-        //     closeDrawer();
-        //     renderGrid(STAFF);
-        // }
+            showToast('In Progress', 'error');
+        }
+
+        function deleteStaff() {
+            // const s = STAFF.find(x => x.id === viewingId);
+            // if (!confirm(`Remove ${s.name} from staff?`)) return;
+            // STAFF = STAFF.filter(x => x.id !== viewingId);
+            // showToast(`${s.name} removed`, 'error');
+            // closeDrawer();
+            // renderGrid(STAFF);
+
+            showToast('In Progress', 'error');
+        }
+
+        fetchStaff()
     </script>
-
-    <script>
-        function openStaffModal() {
-            document.getElementById('staffModal').classList.remove('hidden');
-            document.getElementById('staffModal').classList.add('flex');
-        }
-
-        function closeStaffModal() {
-            document.getElementById('staffModal').classList.add('hidden');
-        }
-
-        async function createStaff(e) {
-            e.preventDefault();
-
-            const payload = {
-                name: document.getElementById('staffName').value,
-                email: document.getElementById('staffEmail').value,
-                phone: document.getElementById('staffPhone').value,
-                password: document.getElementById('staffPassword').value,
-                password_confirmation: document.getElementById('staffPasswordConfirm').value,
-                role: document.getElementById('staffRole').value
-            };
-
-            const res = await fetch('/api/v1/owner/restaurant/staff', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!res.ok) {
-                alert('Failed to create staff');
-                return;
-            }
-
-            closeStaffModal();
-            fetchStaff();
-        }
-
-
-        fetchStaff();
-    </script>
-
-
 
 
 @endsection

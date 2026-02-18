@@ -101,7 +101,7 @@ class RestaurantController extends Controller
 
     public function getMenuItems(Restaurant $restaurant)
     {
-        $menuItems = $restaurant->menuItems()->with('restaurant','category')->get();
+        $menuItems = $restaurant->menuItems()->with('restaurant', 'category')->get();
 
         return response()->json([
             'success' => true,
@@ -139,6 +139,50 @@ class RestaurantController extends Controller
             'data' => $staff,
         ], 201);
     }
+
+    public function updateStaff(Request $request, $id)
+    {
+        $restaurant = Auth::user();
+
+        $staff = User::where('restaurant_id', $restaurant->id)->findOrFail($id);
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $staff->id,
+            'password' => 'sometimes|min:6',
+            'role' => 'sometimes|in:staff,waiter,kitchen,cashier,manager',
+            'phone' => 'sometimes|string|max:20',
+        ]);
+
+        if ($request->has('name')) {
+            $staff->name = $request->name;
+        }
+
+        if ($request->has('email')) {
+            $staff->email = $request->email;
+        }
+
+        if ($request->has('phone')) {
+            $staff->phone = $request->phone;
+        }
+
+        if ($request->has('role')) {
+            $staff->role = $request->role;
+        }
+
+        if ($request->filled('password')) {
+            $staff->password = Hash::make($request->password);
+        }
+
+        $staff->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Staff updated successfully',
+            'data' => $staff,
+        ], 200);
+    }
+
 
 
     public function loginStaff(Request $request)

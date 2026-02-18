@@ -47,7 +47,9 @@ Route::prefix('v1/auth')->group(function () {
 // Owner Routes
 Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner/restaurant')->group(function () {
     Route::post('/staff', [RestaurantController::class, 'createStaff']);
+    Route::patch('/staff/{id}', [RestaurantController::class, 'updateStaff']);
     Route::get('/staff', [RestaurantController::class, 'fetchStaff']);
+
     Route::get('/activities', [RestaurantController::class, 'restaurantActivities']);
 
     Route::post('/add-menu', [MenuController::class, 'store']);
