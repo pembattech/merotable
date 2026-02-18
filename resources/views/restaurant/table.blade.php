@@ -294,13 +294,13 @@
             </div>
 
             ${table.status === 'occupied' ? `
-                                                                                                                                                                                    <div class="mt-4">
-                                                                                                                                                                                        <p class="text-xs opacity-80">Current Bill</p>
-                                                                                                                                                                                        <p class="text-lg font-bold">Rs. ${table.today_total_amount}</p>
-                                                                                                                                                                                    </div>
-                                                                                                                                                                                ` : `
-                                                                                                                                                                                    <div class="mt-6 h-6"></div>
-                                                                                                                                                                                `}
+                                                                                                                                                                                                    <div class="mt-4">
+                                                                                                                                                                                                        <p class="text-xs opacity-80">Current Bill</p>
+                                                                                                                                                                                                        <p class="text-lg font-bold">Rs. ${table.today_total_amount}</p>
+                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                ` : `
+                                                                                                                                                                                                    <div class="mt-6 h-6"></div>
+                                                                                                                                                                                                `}
         </div>
     `;
             }
@@ -412,16 +412,23 @@
 
             function orderHTML(order) {
 
-
+                console.log(order)
                 if (!order) {
                     return `<p class="text-gray-400 text-center mt-10">No active order</p>`;
                 }
 
 
-                const currentOrder = order.table.orders[0];
+                // const currentOrder = order.table.orders[0];
+                // const tableStatus = capitalize(order.table.status);
+                // const activities = currentOrder.activities ?? [];
+                // const totalEarning = order.total_earning;
+
+                const tableOrders = order.table.orders ?? [];
+                const currentOrder = tableOrders.length ? tableOrders[0] : null;
+
                 const tableStatus = capitalize(order.table.status);
-                const activities = currentOrder.activities;
-                const totalEarning = order.total_earning;
+                const activities = currentOrder?.activities ?? [];
+                const totalEarning = order.total_earning ?? 0;
 
 
                 let orderSection = '';
@@ -437,7 +444,7 @@
                 </div>
                 <div>
                     <h2 class="font-bold text-gray-800 text-base leading-tight">Order Details</h2>
-                    <p class="text-xs text-gray-400" id="modal-table-label">Table T${currentOrder.id} · ${capitalize(order.table.status)}</p>
+                    <p class="text-xs text-gray-400" id="modal-table-label">Table T${order.table.id} · ${capitalize(order.table.status)}</p>
                 </div>
             </div>
             <button onclick="closeOrderModal()"
@@ -459,11 +466,11 @@
                     <div class="flex items-start justify-between mb-5">
                         <div>
                             <p class="text-blue-200 text-xs font-medium uppercase tracking-wider mb-1">Order ID</p>
-                            <p class="text-white font-extrabold text-2xl" id="modal-order-id">#${currentOrder.id}</p>
+                            <p class="text-white font-extrabold text-2xl" id="modal-order-id">#${currentOrder?.id ?? '-'}</p>
                         </div>
                         <span id="modal-order-status"
                             class="bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full capitalize">
-                            ${currentOrder.status}
+                            ${currentOrder?.status ?? 'N/A'}
                         </span>
                     </div>
                     <div class="flex items-end justify-between">
@@ -483,30 +490,33 @@
             <div>
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items Ordered</p>
                 <div id="modal-items" class="space-y-2">
-                    ${currentOrder.order_items.map((item, i) => `
-                                                                                                                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-4 py-3 transition group"
-                                                                                                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
-                                                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                                                <div class="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 group-hover:border-blue-300 transition">
-                                                                                                                                                    ${item.menu_item_id}
-                                                                                                                                                </div>
-                                                                                                                                                <div>
-                                                                                                                                                    <p class="font-semibold text-gray-800 text-sm">${item.menu_item.name}</p>
-                                                                                                                                                    <p class="text-xs text-gray-400 mt-0.5">
-                                                                                                                                                        Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}
-                                                                                                                                                    </p>
-                                                                                                                                                </div>
-                                                                                                                                            </div>
-                                                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full status-${item.status}">
-                                                                                                                                                    ${capitalize(item.status)}
-                                                                                                                                                </span>
-                                                                                                                                                <p class="font-bold text-gray-800 text-sm min-w-[68px] text-right">
-                                                                                                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
-                                                                                                                                                </p>
-                                                                                                                                            </div>
-                                                                                                                                        </div>
-                                                                                                                                            `).join('')}
+                    ${currentOrder?.order_items.length ?
+                    currentOrder?.order_items.map((item, i) => `
+                                                                                                                                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-4 py-3 transition group"
+                                                                                                                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
+                                                                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                                                                <div class="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 group-hover:border-blue-300 transition">
+                                                                                                                                                                    ${item.menu_item_id}
+                                                                                                                                                                </div>
+                                                                                                                                                                <div>
+                                                                                                                                                                    <p class="font-semibold text-gray-800 text-sm">${item.menu_item.name}</p>
+                                                                                                                                                                    <p class="text-xs text-gray-400 mt-0.5">
+                                                                                                                                                                        Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}
+                                                                                                                                                                    </p>
+                                                                                                                                                                </div>
+                                                                                                                                                            </div>
+                                                                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                                                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full status-${item.status}">
+                                                                                                                                                                    ${capitalize(item.status)}
+                                                                                                                                                                </span>
+                                                                                                                                                                <p class="font-bold text-gray-800 text-sm min-w-[68px] text-right">
+                                                                                                                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
+                                                                                                                                                                </p>
+                                                                                                                                                            </div>
+                                                                                                                                                        </div>
+                                                                                                                                                            `).join('')
+                                                                                                                                                    : `<p class="text-sm text-gray-400 text-center py-4">No items ordered</p>`
+                                                                                                                                                }
                 </div>
             </div>
 

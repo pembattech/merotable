@@ -48,6 +48,7 @@ class TableController extends Controller
                     $query->whereDate('created_at', Carbon::today());
                 }
             ])
+            ->orderBy('id', 'asc')
             ->get();
         // return response()->json([
         //     'tables' => $tables,
@@ -92,6 +93,7 @@ class TableController extends Controller
             ->with([
                 'orders' => function ($q) {
                     $q->whereIn('status', ['open', 'completed', 'paid'])
+                    ->whereDate('created_at', Carbon::today())
                         ->with([
                             'orderItems.menuItem:id,name',
                             'activities' => function ($q) {  // activities relation
