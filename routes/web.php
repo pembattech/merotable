@@ -36,5 +36,9 @@ Route::get('staff/dashboard', function () {
     return view('staff/dashboard');
 })->name('staff.dashboard');
 
+Route::get('staff/billing', function () {
+    return view('staff/billing');
+})->name('staff.billing');
+
 // });
 

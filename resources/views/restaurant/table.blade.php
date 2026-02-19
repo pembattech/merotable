@@ -168,6 +168,7 @@
             let allTables = [];
             let currentFilter = 'all';
             const token = localStorage.getItem('auth_token');
+            const url = localStorage.getItem('restro_url');
 
             document.addEventListener('DOMContentLoaded', () => {
                 fetchTables();
@@ -319,7 +320,7 @@
                 // modal.classList.add('flex');
 
 
-                const res = await fetch(`/api/v1/owner/restaurant/tables/${tableId}`, {
+                const res = await fetch(`/api/v1/owner/restaurant/${url}/tables/${tableId}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`

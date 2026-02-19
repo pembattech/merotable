@@ -178,11 +178,11 @@ class OrdersController extends Controller
         ]);
 
         $staff = auth('staff')->user();
-        $restaurantId =$staff->restaurant->id;
+        $restaurantId = $staff->restaurant->id;
 
         $order = Order::where('table_id', $validated['table_id'])
-        ->where('restaurant_id', $restaurantId)
-        ->first();
+            ->where('restaurant_id', $restaurantId)
+            ->first();
 
         $orderId = $order->id;
 
@@ -306,29 +306,89 @@ class OrdersController extends Controller
 // }
 
 
-    // public function updateStatus(Request $request, Order $order)
-// {
-//     $request->validate([
-//         'status' => 'required|in:preparing,served,closed,paid',
-//     ]);
+    public function updateOrderStatus(Request $request, string $slug, int $tableId, int $orderId)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'in:open,completed,cancelled'],
+        ]);
 
-    //     $staff = auth()->user();
-//     $oldStatus = $order->status;
+        $staff = auth('staff')->user();
+
+        $order = Order::query()
+            ->whereKey($orderId)
+            ->whereHas(
+                'table',
+                fn($q) =>
+                $q->whereKey($tableId)
+                    ->whereHas(
+                        'restaurant',
+                        fn($r) =>
+                        $r->where('slug', $slug)
+                    )
+            )
+            ->firstOrFail();
+
+        DB::transaction(function () use ($order, $validated, $staff) {
+
+            $oldStatus = $order->status;
+
+            $order->update([
+                'status' => $validated['status']
+            ]);
+
+            if ($validated['status'] === 'completed') {
+                $order_items_status = 'paid';
+            } else if ($validated['status'] === 'cancelled') {
+                $order_items_status = 'cancelled';
+            }
+
+            // update all related items
+            $order->orderItems()->update([
+                'status' => $order_items_status
+            ]);
+
+            OrderActivity::create([
+                'order_id' => $order->id,
+                'staff_id' => $staff->id,
+                'action' => 'updated',
+                'meta' => [
+                    'from' => $oldStatus,
+                    'to' => $validated['status'],
+                ],
+            ]);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order and items status updated'
+        ]);
+    }
+
+
+
+    //   public function updateOrderItemStatus(Request $request, Order $order)
+    // {
+    //     $request->validate([
+    //         'status' => 'required|in:open,completed,cancelled',
+    //     ]);
+
+    //     $staff = auth('staff')->user();
+    //     $oldStatus = $order->status;
 
     //     $order->update(['status' => $request->status]);
 
     //     OrderActivity::create([
-//         'order_id' => $order->id,
-//         'staff_id' => $staff->id,
-//         'action' => 'status_changed',
-//         'meta' => [
-//             'from' => $oldStatus,
-//             'to' => $request->status,
-//         ],
-//     ]);
+    //         'order_id' => $order->id,
+    //         'staff_id' => $staff->id,
+    //         'action' => 'status_changed',
+    //         'meta' => [
+    //             'from' => $oldStatus,
+    //             'to' => $request->status,
+    //         ],
+    //     ]);
 
     //     return response()->json(['message' => 'Status updated']);
-// }
+    // }
 
     public function activityTimeline(Order $order)
     {

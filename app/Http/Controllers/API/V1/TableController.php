@@ -30,17 +30,8 @@ class TableController extends Controller
 
     public function fetchTables(Request $request)
     {
-        $restaurant = auth('restaurant')->user();
-
-        // Eager load today's orders (completed + open for real-time tracking)
-        // $tables = $restaurant->tables()
-        //     // ->with([
-        //     //     'orders' => function ($query) {
-        //     //         $query->whereDate('created_at', Carbon::today());
-        //     //             // ->whereIn('status', ['open', 'completed']);
-        //     //     }
-        //     // ])
-        //     ->get();
+        $restaurant = auth('restaurant')->user()
+            ?? auth('staff')->user()->restaurant;
 
         $tables = $restaurant->tables()
             ->with([
@@ -50,10 +41,6 @@ class TableController extends Controller
             ])
             ->orderBy('id', 'asc')
             ->get();
-        // return response()->json([
-        //     'tables' => $tables,
-        //     'order' => $orders,
-        // ]);
 
         // Map tables with today total amount
         $tablesData = $tables->map(function ($table) {
@@ -84,23 +71,35 @@ class TableController extends Controller
         ], 200);
     }
 
-    public function fetchTableDetails(Request $request, $tableId)
+    public function fetchTableDetails($slug, $tableId)
     {
-        $restaurant = auth('restaurant')->user();
+        // Determine who is authenticated
+        $auth = auth('restaurant')->user() ?? auth('staff')->user();
 
+        // Check if authenticated user is restaurant (owner)
+        $isRestaurant = isset($auth->slug);
+
+        $restaurant = auth('restaurant')->user()
+            ?? auth('staff')->user()->restaurant;
+
+        // Fetch the table
         $table = $restaurant->tables()
             ->where('id', $tableId)
             ->with([
-                'orders' => function ($q) {
+                'orders' => function ($q) use ($isRestaurant) {
                     $q->whereIn('status', ['open', 'completed', 'paid'])
-                    ->whereDate('created_at', Carbon::today())
-                        ->with([
-                            'orderItems.menuItem:id,name',
-                            'activities' => function ($q) {  // activities relation
+                        ->whereDate('created_at', Carbon::today())
+                        ->with(['orderItems.menuItem:id,name']);
+
+                    // Only load activities if restaurant owner
+                    if ($isRestaurant) {
+                        $q->with([
+                            'activities' => function ($q) {
                                 $q->select('id', 'order_id', 'staff_id', 'action', 'meta', 'created_at')
-                                    ->with('staff:id,name,role');     // nested staff name
+                                    ->with('staff:id,name,role');
                             }
                         ]);
+                    }
                 }
             ])
             ->first();
@@ -109,6 +108,8 @@ class TableController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Table not found',
+                'id' => $tableId,
+                'rest' => $restaurant->tables()->pluck('id'),
             ], 404);
         }
 
@@ -123,5 +124,37 @@ class TableController extends Controller
             ],
         ]);
     }
+
+    public function tableUpdateStatus(Request $request, $slug, $tableId)
+    {
+        $staff = auth('staff')->user();
+
+        $table = Table::where('id', $tableId)
+            ->where('restaurant_id', $staff->restaurant_id)
+            ->first();
+
+        if (!$table) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Table not found',
+            ], 404);
+        }
+
+        // Validate input
+        $validated = $request->validate([
+            'status' => 'required|string|in:available,occupied,reserved',
+        ]);
+
+        // Update table
+        $table->status = $validated['status'];
+        $table->save();
+
+        return response()->json([
+            'success' => true,
+            'tableStatus' => $table->status,
+        ]);
+    }
+
+
 
 }

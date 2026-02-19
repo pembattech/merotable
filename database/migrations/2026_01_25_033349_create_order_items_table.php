@@ -21,7 +21,7 @@ return new class extends Migration {
                 ->constrained()
                 ->restrictOnDelete();
 
-            $table->enum('status', ['pending', 'preparing', 'ready', 'served', 'cancelled'])
+            $table->enum('status', ['pending', 'preparing', 'ready', 'served', 'cancelled', 'paid'])
                 ->default('pending');
 
             $table->integer('quantity');

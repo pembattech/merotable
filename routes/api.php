@@ -26,8 +26,11 @@ Route::prefix('v1/auth')->group(function () {
     // AUTH
     Route::post('restaurant/register', [AuthController::class, 'registerRestaurant']);
     Route::post('restaurant/login', [AuthController::class, 'loginRestaurant']);
+    
     // Route::post('user/register', [AuthController::class, 'registerUser']);
-    // Route::post('user/login', [AuthController::class, 'loginUser']);
+    // ROOT LOGIN
+    Route::post('user/login', [AuthController::class, 'loginUser']);
+
     Route::post('staff/login', [RestaurantController::class, 'loginStaff']);
 
     Route::post('logout', [AuthController::class, 'logout']);
@@ -64,7 +67,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVer
 
     // Not Implement!
     Route::get('/tables', [TableController::class, 'fetchTables']);
-    Route::get('/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
+    Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 
 
 
@@ -80,13 +83,20 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::get('/{restaurant:slug}/menu',[StaffController::class, 'getStaffMenu']);
     Route::get('/{restaurant:slug}/categories', [StaffController::class, 'fetchPublicCategories']);
 
+    // Fetch basic table info
     Route::get('/{restaurant:slug}/tables', [StaffController::class, 'fetchTables']);
+    // Fetch table info with orders and total amounts
+    Route::get('/{restaurant:slug}/tables/overview', [TableController::class, 'fetchTables']);
+    Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
     Route::get('/{restaurant:slug}/table/{tableId}', [TableController::class, 'tableStatus']);
+    Route::put('/{restaurant:slug}/table/{tableId}/status',[TableController::class, 'tableUpdateStatus']
+    );
 
 
     Route::post('/{restaurant:slug}/orders', [OrdersController::class, 'store']);
     Route::post('/{restaurant:slug}/add-items', [OrdersController::class, 'addItem']);
     Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
+    Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/status', [OrdersController::class, 'updateOrderStatus']);
 
 
 });
