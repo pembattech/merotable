@@ -1167,12 +1167,17 @@
 
                 }
             }
-            // ── INIT ──────────────────────────────────────────────────────
-            async function init() {
-                await renderTables();
-            }
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-            else init();
+            // // ── INIT ──────────────────────────────────────────────────────
+            // async function init() {
+            //     await renderTables();
+            // }
+            // if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+            // else init();
+
+            document.addEventListener('DOMContentLoaded', () => {
+                renderTables();
+                setInterval(renderTables, 15000); // 🔄 poll every 15 sec
+            });
         </script>
 
 
