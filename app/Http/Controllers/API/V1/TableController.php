@@ -28,29 +28,52 @@ class TableController extends Controller
         ]);
     }
 
+
     public function fetchTables(Request $request)
     {
+        $mode = $request->get('mode', 'default');
+
         $restaurant = auth('restaurant')->user()
             ?? auth('staff')->user()->restaurant;
 
         $tables = $restaurant->tables()
             ->with([
-                'orders' => function ($query) {
-                    $query->whereDate('created_at', Carbon::today());
+                'orders' => function ($query) use ($mode) {
+
+                    if ($mode === 'billing') {
+                        // Only open orders
+                        $query->where('status', 'open')
+                            ->select('id', 'table_id', 'total_amount', 'status', 'created_at');
+                    } else {
+                        // Today's orders
+                        $query->whereDate('created_at', today())
+                            ->select('id', 'table_id', 'total_amount', 'status', 'created_at');
+                    }
+
                 }
             ])
             ->orderBy('id', 'asc')
             ->get();
 
-        // Map tables with today total amount
-        $tablesData = $tables->map(function ($table) {
-            $todayTotalAmount = $table->orders->sum('total_amount');
+        // Map tables
+        $tablesData = $tables->map(function ($table) use ($mode) {
+
+            if ($mode === 'billing') {
+                // Only open order total
+                $amount = optional(
+                    $table->orders->first()
+                )->total_amount ?? 0;
+
+            } else {
+                // Today's total
+                $amount = $table->orders->sum('total_amount');
+            }
 
             return [
                 'id' => $table->id,
                 'table_number' => $table->table_number,
                 'status' => $table->status,
-                'today_total_amount' => $todayTotalAmount,
+                'total_amount' => $amount,
             ];
         });
 
@@ -61,67 +84,81 @@ class TableController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Tables fetched successfully',
             'data' => [
+                'mode' => $mode,
                 'tables' => $tablesData,
                 'occupied_tables_count' => $occupiedTablesCount,
                 'available_tables_count' => $availableTablesCount,
                 'reserved_tables_count' => $reservedTablesCount,
             ],
-        ], 200);
+        ]);
     }
 
-    public function fetchTableDetails($slug, $tableId)
+    // Fetch table details with orders based on mode (billing = open order only, default = today's orders)
+    // Includes items and optional staff activities. Optimized with eager loading.
+    public function fetchTableDetails(Request $request, $slug, $tableId)
     {
-        // Determine who is authenticated
-        $auth = auth('restaurant')->user() ?? auth('staff')->user();
+        $mode = $request->get('mode', 'default');
 
-        // Check if authenticated user is restaurant (owner)
+        $auth = auth('restaurant')->user() ?? auth('staff')->user();
         $isRestaurant = isset($auth->slug);
 
         $restaurant = auth('restaurant')->user()
             ?? auth('staff')->user()->restaurant;
 
-        // Fetch the table
-        $table = $restaurant->tables()
-            ->where('id', $tableId)
-            ->with([
-                'orders' => function ($q) use ($isRestaurant) {
-                    $q->whereIn('status', ['open', 'completed', 'paid'])
-                        ->whereDate('created_at', Carbon::today())
-                        ->with(['orderItems.menuItem:id,name']);
+        $tableQuery = $restaurant->tables()
+            ->where('id', $tableId);
 
-                    // Only load activities if restaurant owner
-                    if ($isRestaurant) {
-                        $q->with([
-                            'activities' => function ($q) {
-                                $q->select('id', 'order_id', 'staff_id', 'action', 'meta', 'created_at')
-                                    ->with('staff:id,name,role');
-                            }
-                        ]);
-                    }
+        // ---- ORDERS RELATION ----
+        $tableQuery->with([
+            'orders' => function ($q) use ($mode, $isRestaurant) {
+
+                if ($mode === 'billing') {
+                    $q->where('status', 'open')->latest()->limit(1);
+                } else {
+                    $q->whereIn('status', ['open', 'completed', 'paid'])
+                        ->whereDate('created_at', today());
                 }
-            ])
-            ->first();
+
+                $q->select('id', 'table_id', 'status', 'total_amount', 'created_at');
+
+                $q->with([
+                    'orderItems:id,order_id,menu_item_id,price,quantity,status',
+                    'orderItems.menuItem:id,name'
+                ]);
+
+                if ($isRestaurant) {
+                    $q->with([
+                        'activities' => function ($q) {
+                            $q->select('id', 'order_id', 'staff_id', 'action', 'meta', 'created_at')
+                                ->with('staff:id,name,role');
+                        }
+                    ]);
+                }
+            }
+        ]);
+
+        $table = $tableQuery->first();
 
         if (!$table) {
             return response()->json([
                 'success' => false,
-                'message' => 'Table not found',
-                'id' => $tableId,
-                'rest' => $restaurant->tables()->pluck('id'),
+                'message' => 'Table not found'
             ], 404);
         }
 
-        $totalEarning = $table->orders->sum('total_amount');
+        // ---- TOTAL ----
+        $totalEarning = $mode === 'billing'
+            ? optional($table->orders->first())->total_amount
+            : $table->orders->sum('total_amount');
 
         return response()->json([
             'success' => true,
-            'message' => 'Table details fetched successfully',
             'data' => [
                 'table' => new TableResource($table),
-                'total_earning' => $totalEarning,
-            ],
+                'total' => $totalEarning,
+                'mode' => $mode
+            ]
         ]);
     }
 

@@ -182,6 +182,7 @@ class OrdersController extends Controller
 
         $order = Order::where('table_id', $validated['table_id'])
             ->where('restaurant_id', $restaurantId)
+            ->where('status', 'open')
             ->first();
 
         $orderId = $order->id;

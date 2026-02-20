@@ -418,7 +418,7 @@
             async function fetchTables() {
 
 
-                const res = await fetch(`/api/v1/staff/${url}/tables/overview`, {
+                const res = await fetch(`/api/v1/staff/${url}/tables/overview?mode=billing`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accepts': 'application/json',
@@ -436,250 +436,6 @@
                 return data;
             }
 
-            //    // ── DATA ─────────────────────────────────────────────────────
-            //     const TABLES = [{
-            //             id: 'T-01',
-            //             status: 'occupied',
-            //             orders: 1,
-            //             total: 1240
-            //         },
-            //         {
-            //             id: 'T-02',
-            //             status: 'available',
-            //             orders: 0,
-            //             total: 0
-            //         },
-            //         {
-            //             id: 'T-03',
-            //             status: 'occupied',
-            //             orders: 1,
-            //             total: 2850
-            //         },
-            //         {
-            //             id: 'T-04',
-            //             status: 'available',
-            //             orders: 0,
-            //             total: 0
-            //         },
-            //         {
-            //             id: 'T-05',
-            //             status: 'occupied',
-            //             orders: 1,
-            //             total: 680
-            //         },
-            //         {
-            //             id: 'T-06',
-            //             status: 'available',
-            //             orders: 0,
-            //             total: 0
-            //         },
-            //         {
-            //             id: 'T-07',
-            //             status: 'occupied',
-            //             orders: 1,
-            //             total: 1950
-            //         },
-            //         {
-            //             id: 'T-08',
-            //             status: 'available',
-            //             orders: 0,
-            //             total: 0
-            //         },
-            //         {
-            //             id: 'T-09',
-            //             status: 'available',
-            //             orders: 0,
-            //             total: 0
-            //         },
-            //         {
-            //             id: 'T-10',
-            //             status: 'occupied',
-            //             orders: 1,
-            //             total: 3200
-            //         },
-            //         {
-            //             id: 'T-11',
-            //             status: 'available',
-            //             orders: 0,
-            //             total: 0
-            //         },
-            //         {
-            //             id: 'T-12',
-            //             status: 'occupied',
-            //             orders: 1,
-            //             total: 890
-            //         },
-            //     ];
-
-            const ORDERS = {
-                'T-01': [{
-                        id: 1,
-                        name: 'Chicken Biryani',
-                        qty: 2,
-                        price: 450,
-                        total: 900
-                    },
-                    {
-                        id: 2,
-                        name: 'Masala Tea',
-                        qty: 4,
-                        price: 50,
-                        total: 200
-                    },
-                    {
-                        id: 3,
-                        name: 'Spring Rolls',
-                        qty: 1,
-                        price: 140,
-                        total: 140
-                    },
-                ],
-                'T-03': [{
-                        id: 4,
-                        name: 'Butter Chicken',
-                        qty: 2,
-                        price: 500,
-                        total: 1000
-                    },
-                    {
-                        id: 5,
-                        name: 'Garlic Naan',
-                        qty: 6,
-                        price: 80,
-                        total: 480
-                    },
-                    {
-                        id: 6,
-                        name: 'Dal Makhani',
-                        qty: 2,
-                        price: 320,
-                        total: 640
-                    },
-                    {
-                        id: 7,
-                        name: 'Mango Lassi',
-                        qty: 3,
-                        price: 150,
-                        total: 450
-                    },
-                    {
-                        id: 8,
-                        name: 'Gulab Jamun',
-                        qty: 2,
-                        price: 140,
-                        total: 280
-                    },
-                ],
-                'T-05': [{
-                        id: 9,
-                        name: 'Veg Momo',
-                        qty: 2,
-                        price: 200,
-                        total: 400
-                    },
-                    {
-                        id: 10,
-                        name: 'Coca Cola',
-                        qty: 2,
-                        price: 80,
-                        total: 160
-                    },
-                    {
-                        id: 11,
-                        name: 'Chocolate Brownie',
-                        qty: 1,
-                        price: 120,
-                        total: 120
-                    },
-                ],
-                'T-07': [{
-                        id: 12,
-                        name: 'Tandoori Platter',
-                        qty: 1,
-                        price: 850,
-                        total: 850
-                    },
-                    {
-                        id: 13,
-                        name: 'Butter Naan',
-                        qty: 4,
-                        price: 100,
-                        total: 400
-                    },
-                    {
-                        id: 14,
-                        name: 'Dal Bhat Set',
-                        qty: 2,
-                        price: 350,
-                        total: 700
-                    },
-                ],
-                'T-10': [{
-                        id: 15,
-                        name: 'Grilled Fish',
-                        qty: 1,
-                        price: 700,
-                        total: 700
-                    },
-                    {
-                        id: 16,
-                        name: 'Pizza Margherita',
-                        qty: 1,
-                        price: 550,
-                        total: 550
-                    },
-                    {
-                        id: 17,
-                        name: 'Fried Rice',
-                        qty: 3,
-                        price: 280,
-                        total: 840
-                    },
-                    {
-                        id: 18,
-                        name: 'Fresh Lime Soda',
-                        qty: 4,
-                        price: 100,
-                        total: 400
-                    },
-                    {
-                        id: 19,
-                        name: 'Ice Cream Sundae',
-                        qty: 2,
-                        price: 200,
-                        total: 400
-                    },
-                    {
-                        id: 20,
-                        name: 'Chicken Wings',
-                        qty: 2,
-                        price: 350,
-                        total: 700
-                    },
-                ],
-                'T-12': [{
-                        id: 21,
-                        name: 'Chowmein Chicken',
-                        qty: 2,
-                        price: 250,
-                        total: 500
-                    },
-                    {
-                        id: 22,
-                        name: 'Veg Pakoda',
-                        qty: 2,
-                        price: 120,
-                        total: 240
-                    },
-                    {
-                        id: 23,
-                        name: 'Masala Tea',
-                        qty: 3,
-                        price: 50,
-                        total: 150
-                    },
-                ],
-            };
 
             let selectedTable = null;
             let selectedMethod = 'cash';
@@ -739,7 +495,6 @@
                 if (!response) return;
 
                 const tables = response.data.tables;
-                console.log(tables)
 
                 const statusStyles = {
                     available: {
@@ -791,7 +546,7 @@
             ${table.status === 'occupied' ? `
                                                 <div class="mt-4">
                                                     <p class="text-xs opacity-80">Current Bill</p>
-                                                    <p class="text-lg font-bold">Rs. ${table.today_total_amount}</p>
+                                                    <p class="text-lg font-bold">Rs. ${table.total_amount}</p>
                                                 </div>
                                             ` : `
                                                 <div class="mt-6 h-6"></div>
@@ -806,9 +561,8 @@
 
             // ── SELECT TABLE ──────────────────────────────────────────────
             async function selectTable(tableId) {
-                alert(tableId)
 
-                const res = await fetch(`/api/v1/staff/${url}/tables/${tableId}`, {
+                const res = await fetch(`/api/v1/staff/${url}/tables/${tableId}?mode=billing`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -822,10 +576,6 @@
                     showToast(data.message || 'Something went wrong ❌', 'error');
                     return;
                 }
-
-                console.log(data)
-
-
 
                 const table = data.data.table;
                 const orders = data.data.table.orders;
@@ -1054,8 +804,6 @@
             function openCheckoutModal() {
                 if (!selectedTable) return;
 
-                console.log(selectedTable)
-
                 const totalText = document.getElementById('total').textContent;
                 document.getElementById('modalTotal').textContent = totalText;
                 document.getElementById('checkoutTableLabel').textContent = `Table ${selectedTable.table_number}`;
@@ -1124,7 +872,6 @@
                 clearSelection();
                 await renderTables();
 
-                alert(selectedTable);
             }
 
             async function updateTableStatus(tableId, orderId, status) {
@@ -1176,7 +923,7 @@
 
             document.addEventListener('DOMContentLoaded', () => {
                 renderTables();
-                setInterval(renderTables, 15000); // 🔄 poll every 15 sec
+                setInterval(renderTables, 10000); // 🔄 poll every 10 sec
             });
         </script>
 
