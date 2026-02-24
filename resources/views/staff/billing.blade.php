@@ -3,6 +3,7 @@
 @section('title', 'Cashier Billing | ' . config('app.name'))
 
 @section('content')
+
     <style>
         @keyframes fadeUp {
             from {
@@ -190,8 +191,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- ══════════════════════════════════════════════
-                                             LEFT: TABLE SELECTION + SEARCH
-                                        ══════════════════════════════════════════════ -->
+                                                                                                     LEFT: TABLE SELECTION + SEARCH
+                                                                                                ══════════════════════════════════════════════ -->
                 <div class="lg:col-span-2 space-y-5">
 
                     <!-- Search by items -->
@@ -208,7 +209,7 @@
 
                         <div class="relative">
                             <input id="itemSearch" type="text" placeholder="Search items in orders..."
-                                oninput="selectedItemNames.size === 0 ? showQuickSearch() : searchByItems()"
+                                {{-- oninput="selectedItemNames.size === 0 ? showQuickSearch() : searchByItems()" --}} oninput="searchByItems()"
                                 class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
                             <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
@@ -228,8 +229,8 @@
                 </div>
 
                 <!-- ══════════════════════════════════════════════
-                                             RIGHT: ORDER DETAILS + CHECKOUT
-                                        ══════════════════════════════════════════════ -->
+                                                                                                     RIGHT: ORDER DETAILS + CHECKOUT
+                                                                                                ══════════════════════════════════════════════ -->
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-2xl border border-gray-100 p-5 sticky top-6 fade-up d4">
 
@@ -291,8 +292,8 @@
         </div>
 
         <!-- ══════════════════════════════════════════════
-                                         CHECKOUT MODAL
-                                    ══════════════════════════════════════════════ -->
+                                                                                                 CHECKOUT MODAL
+                                                                                            ══════════════════════════════════════════════ -->
         <div id="checkoutModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center">
             <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeCheckoutModal()"></div>
             <div
@@ -440,54 +441,6 @@
             let selectedTable = null;
             let selectedMethod = 'cash';
 
-            // Quick search mode — shows all items, click to add as filter
-            function showQuickSearch() {
-                const q = document.getElementById('itemSearch').value.toLowerCase().trim();
-                const results = document.getElementById('searchResults');
-
-                if (selectedItemNames.size > 0) return; // Already in filter mode
-                if (!q) {
-                    results.innerHTML = '';
-                    return;
-                }
-
-                // Collect all unique item names that match
-                const itemSet = new Set();
-                Object.keys(ORDERS).forEach(tableId => {
-                    ORDERS[tableId].forEach(item => {
-                        if (item.name.toLowerCase().includes(q)) {
-                            itemSet.add(item.name);
-                        }
-                    });
-                });
-
-                if (itemSet.size === 0) {
-                    results.innerHTML = '<p class="text-xs text-gray-400 py-2">No items found</p>';
-                    return;
-                }
-
-                const items = [...itemSet];
-                results.innerHTML = `
-    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-2">
-      <p class="text-xs text-blue-600 font-semibold mb-2">💡 Click an item to filter tables by it</p>
-    </div>
-    ${items.map(name => `
-                                                                                  <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50 rounded-lg px-3 py-2 cursor-pointer transition group"
-                                                                                    onclick="addItemToSearch('${name.replace(/'/g, "\'")}'); document.getElementById('itemSearch').value='';">
-                                                                                    <div class="flex items-center gap-2">
-                                                                                      <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                                                                      </svg>
-                                                                                      <p class="text-sm font-semibold text-gray-800">${name}</p>
-                                                                                    </div>
-                                                                                    <svg class="h-4 w-4 text-blue-500 opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                                                    </svg>
-                                                                                  </div>
-                                                                                `).join('')}
-  `;
-            }
-
             // ── RENDER TABLES ─────────────────────────────────────────────
             async function renderTables() {
 
@@ -544,13 +497,13 @@
             </div>
 
             ${table.status === 'occupied' ? `
-                                                <div class="mt-4">
-                                                    <p class="text-xs opacity-80">Current Bill</p>
-                                                    <p class="text-lg font-bold">Rs. ${table.total_amount}</p>
-                                                </div>
-                                            ` : `
-                                                <div class="mt-6 h-6"></div>
-                                            `}
+                                                                                                                                                                <div class="mt-4">
+                                                                                                                                                                    <p class="text-xs opacity-80">Current Bill</p>
+                                                                                                                                                                    <p class="text-lg font-bold">Rs. ${table.total_amount}</p>
+                                                                                                                                                                </div>
+                                                                                                                                                            ` : `
+                                                                                                                                                                <div class="mt-6 h-6"></div>
+                                                                                                                                                            `}
         </div>
     `;
                 }).join(''); // join to a single string
@@ -661,86 +614,178 @@
 
             // ── SEARCH BY ITEMS ───────────────────────────────────────────
             let selectedItemNames = new Set();
+            let searchTimeout;
+            const tableCandidates = {};
+            let controller;
+            let searchController;
+            const debouncedSearchTables = debounce(searchTables, 300);
+
+            function debounce(fn, delay) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        fn.apply(this, args);
+                    }, delay);
+                };
+            }
 
             function searchByItems() {
-                const q = document.getElementById('itemSearch').value.toLowerCase().trim();
+                const query = document.getElementById('itemSearch').value.toLowerCase().trim();
                 const results = document.getElementById('searchResults');
 
-                if (!q && selectedItemNames.size === 0) {
+                // If input is cleared but items still selected
+                if (query.length === 0 && selectedItemNames.size > 0) {
+                    results.innerHTML = ''; // clear suggestions
+                    debouncedSearchTables(); // show tables again
+                    return;
+                }
+
+                if (query.length < 2 && selectedItemNames.size === 0) {
                     results.innerHTML = '';
                     return;
                 }
 
                 // Build search query — combine selected items + new input
                 const searchTerms = [...selectedItemNames];
-                if (q) searchTerms.push(q);
+                if (query) searchTerms.push(query);
 
-                // Find tables that have ALL selected items + match current input
-                const tableCandidates = {};
 
-                Object.keys(ORDERS).forEach(tableId => {
-                    const tableItems = ORDERS[tableId];
-                    const tableItemNames = tableItems.map(i => i.name.toLowerCase());
+                // Debounce to avoid constant requests
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(async () => {
 
-                    // Check if this table has all selected items
-                    const hasAllSelected = [...selectedItemNames].every(sel =>
-                        tableItemNames.some(ti => ti.includes(sel.toLowerCase()))
-                    );
+                    if (controller) controller.abort(); // cancel previous request
+                    controller = new AbortController();
 
-                    if (!hasAllSelected) return;
+                    try {
+                        const res = await fetch(`/api/items?search=${encodeURIComponent(query)}`, {
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                            },
+                            signal: controller.signal
+                        });
 
-                    // If typing new query, check if any item in this table matches
-                    if (q) {
-                        const matchesNewQuery = tableItems.some(item =>
-                            item.name.toLowerCase().includes(q)
-                        );
-                        if (!matchesNewQuery) return;
+                        const data = await res.json();
+
+
+                        if (!data.success) {
+                            results.innerHTML = '<p class="text-gray-500 py-2">No items found</p>';
+                            return;
+                        }
+
+                        // Render suggestions
+                        results.innerHTML = data.items.map(item => `
+                        <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50 rounded-lg px-3 py-2 cursor-pointer transition group"
+        onclick="addItemToSearch('${item.replace(/'/g, "\'")}'); document.getElementById('itemSearch').value='';">
+        <div class="flex items-center gap-2">
+          <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          <p class="text-sm font-semibold text-gray-800">${item}</p>
+        </div>
+        <svg class="h-4 w-4 text-blue-500 opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+                    `).join('');
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error(err);
+                        }
                     }
 
-                    // Collect all matching items from this table
-                    tableCandidates[tableId] = tableItems.filter(item => {
-                        const itemName = item.name.toLowerCase();
-                        // Include if it's a selected item OR matches new query
-                        return [...selectedItemNames].some(sel => itemName.includes(sel.toLowerCase())) ||
-                            (q && itemName.includes(q));
-                    });
+                }, 250); // 250ms debounce
+            }
+
+
+            async function searchTables() {
+
+                if (selectedItemNames.size === 0) return;
+
+                // AbortController (Prevent Race Condition)
+                if (searchController) searchController.abort();
+                searchController = new AbortController();
+
+
+                const params = new URLSearchParams();
+
+                selectedItemNames.forEach(item => {
+                    params.append('item[]', item);
                 });
 
-                const tableIds = Object.keys(tableCandidates);
+                const res = await fetch(`/api/search-tables?${params.toString()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+                    },
+                    signal: searchController.signal
+                });
 
-                if (tableIds.length === 0) {
-                    results.innerHTML = '<p class="text-xs text-gray-400 py-2">No tables match all selected items</p>';
+                const data = await res.json();
+
+                const container = document.getElementById('searchResults');
+
+                let html = '';
+
+                if (!data.tables.length) {
+                    container.innerHTML = `
+                        <p class="text-gray-400 text-md py-2">No tables found</p>
+                    `;
                     return;
                 }
 
-                // Show matching tables with their items
-                results.innerHTML = tableIds.map(tableId => {
-                    const items = tableCandidates[tableId];
-                    const tableTotal = items.reduce((sum, i) => sum + i.total, 0);
+                data.tables.forEach(table => {
 
-                    return `
-    <div class="bg-gray-50 hover:bg-blue-50 rounded-xl p-3 cursor-pointer transition border border-gray-100 hover:border-blue-200"
-      onclick="selectTableFromSearch('${tableId}')">
-      <div class="flex items-center justify-between mb-2">
-        <p class="font-bold text-gray-800 text-sm">Table ${tableId}</p>
-        <p class="text-sm font-bold text-blue-600">Rs. ${tableTotal.toLocaleString()}</p>
-      </div>
-      <div class="space-y-1">
-        ${items.map(item => `
-                                                                                      <div class="flex items-center justify-between text-xs">
-                                                                                        <span class="text-gray-600">${item.name} <span class="text-gray-400">×${item.qty}</span></span>
-                                                                                        <span class="text-gray-500 font-medium">Rs. ${item.total}</span>
-                                                                                      </div>
-                                                                                    `).join('')}
-      </div>
-    </div>`;
-                }).join('');
+                    const ordersHTML = table.orders.map(order => {
+
+                        const itemsHTML = order.order_items.map(orderItem => `
+            <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-600">
+                    ${orderItem.menu_item.name}
+                    <span class="text-gray-400">×${orderItem.quantity}</span>
+                </span>
+                <span class="text-gray-500 font-medium">
+                    Rs. ${(orderItem.price * orderItem.quantity).toLocaleString()}
+                </span>
+            </div>
+        `).join('');
+
+                        return `
+            <div class="space-y-1 pt-2">
+                ${itemsHTML}
+            </div>
+        `;
+                    }).join('');
+
+                    html += `
+        <div class="bg-gray-50 hover:bg-blue-50 rounded-xl p-3 cursor-pointer transition border border-gray-100 hover:border-blue-200"
+            onclick="selectTableFromSearch('${table.id}')">
+
+            <div class="flex items-center justify-between mb-2">
+                <p class="font-bold text-gray-800 text-sm">
+                    Table ${table.table_number}
+                </p>
+                <p class="text-sm font-bold text-blue-600">
+                    Rs. ${table.orders?.[0]?.total_amount.toLocaleString() ?? 0}
+                </p>
+            </div>
+
+            ${ordersHTML}
+        </div>
+    `;
+                });
+
+                container.innerHTML = html;
+
             }
 
             function addItemToSearch(itemName) {
                 selectedItemNames.add(itemName);
+                alert('Added: ' + itemName + ' to selectedItemNames');
+
                 renderSelectedItems();
-                searchByItems();
+
+                debouncedSearchTables();
             }
 
             function removeItemFromSearch(itemName) {
@@ -752,7 +797,7 @@
                     document.getElementById('itemSearch').value = '';
                 }
 
-                searchByItems();
+                debouncedSearchTables();
             }
 
             function renderSelectedItems() {
@@ -914,19 +959,12 @@
 
                 }
             }
-            // // ── INIT ──────────────────────────────────────────────────────
-            // async function init() {
-            //     await renderTables();
-            // }
-            // if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-            // else init();
 
             document.addEventListener('DOMContentLoaded', () => {
                 renderTables();
                 setInterval(renderTables, 10000); // 🔄 poll every 10 sec
             });
         </script>
-
 
     @endsection
 

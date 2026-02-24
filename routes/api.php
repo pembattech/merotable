@@ -112,6 +112,152 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
     Route::post('/restaurant/documents/{slug}/approve', [AdminController::class, 'approveDocuments']);
 });
 
+use App\Models\OrderItem; // assuming each item is stored in OrderItem
+
+Route::get('/items', function(Request $request) {
+    $query = $request->query('search', '');
+
+    if (!$query) {
+        return response()->json(['success' => true, 'items' => []]);
+    }
+
+    // Search distinct item names containing the query (case-insensitive)
+  $items = OrderItem::join('menu_items', 'order_items.menu_item_id', '=', 'menu_items.id')
+        ->where('menu_items.name', 'LIKE', "%{$query}%")
+        ->distinct()
+        ->pluck('menu_items.name');
+
+    return response()->json([
+        'success' => true,
+        'items' => $items,
+        'query' => $query,
+    ]);
+});
+
+
+// use App\Models\Table;
+
+// Route::get('/search-tables', function(Request $request) {
+//     $itemName = $request->query('item', '');
+
+//     if (!$itemName) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Item name is required'
+//         ], 400);
+//     }
+
+//     // Get tables that have order items with the selected menu item name
+//     $tables = Table::whereHas('orders.orderItems.menuItem', function($q) use ($itemName) {
+//         $q->where('name', $itemName);
+//     })
+//     ->with(['orders.orderItems' => function($q) use ($itemName) {
+//         $q->whereHas('menuItem', function($q2) use ($itemName) {
+//             $q2->where('name', $itemName);
+//         })->with('menuItem');
+//     }])
+//     ->get();
+
+//     return response()->json([
+//         'success' => true,
+//         'tables' => $tables
+//     ]);
+// });
+
+
+// use App\Models\Table;
+
+
+// Route::get('/search-tables', function(Request $request) {
+
+//     $items = $request->query('item');
+
+//     if (!$items) {
+//         return response()->json([
+//             'success' => false,
+//             'message' => 'Item name is required'
+//         ], 400);
+//     }
+
+//     // Convert to array if needed
+//     if (!is_array($items)) {
+//         $items = explode(',', $items);
+//     }
+
+//     $tables = Table::whereHas('orders', function ($orderQuery) use ($items) {
+
+//         $orderQuery->where('status', 'open')
+//             ->whereHas('orderItems.menuItem', function($q) use ($items) {
+//                 $q->whereIn('name', $items);
+//             });
+
+//     })
+//     ->with(['orders' => function ($orderQuery) use ($items) {
+
+//         $orderQuery->where('status', 'open')
+//             ->with(['orderItems' => function($q) use ($items) {
+//                 $q->whereHas('menuItem', function($q2) use ($items) {
+//                     $q2->whereIn('name', $items);
+//                 })->with('menuItem');
+//             }]);
+
+//     }])
+//     ->get();
+
+//     return response()->json([
+//         'success' => true,
+//         'items' => $items,
+//         'tables' => $tables,
+//     ]);
+// });
+
+
+use App\Models\Table;
+
+Route::get('/search-tables', function(Request $request) {
+
+    $items = $request->query('item');
+
+    if (!$items) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Item name is required'
+        ], 400);
+    }
+
+    // Convert to array if needed
+    if (!is_array($items)) {
+        $items = explode(',', $items);
+    }
+
+    $tables = Table::whereHas('orders', function ($orderQuery) use ($items) {
+        $orderQuery->where('status', 'open');
+
+        // Loop each item for AND logic
+        foreach ($items as $item) {
+            $orderQuery->whereHas('orderItems.menuItem', function($q) use ($item) {
+                $q->where('name', $item);
+            });
+        }
+
+    })
+    ->with(['orders' => function ($orderQuery) use ($items) {
+        $orderQuery->where('status', 'open')
+            ->with(['orderItems' => function($q) use ($items) {
+                // Only keep items that match selected items
+                $q->whereHas('menuItem', function($q2) use ($items) {
+                    $q2->whereIn('name', $items);
+                })->with('menuItem');
+            }]);
+    }])
+    ->get();
+
+    return response()->json([
+        'success' => true,
+        'items' => $items,
+        'tables' => $tables,
+    ]);
+});
 
 
 
