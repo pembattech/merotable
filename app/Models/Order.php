@@ -15,6 +15,7 @@ class Order extends Model
         'staff_id',
         'status',
         'total_amount',
+        'remarks',
     ];
 
 

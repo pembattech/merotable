@@ -17,7 +17,12 @@ class Restaurant extends Authenticatable
         'email',
         'password',
         'slug',
-        'status'
+        'status',
+        'approved_at',
+        'description',
+        'address',
+        'contact_number',
+        'logo'
     ];
 
 

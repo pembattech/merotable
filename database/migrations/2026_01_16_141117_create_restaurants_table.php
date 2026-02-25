@@ -13,12 +13,23 @@ return new class extends Migration
     {
         Schema::create('restaurants', function (Blueprint $table) {
             $table->id();
+
             $table->string('name', 150);
             $table->string('email', 150)->unique();
             $table->string('password', 255);
             $table->string('slug')->unique();
-            $table->enum('status', ['pending', 'active', 'blocked', 'testing'])->default('pending');
+
+            $table->enum('status', ['pending', 'active', 'blocked', 'testing'])
+                  ->default('pending')
+                  ->index();
+
             $table->timestamp('approved_at')->nullable();
+
+            $table->text('description')->nullable();
+            $table->string('address', 255)->nullable();
+            $table->string('contact_number', 50)->nullable();
+            $table->string('logo')->nullable();
+
             $table->timestamps();
         });
     }
