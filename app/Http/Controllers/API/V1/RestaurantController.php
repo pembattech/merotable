@@ -7,6 +7,7 @@ use App\Http\Resources\V1\AdminMenuItemResource;
 use App\Http\Resources\V1\PublicMenuItemResource;
 use App\Http\Resources\V1\PublicStaffResource;
 use App\Http\Resources\V1\RestaurantProfileResource;
+use App\Http\Resources\V1\RestaurantResource;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\OrderActivity;
@@ -20,6 +21,14 @@ use Illuminate\Validation\ValidationException;
 
 class RestaurantController extends Controller
 {
+
+    public function index()
+    {
+        $restaurant = auth('restaurant')
+            ->user()
+            ->load('subscription');
+        return response()->json(['success' => true, 'data' => new RestaurantResource($restaurant)]);
+    }
 
     public function show(Request $request)
     {
@@ -79,15 +88,6 @@ class RestaurantController extends Controller
         ]);
     }
 
-    // public function index()
-    // {
-    //     $user = Auth::user();
-    //     $restaurants = $user->isadmin 
-    //         ? Restaurant::latest()->get() 
-    //         : Restaurant::where('user_id', $user->id)->get();
-
-    //     return response()->json(['success' => true, 'data' => $restaurants]);
-    // }
 
     // public function store(Request $request)
     // {

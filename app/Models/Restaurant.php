@@ -79,7 +79,7 @@ class Restaurant extends Authenticatable
 
     // SaaS Relationships
 
-    public function subscription(): HasOne
+    public function subscription()
     {
         return $this->hasOne(Subscription::class);
     }
@@ -89,7 +89,7 @@ class Restaurant extends Authenticatable
     //     return $this->hasMany(RestaurantAddOn::class);
     // }
 
-    public function transactions(): HasMany
+    public function transactions()
     {
         return $this->hasMany(Transaction::class);
     }

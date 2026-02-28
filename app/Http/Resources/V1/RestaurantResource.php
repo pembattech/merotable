@@ -25,7 +25,7 @@ class RestaurantResource extends JsonResource
             // Core restaurant info
             'name' => $this->name,
             'email' => $this->email,
-            'phone' => $this->phone,
+            'contact_number' => $this->contact_number,
             'status' => $this->status,
 
             // Computed property to quickly check if restaurant is active
@@ -50,6 +50,12 @@ class RestaurantResource extends JsonResource
             'menuItems' => PublicMenuItemResource::collection(
                 $this->whenLoaded('menuItems')
             ),
+
+            'subscription' => $this->whenLoaded(
+                'subscription',
+                fn() => new SubscriptionResource($this->subscription)
+            ),
+
 
             // Optional: add logo or image URL if available
             'logo' => $this->logo_url ?? null,

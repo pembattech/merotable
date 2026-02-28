@@ -50,10 +50,13 @@ Route::prefix('v1/auth')->group(function () {
 
 // Owner Routes
 Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/owner/restaurant')->group(function () {
+
+    Route::get('/', [RestaurantController::class, 'index']);
+
     Route::get('/profile', [RestaurantController::class, 'show']);
     Route::patch('/basic-settings', [RestaurantController::class, 'update']);
     
-    Route::middleware(['isRestaurantVerifed'])->group(function () {
+    // Route::middleware(['isRestaurantVerifed'])->group(function () {
 
 
         Route::get('/settings', [RestaurantSettingController::class, 'show']);
@@ -79,7 +82,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
         Route::get('/tables', [TableController::class, 'fetchTables']);
         Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 
-    });
+    // });
 
 
 });

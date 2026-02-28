@@ -20,12 +20,12 @@ class Subscription extends Model
         'expires_at',
     ];
 
-    public function restaurant(): BelongsTo
+    public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);
     }
 
-    public function plan(): BelongsTo
+    public function plan()
     {
         return $this->belongsTo(Plan::class);
     }
@@ -36,4 +36,13 @@ class Subscription extends Model
             && $this->expires_at
             && $this->expires_at->isFuture();
     }
+
+    public function daysLeft(): int
+{
+    if (!$this->expires_at) {
+        return 0;
+    }
+
+    return now()->diffInDays($this->expires_at, false);
+}
 }
