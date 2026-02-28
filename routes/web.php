@@ -32,6 +32,10 @@ Route::get('restaurant/staff', function () {
     return view('restaurant/staff');
 })->name('restaurant.staff');
 
+Route::get('restaurant/setting', function () {
+    return view('restaurant/setting');
+})->name('restaurant.setting');
+
 Route::get('staff/dashboard', function () {
     return view('staff/dashboard');
 })->name('staff.dashboard');

@@ -25,7 +25,9 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-        SuperAdminUserSeeder::class,
-    ]);
+            SuperAdminUserSeeder::class,
+            FeatureSeeder::class,
+            PlanSeeder::class,
+        ]);
     }
 }

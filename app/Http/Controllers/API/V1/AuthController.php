@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 use App\Models\Restaurant;
+use App\Models\Plan;
+use App\Models\Subscription;
+
+use Carbon\Carbon;
 
 use App\Http\Resources\V1\RestaurantResource;
 use App\Http\Resources\V1\UserAuthResource;
@@ -22,18 +26,31 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:150',
+            'owner_name' => 'required|string|max:150',
             'email' => 'required|email|unique:restaurants,email',
-            'phone' => 'required|string|max:20',
             'password' => 'required|min:6|confirmed',
+            'contact_number' => 'required|string|max:20',
         ]);
 
         $restaurant = Restaurant::create([
             'name' => $request->name,
+            'owner_name' => $request->owner_name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'status' => 'pending',
+            'contact_number' => $request->contact_number,
         ]);
+
+          $demoPlan = Plan::where('name', 'Demo')->first();
+
+        Subscription::updateOrCreate(
+            ['restaurant_id' => $restaurant->id],
+            [
+                'plan_id' => $demoPlan->id,
+                'starts_at' => now(),
+                'expires_at' => Carbon::now()->addDays(7),
+                'status' => 'trial',
+            ]
+        );
 
         return response()->json([
             'status' => 'success',

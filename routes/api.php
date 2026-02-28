@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\V1\AuthController;
 use App\Http\Controllers\API\V1\RestaurantController;
+use App\Http\Controllers\API\V1\RestaurantSettingController;
 use App\Http\Controllers\API\V1\RestaurantDocumentsController;
 use App\Http\Controllers\API\V1\AdminController;
 use App\Http\Controllers\API\V1\OrdersController;
@@ -26,7 +27,7 @@ Route::prefix('v1/auth')->group(function () {
     // AUTH
     Route::post('restaurant/register', [AuthController::class, 'registerRestaurant']);
     Route::post('restaurant/login', [AuthController::class, 'loginRestaurant']);
-    
+
     // Route::post('user/register', [AuthController::class, 'registerUser']);
     // ROOT LOGIN
     Route::post('user/login', [AuthController::class, 'loginUser']);
@@ -48,27 +49,37 @@ Route::prefix('v1/auth')->group(function () {
 
 
 // Owner Routes
-Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'isRestaurantVerified'])->prefix('v1/owner/restaurant')->group(function () {
-    Route::post('/staff', [RestaurantController::class, 'createStaff']);
-    Route::patch('/staff/{id}', [RestaurantController::class, 'updateStaff']);
-    Route::get('/staff', [RestaurantController::class, 'fetchStaff']);
+Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/owner/restaurant')->group(function () {
+    Route::get('/profile', [RestaurantController::class, 'show']);
+    Route::patch('/basic-settings', [RestaurantController::class, 'update']);
+    
+    Route::middleware(['isRestaurantVerifed'])->group(function () {
 
-    Route::get('/activities', [RestaurantController::class, 'restaurantActivities']);
 
-    Route::post('/add-menu', [MenuController::class, 'store']);
-    Route::patch('/update-menu/{menuItem}', [MenuController::class, 'update']);
-    Route::patch('/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
-    Route::get('/menu/{menuItem}', [MenuController::class, 'show']);
+        Route::get('/settings', [RestaurantSettingController::class, 'show']);
+        Route::patch('/settings', [RestaurantSettingController::class, 'update']);
 
-    // Not Implement!
-    Route::post('/add-category', [CategoryController::class, 'store']);
-    Route::patch('/update-category/{category}', [CategoryController::class, 'update']);
-    Route::get('/category', [CategoryController::class, 'index']);
+        Route::post('/staff', [RestaurantController::class, 'createStaff']);
+        Route::patch('/staff/{id}', [RestaurantController::class, 'updateStaff']);
+        Route::get('/staff', [RestaurantController::class, 'fetchStaff']);
 
-    // Not Implement!
-    Route::get('/tables', [TableController::class, 'fetchTables']);
-    Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
+        Route::get('/activities', [RestaurantController::class, 'restaurantActivities']);
 
+        Route::post('/add-menu', [MenuController::class, 'store']);
+        Route::patch('/update-menu/{menuItem}', [MenuController::class, 'update']);
+        Route::patch('/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
+        Route::get('/menu/{menuItem}', [MenuController::class, 'show']);
+
+        // Not Implement!
+        Route::post('/add-category', [CategoryController::class, 'store']);
+        Route::patch('/update-category/{category}', [CategoryController::class, 'update']);
+        Route::get('/category', [CategoryController::class, 'index']);
+
+        // Not Implement!
+        Route::get('/tables', [TableController::class, 'fetchTables']);
+        Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
+
+    });
 
 
 });
@@ -80,7 +91,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
 
     Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
 
-    Route::get('/{restaurant:slug}/menu',[StaffController::class, 'getStaffMenu']);
+    Route::get('/{restaurant:slug}/menu', [StaffController::class, 'getStaffMenu']);
     Route::get('/{restaurant:slug}/categories', [StaffController::class, 'fetchPublicCategories']);
 
     // Fetch basic table info
@@ -89,7 +100,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::get('/{restaurant:slug}/tables/overview', [TableController::class, 'fetchTables']);
     Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
     Route::get('/{restaurant:slug}/table/{tableId}', [TableController::class, 'tableStatus']);
-    Route::put('/{restaurant:slug}/table/{tableId}/status',[TableController::class, 'tableUpdateStatus']
+    Route::put(
+        '/{restaurant:slug}/table/{tableId}/status',
+        [TableController::class, 'tableUpdateStatus']
     );
 
 
@@ -114,7 +127,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
 
 use App\Models\OrderItem; // assuming each item is stored in OrderItem
 
-Route::get('/items', function(Request $request) {
+Route::get('/items', function (Request $request) {
     $query = $request->query('search', '');
 
     if (!$query) {
@@ -122,7 +135,7 @@ Route::get('/items', function(Request $request) {
     }
 
     // Search distinct item names containing the query (case-insensitive)
-  $items = OrderItem::join('menu_items', 'order_items.menu_item_id', '=', 'menu_items.id')
+    $items = OrderItem::join('menu_items', 'order_items.menu_item_id', '=', 'menu_items.id')
         ->where('menu_items.name', 'LIKE', "%{$query}%")
         ->distinct()
         ->pluck('menu_items.name');
@@ -214,7 +227,7 @@ Route::get('/items', function(Request $request) {
 
 use App\Models\Table;
 
-Route::get('/search-tables', function(Request $request) {
+Route::get('/search-tables', function (Request $request) {
 
     $items = $request->query('item');
 
@@ -235,22 +248,26 @@ Route::get('/search-tables', function(Request $request) {
 
         // Loop each item for AND logic
         foreach ($items as $item) {
-            $orderQuery->whereHas('orderItems.menuItem', function($q) use ($item) {
+            $orderQuery->whereHas('orderItems.menuItem', function ($q) use ($item) {
                 $q->where('name', $item);
             });
         }
 
     })
-    ->with(['orders' => function ($orderQuery) use ($items) {
-        $orderQuery->where('status', 'open')
-            ->with(['orderItems' => function($q) use ($items) {
-                // Only keep items that match selected items
-                $q->whereHas('menuItem', function($q2) use ($items) {
-                    $q2->whereIn('name', $items);
-                })->with('menuItem');
-            }]);
-    }])
-    ->get();
+        ->with([
+            'orders' => function ($orderQuery) use ($items) {
+                $orderQuery->where('status', 'open')
+                    ->with([
+                        'orderItems' => function ($q) use ($items) {
+                            // Only keep items that match selected items
+                            $q->whereHas('menuItem', function ($q2) use ($items) {
+                                $q2->whereIn('name', $items);
+                            })->with('menuItem');
+                        }
+                    ]);
+            }
+        ])
+        ->get();
 
     return response()->json([
         'success' => true,

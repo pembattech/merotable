@@ -15,19 +15,18 @@ return new class extends Migration
             $table->id();
 
             $table->string('name', 150);
+            $table->string('owner_name', 150);
             $table->string('email', 150)->unique();
             $table->string('password', 255);
             $table->string('slug')->unique();
+            $table->string('contact_number', 50);
 
-            $table->enum('status', ['pending', 'active', 'blocked', 'testing'])
-                  ->default('pending')
+            $table->enum('status', ['active', 'blocked', 'expired'])
+                  ->default('active')
                   ->index();
-
-            $table->timestamp('approved_at')->nullable();
 
             $table->text('description')->nullable();
             $table->string('address', 255)->nullable();
-            $table->string('contact_number', 50)->nullable();
             $table->string('logo')->nullable();
 
             $table->timestamps();

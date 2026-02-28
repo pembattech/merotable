@@ -76,6 +76,19 @@
             Staff Management
         </a>
 
+        {{-- Setting --}}
+        <a href="{{ route('restaurant.setting') }}"
+            class="flex items-center p-3 rounded-lg
+           {{ request()->routeIs('restaurant.setting*')
+               ? 'bg-blue-600 text-white'
+               : 'text-gray-400 hover:bg-gray-800 transition' }}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11.983 2.25c.414 0 .75.336.75.75v1.087a7.5 7.5 0 012.327.964l.77-.77a.75.75 0 011.06 0l1.06 1.06a.75.75 0 010 1.06l-.77.77c.41.73.73 1.515.964 2.327H21a.75.75 0 01.75.75v1.5a.75.75 0 01-.75.75h-1.087a7.5 7.5 0 01-.964 2.327l.77.77a.75.75 0 010 1.06l-1.06 1.06a.75.75 0 01-1.06 0l-.77-.77a7.5 7.5 0 01-2.327.964V21a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75v-1.087a7.5 7.5 0 01-2.327-.964l-.77.77a.75.75 0 01-1.06 0l-1.06-1.06a.75.75 0 010-1.06l.77-.77a7.5 7.5 0 01-.964-2.327H3a.75.75 0 01-.75-.75v-1.5A.75.75 0 013 9.75h1.087a7.5 7.5 0 01.964-2.327l-.77-.77a.75.75 0 010-1.06l1.06-1.06a.75.75 0 011.06 0l.77.77a7.5 7.5 0 012.327-.964V3c0-.414.336-.75.75-.75h1.5zM12 9.75a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+            </svg>
+            Setting
+        </a>
+
         {{-- Logout --}}
         <a href="javascript:void(0)" onclick="logout()"
             class="flex items-center p-3 text-red-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition">

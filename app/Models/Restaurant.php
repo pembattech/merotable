@@ -14,14 +14,14 @@ class Restaurant extends Authenticatable
 
     protected $fillable = [
         'name',
+        'owner_name',
         'email',
         'password',
         'slug',
+        'contact_number',
         'status',
-        'approved_at',
         'description',
         'address',
-        'contact_number',
         'logo'
     ];
 
@@ -51,6 +51,11 @@ class Restaurant extends Authenticatable
         return $this->hasMany(RestaurantDocuments::class);
     }
 
+    public function setting()
+{
+    return $this->hasOne(RestaurantSetting::class);
+}
+
     public function tables()
     {
         return $this->hasMany(Table::class);
@@ -72,4 +77,66 @@ class Restaurant extends Authenticatable
     }
 
 
+    // SaaS Relationships
+
+    public function subscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+    // public function addOns(): HasMany
+    // {
+    //     return $this->hasMany(RestaurantAddOn::class);
+    // }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SaaS Feature Logic
+    |--------------------------------------------------------------------------
+    */
+
+    public function getFeatureLimit(string $featureName): int
+    {
+        $plan = $this->subscription?->plan;
+
+        if (!$plan) return 0;
+
+        $feature = $plan->features()
+            ->where('name', $featureName)
+            ->first();
+
+        if (!$feature) return 0;
+
+        $baseLimit = (int) $feature->pivot->value;
+
+        $extra = $this->addOns()
+            ->whereHas('addOn', function ($q) use ($featureName) {
+                $q->where('feature_key', $featureName);
+            })
+            ->where('expires_at', '>', now())
+            ->sum('quantity');
+
+        return $baseLimit + $extra;
+    }
+
+    public function hasBooleanFeature(string $featureName): bool
+    {
+        $plan = $this->subscription?->plan;
+
+        if (!$plan) return false;
+
+        $feature = $plan->features()
+            ->where('name', $featureName)
+            ->first();
+
+        if (!$feature) return false;
+
+        return $feature->pivot->value === 'true';
+    }
 }
+

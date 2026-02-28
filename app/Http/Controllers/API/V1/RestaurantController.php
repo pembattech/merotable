@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\AdminMenuItemResource;
 use App\Http\Resources\V1\PublicMenuItemResource;
 use App\Http\Resources\V1\PublicStaffResource;
+use App\Http\Resources\V1\RestaurantProfileResource;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\OrderActivity;
@@ -19,6 +20,65 @@ use Illuminate\Validation\ValidationException;
 
 class RestaurantController extends Controller
 {
+
+    public function show(Request $request)
+    {
+        $restaurant = auth('restaurant')
+            ->user()
+            ->load(['setting', 'documents']);
+
+        return new RestaurantProfileResource($restaurant);
+    }
+
+    public function update(Request $request)
+    {
+        $restaurant = auth('restaurant')->user();
+
+
+        // Validation
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:restaurants,slug,' . $restaurant->id,
+            'email' => 'nullable|email|max:255|unique:restaurants,email,' . $restaurant->id,
+            'contact_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'description' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        // dd($request->all());
+
+        // return response()->json([
+        //     'success' => true,
+        //     'request' => $validated,
+        // ]);
+
+        // Update basic info
+        $data = $request->only('name', 'slug', 'email', 'contact_number', 'address', 'description');
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($restaurant->logo && \Storage::disk('public')->exists($restaurant->logo)) {
+                \Storage::disk('public')->delete($restaurant->logo);
+            }
+
+            $path = $request->file('logo')->store('logos', 'public');
+
+            $data['logo'] = $path;
+        }
+
+        $restaurant->update($data);
+
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Restaurant information updated successfully.',
+            'data' => new RestaurantProfileResource($restaurant),
+        ]);
+    }
+
     // public function index()
     // {
     //     $user = Auth::user();
@@ -53,30 +113,6 @@ class RestaurantController extends Controller
     //     ], 201);
     // }
 
-    // public function show(Restaurant $restaurant)
-    // {
-    //     $this->authorizeAccess($restaurant);
-    //     return response()->json(['success' => true, 'data' => $restaurant]);
-    // }
-
-    // public function update(Request $request, Restaurant $restaurant)
-    // {
-    //     $this->authorizeAccess($restaurant);
-
-    //     $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'phone' => 'required|string|max:20',
-    //         'address' => 'required|string',
-    //     ]);
-
-    //     $restaurant->update($request->only('name', 'phone', 'address'));
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Restaurant updated successfully',
-    //         'data' => $restaurant
-    //     ]);
-    // }
 
     // public function destroy(Restaurant $restaurant)
     // {

@@ -16,9 +16,11 @@
     </style>
 
     <script src="{{ asset('js/auth-guard.js') }}"></script>
-    <script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         requireGuest();
-    </script>
+    });
+</script>
 
     <style>
         * {
@@ -44,7 +46,7 @@
         body {
             font-family: 'DM Sans', sans-serif;
             background: linear-gradient(135deg, #000000 0%, #0a1929 50%, #001e3c 100%);
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -467,10 +469,6 @@
 </head>
 
 <body>
-    <div class="api-config">
-        <button class="api-config-btn" onclick="toggleApiConfig()">⚙️ API Config</button>
-    </div>
-
     <div class="container">
         <div class="card">
             <div class="form-wrapper">
@@ -515,11 +513,6 @@
                             <a href="#" onclick="return false;">Forgot password?</a>
                         </div>
 
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="remember-me">
-                            <label for="remember-me">Remember me for 30 days</label>
-                        </div>
-
                         <button type="submit" id="loginBtn">
                             <span id="loginBtnText">Sign in</span>
                         </button>
@@ -541,6 +534,11 @@
                         <div class="form-group">
                             <label for="register-name">Restaurant Name</label>
                             <input type="text" id="register-name" placeholder="Your Restaurant Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="owner-name">Owner Name</label>
+                            <input type="text" id="owner-name" placeholder="Your owner Name" required>
                         </div>
 
                         <div class="form-group">
@@ -672,7 +670,6 @@
 
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            const rememberMe = document.getElementById('remember-me').checked;
 
             // Determine the endpoint based on user type
             let endpoint = '';
@@ -694,7 +691,6 @@
                     body: JSON.stringify({
                         email: email,
                         password: password,
-                        remember: rememberMe
                     })
                 });
 
@@ -742,6 +738,7 @@
             clearAlerts();
 
             const name = document.getElementById('register-name').value;
+            const ownername = document.getElementById('owner-name').value;
             const email = document.getElementById('register-email').value;
             const phone = document.getElementById('register-phone').value;
             const address = document.getElementById('register-address').value;
@@ -771,8 +768,9 @@
                     },
                     body: JSON.stringify({
                         name: name,
+                        owner_name: ownername,
                         email: email,
-                        phone: phone,
+                        contact_number: phone,
                         address: address,
                         password: password,
                         password_confirmation: confirmPassword
