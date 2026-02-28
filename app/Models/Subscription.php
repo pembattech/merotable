@@ -30,19 +30,19 @@ class Subscription extends Model
         return $this->belongsTo(Plan::class);
     }
 
-    public function isActive(): bool
-    {
-        return $this->status === 'active'
-            && $this->expires_at
-            && $this->expires_at->isFuture();
-    }
+    // public function isActive(): bool
+    // {
+    //     return $this->status === 'active'
+    //         && $this->expires_at
+    //         && $this->expires_at->isFuture();
+    // }
 
     public function daysLeft(): int
-{
-    if (!$this->expires_at) {
-        return 0;
-    }
+    {
+        if (!$this->expires_at) {
+            return 0;
+        }
 
-    return now()->diffInDays($this->expires_at, false);
-}
+        return now()->diffInDays($this->expires_at, false);
+    }
 }

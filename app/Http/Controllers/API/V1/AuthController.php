@@ -40,18 +40,6 @@ class AuthController extends Controller
             'contact_number' => $request->contact_number,
         ]);
 
-          $demoPlan = Plan::where('name', 'Demo')->first();
-
-        Subscription::updateOrCreate(
-            ['restaurant_id' => $restaurant->id],
-            [
-                'plan_id' => $demoPlan->id,
-                'starts_at' => now(),
-                'expires_at' => Carbon::now()->addDays(7),
-                'status' => 'trial',
-            ]
-        );
-
         return response()->json([
             'status' => 'success',
             'message' => 'Restaurant registered successfully. Waiting for admin verification.',

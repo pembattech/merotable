@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Restaurant;
 use App\Models\RestaurantDocuments;
+use App\Models\Plan;
+use App\Models\Subscription;
 
 class AdminController extends Controller
 {
@@ -39,41 +41,52 @@ class AdminController extends Controller
 
 
 
-        $documents = RestaurantDocuments::where('restaurant_id', $restaurant->id);
+        // $documents = RestaurantDocuments::where('restaurant_id', $restaurant->id);
 
-        $totalDocuments = $documents->count();
+        // $totalDocuments = $documents->count();
 
-        $approvedDocuments = RestaurantDocuments::where('restaurant_id', $restaurant->id)
-            ->where('status', 'approved')
-            ->count();
+        // $approvedDocuments = RestaurantDocuments::where('restaurant_id', $restaurant->id)
+        //     ->where('status', 'approved')
+        //     ->count();
 
-        // Minimum required documents check
-        if ($totalDocuments < 2) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Insufficient documents uploaded.',
-                'uploaded' => $totalDocuments
-            ], 422);
-        }
+        // // Minimum required documents check
+        // if ($totalDocuments < 2) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Insufficient documents uploaded.',
+        //         'uploaded' => $totalDocuments
+        //     ], 422);
+        // }
 
-        // All documents must be approved
-        if ($totalDocuments !== $approvedDocuments) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Some documents are still pending approval.',
-                'approved' => $approvedDocuments,
-                'total' => $totalDocuments
-            ], 422);
-        }
+        // // All documents must be approved
+        // if ($totalDocuments !== $approvedDocuments) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Some documents are still pending approval.',
+        //         'approved' => $approvedDocuments,
+        //         'total' => $totalDocuments
+        //     ], 422);
+        // }
 
 
         // TODO: Understand transactions more deeply
         DB::transaction(function () use ($restaurant) {
 
-            $active_restaurant = $restaurant->update(attributes: [
-                'status' => 'active',
-                'approved_at' => now(),
+            $restaurant->update(attributes: [
+                'status' => 'active'
             ]);
+
+            $demoPlan = Plan::where('name', 'Demo')->first();
+
+            Subscription::updateOrCreate(
+                ['restaurant_id' => $restaurant->id],
+                [
+                    'plan_id' => $demoPlan->id,
+                    'starts_at' => now(),
+                    'expires_at' => Carbon::now()->addDays(7),
+                    'status' => 'trial',
+                ]
+            );
 
 
             /**

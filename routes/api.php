@@ -15,9 +15,13 @@ use App\Http\Controllers\API\V1\StaffController;
 use App\Http\Controllers\API\V1\TableController;
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
+     $restaurant = auth('restaurant')->user()
+            ?? auth('staff')->user()->restaurant;
+            
     return response()->json([
         'success' => true,
+        'days_left' => $request->subscription_days_left ?? 0, // from middleware
     ]);
 });
 
@@ -49,7 +53,7 @@ Route::prefix('v1/auth')->group(function () {
 
 
 // Owner Routes
-Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/owner/restaurant')->group(function () {
+Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'checkSubscription'])->prefix('v1/owner/restaurant')->group(function () {
 
     Route::get('/', [RestaurantController::class, 'index']);
 
@@ -57,7 +61,6 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
     Route::patch('/basic-settings', [RestaurantController::class, 'update']);
     
     // Route::middleware(['isRestaurantVerifed'])->group(function () {
-
 
         Route::get('/settings', [RestaurantSettingController::class, 'show']);
         Route::patch('/settings', [RestaurantSettingController::class, 'update']);
@@ -88,7 +91,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
 });
 
 // Staff Routes
-Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
+Route::middleware(['auth:sanctum', 'checkSubscription'])->prefix('v1/staff')->group(function () {
     Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
     Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
 

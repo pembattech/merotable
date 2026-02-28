@@ -13,6 +13,66 @@ use App\Models\Restaurant;
 class TableController extends Controller
 {
 
+    // app/Http/Controllers/TableController.php
+
+    // public function store(Request $request)
+    // {
+    //     $restaurant = auth()->user()->restaurant;
+
+    //     // Uses your getFeatureLimit() — returns 0 if no plan/feature
+    //     $limit = $restaurant->getFeatureLimit('tables_limit');
+
+    //     if ($limit > 0 && $restaurant->tables()->count() >= $limit) {
+    //         return back()->with('error', "Table limit of {$limit} reached. Upgrade your plan.");
+    //     }
+
+    //     $request->validate([
+    //         'table_number' => [
+    //             'required',
+    //             'string',
+    //             'max:5',
+    //             Rule::unique('tables')->where('restaurant_id', $restaurant->id),
+    //         ],
+    //         'status' => ['required', Rule::in(['available', 'occupied', 'reserved'])],
+    //     ]);
+
+    //     $restaurant->tables()->create($request->only('table_number', 'status'));
+
+    //     return back()->with('success', 'Table added successfully.');
+    // }
+
+    // public function storeBulk(Request $request)
+    // {
+    //     $restaurant = auth()->user()->restaurant;
+    //     $limit = $restaurant->getFeatureLimit('tables_limit');
+    //     $current = $restaurant->tables()->count();
+    //     $incoming = count($request->tables);
+
+    //     if ($limit > 0 && ($current + $incoming) > $limit) {
+    //         $remaining = max(0, $limit - $current);
+    //         return back()->with('error', "You can only add {$remaining} more table(s). Plan limit: {$limit}.");
+    //     }
+
+    //     $request->validate([
+    //         'tables' => ['required', 'array', 'min:1', 'max:100'],
+    //         'tables.*.table_number' => ['required', 'string', 'max:5'],
+    //         'tables.*.status' => ['required', Rule::in(['available', 'occupied', 'reserved'])],
+    //     ]);
+
+    //     $now = now();
+    //     $rows = collect($request->tables)->map(fn($t) => [
+    //         'restaurant_id' => $restaurant->id,
+    //         'table_number' => strtoupper($t['table_number']),
+    //         'status' => $t['status'],
+    //         'created_at' => $now,
+    //         'updated_at' => $now,
+    //     ])->toArray();
+
+    //     DB::table('tables')->insertOrIgnore($rows);
+
+    //     return back()->with('success', 'Tables added.');
+    // }
+
     public function tableStatus(Restaurant $restaurant, $tableId)
     {
         $staff = auth('staff')->user();

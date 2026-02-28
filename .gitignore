@@ -1,5 +1,7 @@
 TODO
 docs/
+test.html
+prototype.html
 *.log
 .DS_Store
 .env

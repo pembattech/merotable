@@ -340,6 +340,12 @@
 
                     if (!subscription) return;
 
+                    // If no subscription or expired, redirect to pricing page
+                    if (!subscription || subscription.daysLeft <= 0) {
+                        window.location.href = "/pricing";
+                        return;
+                    }
+
                     const planTier = subscription.plan?.name ?? 'No Plan';
                     const expiryDays = subscription.daysLeft ?? 0;
 

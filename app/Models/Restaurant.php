@@ -52,9 +52,9 @@ class Restaurant extends Authenticatable
     }
 
     public function setting()
-{
-    return $this->hasOne(RestaurantSetting::class);
-}
+    {
+        return $this->hasOne(RestaurantSetting::class);
+    }
 
     public function tables()
     {
@@ -104,13 +104,15 @@ class Restaurant extends Authenticatable
     {
         $plan = $this->subscription?->plan;
 
-        if (!$plan) return 0;
+        if (!$plan)
+            return 0;
 
         $feature = $plan->features()
             ->where('name', $featureName)
             ->first();
 
-        if (!$feature) return 0;
+        if (!$feature)
+            return 0;
 
         $baseLimit = (int) $feature->pivot->value;
 
@@ -128,15 +130,32 @@ class Restaurant extends Authenticatable
     {
         $plan = $this->subscription?->plan;
 
-        if (!$plan) return false;
+        if (!$plan)
+            return false;
 
         $feature = $plan->features()
             ->where('name', $featureName)
             ->first();
 
-        if (!$feature) return false;
+        if (!$feature)
+            return false;
 
         return $feature->pivot->value === 'true';
+    }
+
+    // Add to Restaurant model — replaces the old hasFeature()
+    public function canAddMoreTables(): bool
+    {
+        $limit = $this->getFeatureLimit('tables_limit');
+        return $limit === 0 || $this->tables()->count() < $limit;
+    }
+
+    public function remainingTables(): int
+    {
+        $limit = $this->getFeatureLimit('tables_limit');
+        if ($limit === 0)
+            return PHP_INT_MAX; // unlimited
+        return max(0, $limit - $this->tables()->count());
     }
 }
 

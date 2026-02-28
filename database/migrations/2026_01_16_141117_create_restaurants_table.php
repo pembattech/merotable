@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('contact_number', 50);
 
-            $table->enum('status', ['active', 'blocked', 'expired'])
-                  ->default('active')
+            $table->enum('status', ['active', 'blocked', 'expired', 'pending'])
+                  ->default('pending')
                   ->index();
 
             $table->text('description')->nullable();

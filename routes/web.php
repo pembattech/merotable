@@ -11,6 +11,10 @@ Route::get('/auth', function () {
     return view('authentication');
 })->name('auth');
 
+Route::get('pricing', function(){
+    return view('pricing');
+})->name('pricing');
+
 // Restaurant Routes
 Route::get('restaurant/dashboard', function () {
     return view('restaurant/dashboard');
