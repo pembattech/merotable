@@ -19,7 +19,14 @@ class CheckSubscription
             ], 401);
         }
 
-        $subscription = $restaurant->subscription;
+        if ($restaurant->status === 'expired') {
+            return response()->json([
+                'message' => 'Subscription expired or inactive',
+                'redirect_url' => '/pricing'
+            ], 403);
+        }
+
+        $subscription = $restaurant->activeSubscription;
 
         // Calculate days left
         $daysLeft = 0;

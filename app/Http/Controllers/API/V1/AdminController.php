@@ -11,6 +11,7 @@ use App\Models\Restaurant;
 use App\Models\RestaurantDocuments;
 use App\Models\Plan;
 use App\Models\Subscription;
+use App\Models\Transaction;
 
 class AdminController extends Controller
 {
@@ -186,6 +187,80 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'All documents approved successfully'
+        ]);
+    }
+
+    public function getPendingTranscation(Request $request)
+    {
+        return response()->json([
+            'data' => Transaction::where('status', 'pending')->latest()->get()
+        ]);
+    }
+
+    public function approveTransaction($slug)
+    {
+        $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
+
+        // Get latest pending transaction
+        $transaction = $restaurant->transactions()
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        if (!$transaction) {
+            return response()->json([
+                'message' => 'No pending transaction found.'
+            ], 404);
+        }
+
+        // Prevent double approval of same transaction
+        if ($transaction->status === 'completed') {
+            return response()->json([
+                'message' => 'Transaction already approved.'
+            ], 400);
+        }
+
+        DB::transaction(function () use ($restaurant, $transaction) {
+
+            $plan = $transaction->plan;
+            // TODO: create features according to plan.
+
+            $startsAt = Carbon::now();
+
+            $expiresAt = match ($plan->duration) {
+                'semiannually' => $startsAt->copy()->addMonths(6),
+                'annually' => $startsAt->copy()->addYear(),
+            };
+
+            // Expire old active subscription (if any)
+            Subscription::where('restaurant_id', $restaurant->id)
+                ->where('status', 'active')
+                ->update(['status' => 'expired']);
+
+            // Create new subscription
+            Subscription::create([
+                'restaurant_id' => $restaurant->id,
+                'plan_id' => $plan->id,
+                'starts_at' => $startsAt,
+                'expires_at' => $expiresAt,
+                'status' => 'active',
+            ]);
+
+            // Mark transaction completed
+            $transaction->update([
+                'status' => 'completed'
+            ]);
+
+            // Activate restaurant
+            $restaurant->update([
+                'status' => 'active'
+            ]);
+        });
+
+        // TODO: send message to the restaurant owner.
+
+        return response()->json([
+            'message' => 'Transaction approved and subscription activated successfully.'
         ]);
     }
 }

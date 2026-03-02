@@ -15,6 +15,10 @@ Route::get('pricing', function(){
     return view('pricing');
 })->name('pricing');
 
+Route::get('/payment-success', function () {
+    return view('payment-success');
+});
+
 // Restaurant Routes
 Route::get('restaurant/dashboard', function () {
     return view('restaurant/dashboard');

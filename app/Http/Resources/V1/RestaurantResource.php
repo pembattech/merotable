@@ -51,11 +51,41 @@ class RestaurantResource extends JsonResource
                 $this->whenLoaded('menuItems')
             ),
 
-            'subscription' => $this->whenLoaded(
-                'subscription',
-                fn() => new SubscriptionResource($this->subscription)
+            'subscription_history' => SubscriptionResource::collection(
+                $this->whenLoaded('subscriptions')
             ),
 
+            // 'active_subscription' => $this->when($this->activeSubscription, function () {
+            //     return [
+            //         'planId' => $this->activeSubscription->plan?->id,
+            //         'planName' => $this->activeSubscription->plan?->name,
+            //         'planPrice' => $this->activeSubscription->plan?->price,
+            //         'startsAt' => $this->activeSubscription->starts_at,
+            //         'expiresAt' => $this->activeSubscription->expires_at,
+            //         'status' => $this->activeSubscription->status,
+            //         'daysLeft' => $this->activeSubscription->expires_at
+            //             ? now()->diffInDays($this->activeSubscription->expires_at, false)
+            //             : null,
+            //     ];
+            // }),
+
+            'active_subscription' => $this->whenLoaded('activeSubscription', function () {
+                $active = $this->activeSubscription;
+
+                return [
+                    // Subscription info
+                    'id' => $active->id,
+                    'startsAt' => $active->starts_at,
+                    'expiresAt' => $active->expires_at,
+                    'status' => $active->status,
+                    'daysLeft' => $active->expires_at
+                        ? now()->diffInDays($active->expires_at, false)
+                        : null,
+
+                    // Nested plan info
+                    'plan' => $active->plan ? new PlanResource($active->plan) : null,
+                ];
+            }),
 
             // Optional: add logo or image URL if available
             'logo' => $this->logo_url ?? null,

@@ -79,9 +79,9 @@ class Restaurant extends Authenticatable
 
     // SaaS Relationships
 
-    public function subscription()
+    public function subscriptions()
     {
-        return $this->hasOne(Subscription::class);
+        return $this->hasMany(Subscription::class);
     }
 
     // public function addOns(): HasMany
@@ -100,48 +100,53 @@ class Restaurant extends Authenticatable
     |--------------------------------------------------------------------------
     */
 
-    public function getFeatureLimit(string $featureName): int
+    public function activeSubscription()
     {
-        $plan = $this->subscription?->plan;
-
-        if (!$plan)
-            return 0;
-
-        $feature = $plan->features()
-            ->where('name', $featureName)
-            ->first();
-
-        if (!$feature)
-            return 0;
-
-        $baseLimit = (int) $feature->pivot->value;
-
-        $extra = $this->addOns()
-            ->whereHas('addOn', function ($q) use ($featureName) {
-                $q->where('feature_key', $featureName);
-            })
-            ->where('expires_at', '>', now())
-            ->sum('quantity');
-
-        return $baseLimit + $extra;
+        return $this->hasOne(Subscription::class)
+            ->where('status', 'active')
+            ->latestOfMany(); // latestOfMany() ensures you get the newest active one.
     }
+    
+    public function getFeatureLimit(string $featureName)
+{
+    $subscription = $this->activeSubscription;
+
+    if (!$subscription) {
+        return 0;
+    }
+
+    $plan = $subscription->plan;
+
+    if (!$plan) {
+        return 0;
+    }
+
+    $feature = $plan->features()
+        ->where('name', $featureName)
+        ->first();
+
+    if (!$feature) {
+        return 0;
+    }
+
+    return (int) $feature->pivot->value;
+}
 
     public function hasBooleanFeature(string $featureName): bool
-    {
-        $plan = $this->subscription?->plan;
+{
+    $subscription = $this->activeSubscription;
 
-        if (!$plan)
-            return false;
-
-        $feature = $plan->features()
-            ->where('name', $featureName)
-            ->first();
-
-        if (!$feature)
-            return false;
-
-        return $feature->pivot->value === 'true';
+    if (!$subscription) {
+        return false;
     }
+
+    $feature = $subscription->plan
+        ->features()
+        ->where('name', $featureName)
+        ->first();
+
+    return $feature && $feature->pivot->value === 'true';
+}
 
     // Add to Restaurant model — replaces the old hasFeature()
     public function canAddMoreTables(): bool

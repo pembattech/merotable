@@ -9,36 +9,35 @@ use Carbon\Carbon;
 use App\Http\Resources\V1\TableResource;
 use App\Models\Table;
 use App\Models\Restaurant;
+use GrahamCampbell\ResultType\Success;
 
 class TableController extends Controller
 {
 
-    // app/Http/Controllers/TableController.php
-
     // public function store(Request $request)
     // {
-    //     $restaurant = auth()->user()->restaurant;
+    //     $restaurant = auth('restaurant')->user();
 
     //     // Uses your getFeatureLimit() — returns 0 if no plan/feature
     //     $limit = $restaurant->getFeatureLimit('tables_limit');
 
-    //     if ($limit > 0 && $restaurant->tables()->count() >= $limit) {
-    //         return back()->with('error', "Table limit of {$limit} reached. Upgrade your plan.");
-    //     }
+        // if ($limit > 0 && $restaurant->tables()->count() >= $limit) {
+        //     return back()->with('error', "Table limit of {$limit} reached. Upgrade your plan.");
+        // }
 
-    //     $request->validate([
-    //         'table_number' => [
-    //             'required',
-    //             'string',
-    //             'max:5',
-    //             Rule::unique('tables')->where('restaurant_id', $restaurant->id),
-    //         ],
-    //         'status' => ['required', Rule::in(['available', 'occupied', 'reserved'])],
-    //     ]);
+        // $request->validate([
+        //     'table_number' => [
+        //         'required',
+        //         'string',
+        //         'max:5',
+        //         Rule::unique('tables')->where('restaurant_id', $restaurant->id),
+        //     ],
+        //     'status' => ['required', Rule::in(['available', 'occupied', 'reserved'])],
+        // ]);
 
-    //     $restaurant->tables()->create($request->only('table_number', 'status'));
+        // $restaurant->tables()->create($request->only('table_number', 'status'));
 
-    //     return back()->with('success', 'Table added successfully.');
+        // return back()->with('success', 'Table added successfully.');
     // }
 
     // public function storeBulk(Request $request)

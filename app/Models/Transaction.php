@@ -9,6 +9,7 @@ class Transaction extends Model
 {
     protected $fillable = [
         'restaurant_id',
+        'plan_id',
         'amount',
         'type',
         'reference_id',
@@ -21,8 +22,8 @@ class Transaction extends Model
         return $this->belongsTo(Restaurant::class);
     }
 
-    public function isSuccessful(): bool
-    {
-        return $this->status === 'completed';
+    public function plan(){
+        return $this->belongsTo(Plan::class);
     }
+
 }

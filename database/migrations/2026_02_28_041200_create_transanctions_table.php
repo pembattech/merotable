@@ -11,8 +11,13 @@ return new class extends Migration {
             $table->id();
 
             $table->foreignId('restaurant_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->foreignId('plan_id')
+                ->nullable()
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->decimal('amount', 10, 2);
 
@@ -21,7 +26,7 @@ return new class extends Migration {
                 'add_on'
             ]);
 
-            $table->string('reference_id')->nullable();
+            $table->string('reference_id');
             $table->string('payment_method')->nullable();
 
             $table->enum('status', [

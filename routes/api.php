@@ -13,12 +13,13 @@ use App\Http\Controllers\API\V1\MenuController;
 use App\Http\Controllers\API\V1\CategoryController;
 use App\Http\Controllers\API\V1\StaffController;
 use App\Http\Controllers\API\V1\TableController;
+use App\Http\Controllers\API\V1\TransactionController;
 
 
 Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
-     $restaurant = auth('restaurant')->user()
-            ?? auth('staff')->user()->restaurant;
-            
+    $restaurant = auth('restaurant')->user()
+        ?? auth('staff')->user()->restaurant;
+
     return response()->json([
         'success' => true,
         'days_left' => $request->subscription_days_left ?? 0, // from middleware
@@ -53,14 +54,17 @@ Route::prefix('v1/auth')->group(function () {
 
 
 // Owner Routes
-Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'checkSubscription'])->prefix('v1/owner/restaurant')->group(function () {
+Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/owner/restaurant')->group(function () {
 
-    Route::get('/', [RestaurantController::class, 'index']);
+    Route::post('/subscription/transaction', [TransactionController::class, 'store']);
 
-    Route::get('/profile', [RestaurantController::class, 'show']);
-    Route::patch('/basic-settings', [RestaurantController::class, 'update']);
-    
-    // Route::middleware(['isRestaurantVerifed'])->group(function () {
+    Route::middleware(['checkSubscription'])->group(function () {
+
+        Route::get('/', [RestaurantController::class, 'index']);
+
+        Route::get('/profile', [RestaurantController::class, 'show']);
+        Route::patch('/basic-settings', [RestaurantController::class, 'update']);
+
 
         Route::get('/settings', [RestaurantSettingController::class, 'show']);
         Route::patch('/settings', [RestaurantSettingController::class, 'update']);
@@ -81,11 +85,12 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated', 'checkSubscripti
         Route::patch('/update-category/{category}', [CategoryController::class, 'update']);
         Route::get('/category', [CategoryController::class, 'index']);
 
-        // Not Implement!
+        // Route::post('table/add', [TableController::class, 'store']);
         Route::get('/tables', [TableController::class, 'fetchTables']);
         Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 
-    // });
+
+    });
 
 
 });
@@ -129,6 +134,10 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
     Route::post('/restaurants/{slug}/reject', [AdminController::class, 'reject']);
 
     Route::post('/restaurant/documents/{slug}/approve', [AdminController::class, 'approveDocuments']);
+
+    Route::get('/subscription/transaction/pending', [AdminController::class, 'getPendingTranscation']);
+
+    Route::post('/subscription/transaction/{slug}/approve', [AdminController::class, 'approveTransaction']);
 });
 
 use App\Models\OrderItem; // assuming each item is stored in OrderItem

@@ -336,7 +336,7 @@
 
                     console.log('Restaurant Data:', data);
 
-                    const subscription = data.data.subscription;
+                    const subscription = data.data.active_subscription;
 
                     if (!subscription) return;
 
