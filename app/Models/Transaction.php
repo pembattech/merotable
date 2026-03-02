@@ -14,6 +14,7 @@ class Transaction extends Model
         'type',
         'reference_id',
         'payment_method',
+        'billing_cycle', // semiannually or annually
         'status',
     ];
 

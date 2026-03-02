@@ -25,7 +25,7 @@ class RestaurantController extends Controller
     public function index()
     {
         $restaurant = auth('restaurant')->user();
-        $restaurant->load(['activeSubscription.plan']);
+        $restaurant->load(['currentSubscription.plan']);
 
         return response()->json(['success' => true, 'data' => new RestaurantResource($restaurant)]);
     }

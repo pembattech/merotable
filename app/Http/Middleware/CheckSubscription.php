@@ -26,7 +26,7 @@ class CheckSubscription
             ], 403);
         }
 
-        $subscription = $restaurant->activeSubscription;
+        $subscription = $restaurant->currentSubscription;
 
         // Calculate days left
         $daysLeft = 0;
@@ -57,7 +57,7 @@ class CheckSubscription
         }
 
         // Attach days left for active subscription
-        $request->merge(['subscription_days_left' => $daysLeft]);
+        $request->merge(['subscription_days_left' => $daysLeft, 'test' => $subscription]);
 
         return $next($request);
     }

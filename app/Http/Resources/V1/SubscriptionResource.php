@@ -25,7 +25,7 @@ class SubscriptionResource extends JsonResource
             'startsAt' => $this->starts_at,
             'expiresAt' => $this->expires_at,
 
-            'daysLeft' => $this->daysLeft(),
+            'daysLeft' => $this->expires_at ? now()->diffInDays($this->expires_at, false) : 0,
             'status' => $this->status,
 
             'created_at' => $this->created_at,

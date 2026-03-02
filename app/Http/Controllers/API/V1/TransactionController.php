@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
+use App\Models\Plan;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -13,7 +14,8 @@ class TransactionController extends Controller
         $restaurant = auth('restaurant')->user();
 
         $request->validate([
-            'plan_id' => 'required|exists:plans,id',
+            'plan_name' => 'required|exists:plans,name',
+            'billing_cycle' => 'required|in:semiannually,annually',
             'amount' => 'required|numeric|min:1',
             'type' => 'required|in:subscription,add_on',
             'reference_id' => 'required|string|max:100',
@@ -21,13 +23,16 @@ class TransactionController extends Controller
 
         ]);
 
+        $plan_id = Plan::where('name', $request->plan_name)->value('id');
+
         $transaction = Transaction::create([
             'restaurant_id' => $restaurant->id,
-            'plan_id' => $request->plan_id,
+            'plan_id' => $plan_id,
             'amount' => $request->amount,
             'type' => $request->type,
             'reference_id' => $request->reference_id,
-            'payment_method' => $request->payment_method
+            'payment_method' => $request->payment_method,
+            'billing_cycle' => $request->billing_cycle,
         ]);
 
         return response()->json([

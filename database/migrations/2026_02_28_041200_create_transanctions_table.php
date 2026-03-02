@@ -26,8 +26,10 @@ return new class extends Migration {
                 'add_on'
             ]);
 
-            $table->string('reference_id');
+            $table->string('reference_id')->unique();
             $table->string('payment_method')->nullable();
+
+            $table->enum('billing_cycle', ['semiannually', 'annually']);
 
             $table->enum('status', [
                 'pending',

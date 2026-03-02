@@ -14,7 +14,7 @@ use App\Http\Controllers\API\V1\CategoryController;
 use App\Http\Controllers\API\V1\StaffController;
 use App\Http\Controllers\API\V1\TableController;
 use App\Http\Controllers\API\V1\TransactionController;
-
+use App\Http\Controllers\API\V1\SubscriptionController;
 
 Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
     $restaurant = auth('restaurant')->user()
@@ -57,6 +57,7 @@ Route::prefix('v1/auth')->group(function () {
 Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/owner/restaurant')->group(function () {
 
     Route::post('/subscription/transaction', [TransactionController::class, 'store']);
+    Route::get('/subscription/expired', [SubscriptionController::class, 'lastExpiredSubscription']);
 
     Route::middleware(['checkSubscription'])->group(function () {
 

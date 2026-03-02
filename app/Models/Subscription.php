@@ -13,6 +13,7 @@ class Subscription extends Model
         'starts_at',
         'expires_at',
         'status',
+        'billing_cycle',
     ];
 
     protected $dates = [

@@ -11,12 +11,14 @@ return new class extends Migration {
             $table->id();
 
             $table->foreignId('restaurant_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->foreignId('plan_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->enum('billing_cycle', ['semiannually', 'annually'])->nullable();
 
             $table->timestamp('starts_at')->useCurrent();
             $table->timestamp('expires_at')->nullable();

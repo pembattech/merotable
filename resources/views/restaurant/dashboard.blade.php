@@ -352,7 +352,7 @@
                     console.log(planTier, expiryDays);
 
                     document.getElementById('planTier').textContent = planTier;
-                    document.getElementById('expiryDays').textContent = expiryDays;
+                    document.getElementById('expiryDays').textContent = parseInt(expiryDays);;
 
                 } catch (error) {
                     console.error('Error:', error);

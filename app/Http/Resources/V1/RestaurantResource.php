@@ -55,22 +55,22 @@ class RestaurantResource extends JsonResource
                 $this->whenLoaded('subscriptions')
             ),
 
-            // 'active_subscription' => $this->when($this->activeSubscription, function () {
+            // 'active_subscription' => $this->when($this->currentSubscription, function () {
             //     return [
-            //         'planId' => $this->activeSubscription->plan?->id,
-            //         'planName' => $this->activeSubscription->plan?->name,
-            //         'planPrice' => $this->activeSubscription->plan?->price,
-            //         'startsAt' => $this->activeSubscription->starts_at,
-            //         'expiresAt' => $this->activeSubscription->expires_at,
-            //         'status' => $this->activeSubscription->status,
-            //         'daysLeft' => $this->activeSubscription->expires_at
-            //             ? now()->diffInDays($this->activeSubscription->expires_at, false)
+            //         'planId' => $this->currentSubscription->plan?->id,
+            //         'planName' => $this->currentSubscription->plan?->name,
+            //         'planPrice' => $this->currentSubscription->plan?->price,
+            //         'startsAt' => $this->currentSubscription->starts_at,
+            //         'expiresAt' => $this->currentSubscription->expires_at,
+            //         'status' => $this->currentSubscription->status,
+            //         'daysLeft' => $this->currentSubscription->expires_at
+            //             ? now()->diffInDays($this->currentSubscription->expires_at, false)
             //             : null,
             //     ];
             // }),
 
-            'active_subscription' => $this->whenLoaded('activeSubscription', function () {
-                $active = $this->activeSubscription;
+            'active_subscription' => $this->whenLoaded('currentSubscription', function () {
+                $active = $this->currentSubscription;
 
                 return [
                     // Subscription info

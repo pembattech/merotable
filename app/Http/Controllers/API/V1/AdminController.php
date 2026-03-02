@@ -223,19 +223,22 @@ class AdminController extends Controller
         DB::transaction(function () use ($restaurant, $transaction) {
 
             $plan = $transaction->plan;
-            // TODO: create features according to plan.
 
-            $startsAt = Carbon::now();
+            $startsAt = now();
 
-            $expiresAt = match ($plan->duration) {
+            // Set expiry date based on transaction's billing_cycle
+            $expiresAt = match ($transaction->billing_cycle) {
                 'semiannually' => $startsAt->copy()->addMonths(6),
-                'annually' => $startsAt->copy()->addYear(),
+                'annually' => $startsAt->copy()->addYear()
             };
 
             // Expire old active subscription (if any)
             Subscription::where('restaurant_id', $restaurant->id)
                 ->where('status', 'active')
-                ->update(['status' => 'expired']);
+                ->update([
+                    'status' => 'expired',
+                    'billing_cycle' => $transaction->billing_cycle
+                ]);
 
             // Create new subscription
             Subscription::create([
@@ -244,17 +247,14 @@ class AdminController extends Controller
                 'starts_at' => $startsAt,
                 'expires_at' => $expiresAt,
                 'status' => 'active',
+                'billing_cycle' => $transaction->billing_cycle,
             ]);
 
             // Mark transaction completed
-            $transaction->update([
-                'status' => 'completed'
-            ]);
+            $transaction->update(['status' => 'completed']);
 
             // Activate restaurant
-            $restaurant->update([
-                'status' => 'active'
-            ]);
+            $restaurant->update(['status' => 'active']);
         });
 
         // TODO: send message to the restaurant owner.
