@@ -90,8 +90,8 @@
             <div class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-700">
                 SR</div>
             <div>
-                <p class="text-sm font-600 text-slate-800 leading-none" id="restro_name">...loading</p>
-                <p class="text-xs text-slate-400 mt-0.5 leading-none"> <span id="subscription_plan">...loading</span>
+                <p class="text-sm font-600 text-slate-800 leading-none"><span class="restro_name"></span></p>
+                <p class="text-xs text-slate-400 mt-0.5 leading-none"> <span class="subscription_plan">...loading</span>
                     Plan · <span class="text-red-500 font-500" id="subscription_status">Expired</span></p>
             </div>
         </div>
@@ -104,8 +104,9 @@
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">🔒
             </div>
             <div>
-                <p class="font-600 text-sm">Your <strong>Basic Plan</strong> has expired</p>
-                <p class="text-xs text-red-200">Sajha Restro is currently paused — renew to go live again.</p>
+                <p class="font-600 text-sm">Your <strong><span class="subscription_plan"></span> Plan</strong> has expired</p>
+                <p class="text-xs text-red-200"><span class="restro_name"></span> is currently paused — renew to go live
+                    again.</p>
             </div>
         </div>
         <span class="text-xs bg-white/15 border border-white/25 rounded-lg px-3 py-1.5 font-500 whitespace-nowrap">
@@ -124,10 +125,11 @@
                 Subscription Required
             </p>
             <h1 class="font-display text-4xl md:text-5xl font-700 text-slate-900 leading-tight mb-4">
-                Renew your<br /><em class="not-italic text-brand-600">Basic Plan</em>
+                Renew your<br /><em class="not-italic text-brand-600"><span class="subscription_plan"></span> Plan</em>
             </h1>
             <p class="text-slate-500 font-300 text-lg max-w-md mx-auto leading-relaxed">
-                Pick a billing cycle and reactivate Sajha Restro — your menu, tables, and settings are all preserved.
+                Pick a billing cycle and reactivate <span class="restro_name"></span> — your menu, tables, and settings
+                are all preserved.
             </p>
         </div>
 
@@ -392,17 +394,6 @@
         </div>
     </div>
 
-    <!-- ─── FOOTER ─── -->
-    <footer class="bg-slate-900 text-slate-500 text-center py-8 text-xs leading-loose">
-        <p><strong class="text-slate-300">Mero Table</strong> — Restaurant Management Software · Kathmandu, Nepal 🇳🇵
-        </p>
-        <p class="mt-1">
-            <a href="#" class="hover:text-slate-300 transition-colors">Privacy Policy</a> ·
-            <a href="#" class="hover:text-slate-300 transition-colors ml-2">Terms</a> ·
-            <a href="#" class="hover:text-slate-300 transition-colors ml-2">Contact</a>
-        </p>
-        <p class="mt-1">© 2025 Mero Table. All rights reserved.</p>
-    </footer>
 
     <script>
         // Plan data
@@ -606,8 +597,20 @@
 
                     console.log(data.data)
 
-                    document.getElementById('restro_name').textContent = restro_name;
-                    document.getElementById('subscription_plan').textContent = data.data.subscription.plan.name;
+
+                    const restroName = document.querySelectorAll('.restro_name');
+                    restroName.forEach(element => {
+                        console.log(element)
+                        element.textContent = restro_name;
+                    });
+
+                    const restroSubscriptionPlan = document.querySelectorAll('.subscription_plan');
+                    restroSubscriptionPlan.forEach(element => {
+                        console.log(element)
+                        element.textContent = data.data.subscription.plan.name;
+                    });
+
+
                     document.getElementById('subscription_status').textContent = data.data.subscription.status;
 
                 } catch (error) {
