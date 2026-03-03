@@ -97,7 +97,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
 });
 
 // Staff Routes
-Route::middleware(['auth:sanctum', 'checkSubscription'])->prefix('v1/staff')->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
     Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
 

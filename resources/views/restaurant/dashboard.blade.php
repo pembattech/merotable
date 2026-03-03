@@ -202,6 +202,61 @@
             background: #ef4444;
             border: 2px solid #fff;
         }
+
+        .top-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .top-item-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+
+        .top-item-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-rank {
+            font-weight: bold;
+            font-size: 1rem;
+            color: #4b5563;
+            /* gray-700 */
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #111827;
+            /* gray-900 */
+        }
+
+        .item-orders {
+            font-size: 0.875rem;
+            color: #6b7280;
+            /* gray-500 */
+        }
+
+        .item-revenue {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #111827;
+            /* gray-900 */
+        }
     </style>
 
     <header class="flex justify-between items-center mb-8">
@@ -247,22 +302,23 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <p class="text-sm text-gray-500 font-medium">Today's Revenue</p>
-            <h3 class="text-3xl font-bold mt-2">Rs. 12,450</h3>
-            <p class="text-xs text-green-600 mt-2 font-bold">↑ 12% from yesterday</p>
+            <h3 class="text-3xl font-bold mt-2" id="todayRevenue">Rs. 0</h3>
+            <p class="text-xs text-green-600 mt-2 font-bold"><span id="revenueTrend"></span> <span
+                    id="revenueChangePercent"></span>% from yesterday</p>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <p class="text-sm text-gray-500 font-medium">Active Orders</p>
-            <h3 class="text-3xl font-bold mt-2">08</h3>
+            <h3 class="text-3xl font-bold mt-2" id="totalActiveOrders">0</h3>
             <p class="text-xs text-blue-600 mt-2 font-bold">Live tracking active</p>
         </div>
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <p class="text-sm text-gray-500 font-medium">Occupied Tables</p>
-            <h3 class="text-3xl font-bold mt-2">5/15</h3>
+            <h3 class="text-3xl font-bold mt-2"><span id="totalOccupiedTables"></span>/<span id="totalTables"></span></h3>
             <p class="text-xs text-gray-400 mt-2 font-bold">Standard Capacity</p>
         </div>
     </div>
 
-    <section>
+    <section class="mb-10">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-gray-800">Live Table Map</h2>
             <button class="text-sm text-blue-600 font-bold hover:underline">Refresh Status</button>
@@ -312,6 +368,17 @@
     </section>
 
 
+    
+    <section class="mb-10">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Top Menu Items</h2>
+        </div>
+        
+        <div id="topMenuItems" class="top-items-container bg-white rounded-2xl shadow-sm border border-gray-100"></div>
+    </section>
+    
+    {{-- TODO: Add Recent Orders,  Staff on Duty --}}
+
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
 
@@ -336,7 +403,7 @@
 
                     console.log('Restaurant Data:', data);
 
-                    const subscription = data.data.active_subscription;
+                    const subscription = data.data.activeSubscription;
 
                     if (!subscription) return;
 
@@ -349,10 +416,54 @@
                     const planTier = subscription.plan?.name ?? 'No Plan';
                     const expiryDays = subscription.daysLeft ?? 0;
 
-                    console.log(planTier, expiryDays);
+                    const activeOrders = data.data.activeOrders;
+                    const totalOccupiedTables = data.data.occupiedTables;
+                    const totalTables = data.data.tableCount;
 
+                    const todayRevenue = data.data.todayRevenue;
+                    const yesterdayRevenue = data.data.yesterdayRevenue;
+                    const revenueChangePercent = data.data.revenueChangePercent;
+                    const revenueTrend = todayRevenue >= yesterdayRevenue ? '↑' : '↓';
+
+                    // ---- Display Dashboard Values ----
                     document.getElementById('planTier').textContent = planTier;
-                    document.getElementById('expiryDays').textContent = parseInt(expiryDays);;
+                    document.getElementById('expiryDays').textContent = parseInt(expiryDays) + " days";
+                    document.getElementById('totalActiveOrders').textContent = activeOrders;
+                    document.getElementById('totalOccupiedTables').textContent = totalOccupiedTables;
+                    document.getElementById('totalTables').textContent = totalTables;
+
+                    document.getElementById('todayRevenue').textContent = "Rs. " + todayRevenue;
+                    document.getElementById('revenueChangePercent').textContent = revenueChangePercent +
+                        "%";
+                    document.getElementById('revenueTrend').textContent = revenueTrend;
+
+                    // ---- Display Top Menu Items ----
+                    const topItemsContainer = document.getElementById('topMenuItems');
+                    topItemsContainer.innerHTML = ''; // clear previous items if any
+
+                    const topItems = data.data.topItems ?? [];
+
+                    if (topItems.length === 0) {
+                        topItemsContainer.innerHTML = '<p>No menu items sold today.</p>';
+                    } else {
+                        topItems.forEach((item, index) => {
+                            const div = document.createElement('div');
+                            div.classList.add('top-item-card');
+
+                            div.innerHTML = `
+            <div class="item-left">
+                <div class="item-rank">${index + 1}</div>
+                <div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-orders">${item.total_orders} orders</div>
+                </div>
+            </div>
+            <div class="item-revenue">Rs. ${item.revenue}</div>
+        `;
+
+                            topItemsContainer.appendChild(div);
+                        });
+                    }
 
                 } catch (error) {
                     console.error('Error:', error);

@@ -10,7 +10,8 @@ class CheckSubscription
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $restaurant = auth('restaurant')->user();
+        // $restaurant = auth('restaurant')->user();
+        $restaurant = auth('restaurant')->user() ?? auth('staff')->user()?->restaurant;
 
         if (!$restaurant) {
             return response()->json([

@@ -6,29 +6,87 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\AdminMenuItemResource;
 use App\Http\Resources\V1\PublicMenuItemResource;
 use App\Http\Resources\V1\PublicStaffResource;
+use App\Http\Resources\V1\RestaurantDashboardResource;
 use App\Http\Resources\V1\RestaurantProfileResource;
 use App\Http\Resources\V1\RestaurantResource;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\OrderActivity;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 
 
 
 class RestaurantController extends Controller
 {
 
-    public function index()
-    {
-        $restaurant = auth('restaurant')->user();
-        $restaurant->load(['currentSubscription.plan']);
+public function index()
+{
+    $restaurant = auth('restaurant')->user();
+    $restaurant->load('currentSubscription.plan');
 
-        return response()->json(['success' => true, 'data' => new RestaurantResource($restaurant)]);
+    // Get today and yesterday dates
+    $today = Carbon::today()->toDateString();
+    $yesterday = Carbon::yesterday()->toDateString();
+
+    // SQLite compatible query
+    $stats = $restaurant->orders()
+        ->selectRaw("
+            SUM(CASE WHEN DATE(created_at) = ? AND status = 'completed' THEN total_amount ELSE 0 END) as today_revenue,
+            SUM(CASE WHEN DATE(created_at) = ? AND status = 'completed' THEN total_amount ELSE 0 END) as yesterday_revenue,
+            SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as active_orders
+        ", [$today, $yesterday])
+        ->first();
+
+    $occupiedTables = $restaurant->tables()
+        ->where('status', 'occupied')
+        ->count();
+
+    // Revenue change calculation
+    $changePercent = 0;
+    if ($stats->yesterday_revenue > 0) {
+        $changePercent = (($stats->today_revenue - $stats->yesterday_revenue) / $stats->yesterday_revenue) * 100;
+    } elseif ($stats->today_revenue > 0) {
+        $changePercent = 100;
     }
+
+    // Top 10 menu items today
+    $topItems = OrderItem::query()
+        ->select(
+            'menu_items.id',
+            'menu_items.name',
+            DB::raw('SUM(order_items.quantity) as total_orders'),
+            DB::raw('SUM(order_items.quantity * order_items.price) as revenue')
+        )
+        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        ->join('menu_items', 'order_items.menu_item_id', '=', 'menu_items.id')
+        ->where('orders.restaurant_id', $restaurant->id)
+        ->whereDate('orders.created_at', $today)
+        ->groupBy('menu_items.id', 'menu_items.name')
+        ->orderByDesc('total_orders')
+        ->limit(10)
+        ->get();
+
+    // Attach to restaurant
+    $restaurant->today_revenue = $stats->today_revenue;
+    $restaurant->yesterday_revenue = $stats->yesterday_revenue;
+    $restaurant->active_orders_count = $stats->active_orders;
+    $restaurant->occupied_tables_count = $occupiedTables;
+    $restaurant->revenue_change_percent = round($changePercent, 2);
+    $restaurant->top_items_today = $topItems;
+
+    return response()->json([
+        'success' => true,
+        'data' => new RestaurantDashboardResource($restaurant)
+    ]);
+}
 
     public function show(Request $request)
     {

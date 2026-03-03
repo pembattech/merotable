@@ -11,7 +11,7 @@ function apiTest() {
     .then(async res => {
         if (res.status === 401) {
             localStorage.clear();
-            window.location.replace('/auth');
+            // window.location.replace('/auth');
             throw new Error('Unauthorized');
         }
 
