@@ -48,14 +48,9 @@ class RestaurantResource extends JsonResource
             'occupiedTables' => $this->occupied_tables_count ?? 0,
 
             // Revenue
-            'todayRevenue' => $this->orders()
-                ->where('status', 'completed')
-                ->sum('total_amount'),
+            'todayRevenue' => $this->today_revenue,
 
-            'yesterdayRevenue' => $this->orders()
-                ->where('status', 'completed')
-                ->whereDate('created_at', now()->subDay())
-                ->sum('total_amount'),
+            'yesterdayRevenue' => $this->yesterday_revenue,
 
             'revenueChangePercent' => $this->revenue_change_percent,
 
