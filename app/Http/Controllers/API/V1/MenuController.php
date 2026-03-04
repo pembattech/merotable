@@ -15,6 +15,16 @@ class MenuController extends Controller
         // Get authenticated restaurant
         $restaurant = auth('restaurant')->user();
 
+        // TODO: Add cache
+        $limit = $restaurant->getFeatureLimit('menu_limit');
+
+        if ($limit > 0 && $restaurant->menuItems()->count() >= $limit) {
+            return response()->json([
+                'success' => false,
+                'message' => "Menu limit of {$limit} reached. Upgrade your plan.",
+            ], 403);
+        }
+
         // Validate request data
         $validatedData = $request->validate([
             'category_id' => 'nullable|exists:categories,id',

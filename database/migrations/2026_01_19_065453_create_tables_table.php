@@ -11,8 +11,11 @@ return new class extends Migration {
             $table->id();
 
             $table->foreignId('restaurant_id')
-                  ->constrained()
-                  ->cascadeOnDelete();
+                ->constrained()
+                ->cascadeOnDelete();
+
+            // 1. Grouping by Area (e.g., Indoor, Terrace)
+            $table->string('area_name')->default('Main Hall')->index();
 
             $table->string('table_number', 5);
             $table->enum('status', ['available', 'occupied', 'reserved'])->default('available');

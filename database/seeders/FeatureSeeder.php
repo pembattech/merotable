@@ -12,6 +12,8 @@ class FeatureSeeder extends Seeder
         $features = [
             ['name' => 'tables_limit', 'type' => 'limit', 'description' => 'Maximum number of tables'],
             ['name' => 'staff_limit', 'type' => 'limit', 'description' => 'Maximum number of staff'],
+            ['name' => 'menu_limit', 'type' => 'limit', 'description' => 'Maximum number of Menu'],
+            ['name' => 'category_limit', 'type' => 'limit', 'description' => 'Maximum number of Category'],
             ['name' => 'qr_order', 'type' => 'boolean', 'description' => 'Enable QR ordering'],
             ['name' => 'analytics', 'type' => 'boolean', 'description' => 'Access to analytics'],
             ['name' => 'export_reports', 'type' => 'boolean', 'description' => 'Download reports'],

@@ -36,6 +36,8 @@ class PlanSeeder extends Seeder
         $this->attachFeatures($demo, [
             'tables_limit' => '15',
             'staff_limit' => '5',
+            'menu_limit' => '100',
+            'category_limit' => '10',
             'qr_order' => 'false',
             'analytics' => 'false',
             'export_reports' => 'false',
@@ -44,6 +46,8 @@ class PlanSeeder extends Seeder
          $this->attachFeatures($basic, [
             'tables_limit' => '15',
             'staff_limit' => '5',
+            'menu_limit' => '100',
+            'category_limit' => '10',
             'qr_order' => 'true',
             'analytics' => 'true',
             'export_reports' => 'false',
@@ -52,6 +56,8 @@ class PlanSeeder extends Seeder
         $this->attachFeatures($premium, [
             'tables_limit' => '50',
             'staff_limit' => '20',
+            'menu_limit' => '200',
+            'category_limit' => '20',
             'qr_order' => 'true',
             'analytics' => 'true',
             'export_reports' => 'true',
@@ -60,6 +66,8 @@ class PlanSeeder extends Seeder
         $this->attachFeatures($platinum, [
             'tables_limit' => '9999',
             'staff_limit' => '9999',
+            'menu_limit' => '9999',
+            'category_limit' => '1000',
             'qr_order' => 'true',
             'analytics' => 'true',
             'export_reports' => 'true',

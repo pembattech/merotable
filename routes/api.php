@@ -86,7 +86,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
         Route::patch('/update-category/{category}', [CategoryController::class, 'update']);
         Route::get('/category', [CategoryController::class, 'index']);
 
-        // Route::post('table/add', [TableController::class, 'store']);
+        Route::post('/table/add', [TableController::class, 'store']);
         Route::get('/tables', [TableController::class, 'fetchTables']);
         Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 

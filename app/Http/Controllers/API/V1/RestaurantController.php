@@ -215,7 +215,17 @@ class RestaurantController extends Controller
 
     public function createStaff(Request $request)
     {
-        $restaurant = Auth::user();
+        $restaurant = Auth::guard('restaurant')->user();
+
+        // TODO: Add cache
+        $limit = $restaurant->getFeatureLimit('staff_limit');
+
+        if ($limit > 0 && $restaurant->staff()->count() >= $limit) {
+            return response()->json([
+                'success' => false,
+                'message' => "Staff limit of {$limit} reached. Upgrade your plan.",
+            ], 403);
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
