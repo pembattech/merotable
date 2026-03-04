@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
 
     <script src="{{ asset('js/api.js') }}"></script>
     <script>
@@ -93,6 +95,15 @@
             toast.classList.remove('hidden');
             clearTimeout(toast._timer);
             toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function() {
+                    console.log("Service Worker Registered");
+                });
         }
     </script>
 </body>

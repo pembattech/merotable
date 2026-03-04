@@ -30,19 +30,40 @@
 </head>
 
 <body class="bg-gray-50 overflow-hidden">
-
-    <div class="flex justify-between items-center bg-gray-900 text-white">
-
-        <div class="p-4 text-2xl font-extrabold text-blue-400 tracking-tight">
-            MeroTable
+    <nav class="flex items-center justify-between px-6 py-3 bg-[#0f172a] text-white border-b border-gray-800">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-2xl font-bold text-[#3b82f6]">MeroTable</h1>
+            <div class="h-6 w-px bg-gray-700"></div> <span class="text-lg font-medium text-gray-200" id="restroName">Pemba
+                Pasal</span>
         </div>
 
-        <nav class="flex items-center gap-4 pr-3">
+        <div>
+            {{-- Dashboard --}}
+        <a href="{{ route('staff.dashboard') }}"
+            class="p-3 rounded-lg
+           {{ request()->routeIs('staff.dashboard')
+               ? 'underline font-semibold'
+               : 'text-gray-400 hover:bg-gray-800 transition' }}">
+            Dashboard
+        </a>
 
-            <p class="user-name text-sm font-medium"></p>
+        {{-- Active Tables --}}
+        <a href="{{ route('staff.billing') }}"
+            class="p-3 rounded-lg
+           {{ request()->routeIs('staff.billing*')
+               ? 'underline font-semibold'
+               : 'text-gray-400 hover:bg-gray-800 transition' }}">
+            Billing
+        </a>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <div class="text-right">
+                <p class="text-xs uppercase tracking-wider text-gray-500 font-semibold">Logged in as</p>
+                <p class="user-name text-sm font-medium text-white">Pemba Pasal</p>
+            </div>
 
             <div>
-
                 <a href="javascript:void(0)" onclick="logout()"
                     class="flex items-center p-3 text-red-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,16 +73,12 @@
                     Logout
                 </a>
             </div>
-        </nav>
-    </div>
+        </div>
+    </nav>
 
     <main class="p-8 h-screen overflow-y-auto">
         @yield('content')
     </main>
-
-    {{-- @include('layouts.footer') --}}
-
-    {{-- <script src="{{ asset('js/CategoryService.js') }}"></script> --}}
 
     <!-- ====== SUCCESS TOAST ====== -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
@@ -75,8 +92,10 @@
 
     <script>
         let userName = localStorage.getItem('user_name');
-        if (userName) {
+        let restroName = localStorage.getItem('restro_name');
+        if (userName && restroName) {
             document.querySelector('.user-name').textContent = userName;
+            document.querySelector('#restroName').textContent = restroName;
         }
 
 

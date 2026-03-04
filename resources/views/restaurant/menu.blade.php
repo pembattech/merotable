@@ -147,7 +147,7 @@
                         <p class="text-xs text-gray-400">Fill in the details below</p>
                     </div>
                 </div>
-                <button id="closeDrawer"
+                <button id="closeDrawer" type="button"
                     class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-2 transition">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -260,7 +260,7 @@
                 <!-- FOOTER -->
                 <div class="px-5 py-4 border-t border-gray-100 bg-gray-50/80 flex-shrink-0">
                     <div class="flex gap-3">
-                        <button onclick="closeDrawer()"
+                        <button onclick="closeDrawer()" type="button"
                             class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition duration-150">
                             Cancel
                         </button>

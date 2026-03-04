@@ -28,11 +28,16 @@ class TableController extends Controller
             ], 403);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'table_number' => ['required', 'string', 'max:5', Rule::unique('tables')->where('restaurant_id', $restaurant->id)],
+            'area_name' => 'nullable|string|max:50',
         ]);
 
-        $restaurant->tables()->create($request->only('table_number'));
+        // 4. Create the table
+        $table = $restaurant->tables()->create([
+            'table_number' => $validated['table_number'],
+            'area_name' => $validated['area_name'] ?? 'Main Hall',
+        ]);
 
         return response()->json([
             'success' => true,

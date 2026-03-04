@@ -164,14 +164,21 @@
     <header class="flex justify-between items-center mb-8">
         <h1 class="text-2xl font-extrabold text-gray-800">Table Overview</h1>
 
-        <div class="filter-wrapper">
-            <div class="slider" id="filterSlider"></div>
+        <div class="flex space-x-3">
 
-            <button onclick="setFilter('all', this)" class="table-status-btn active">All</button>
-            <button onclick="setFilter('available', this)" class="table-status-btn">Available</button>
-            <button onclick="setFilter('occupied', this)" class="table-status-btn">Occupied</button>
+            <div class="filter-wrapper">
+                <div class="slider" id="filterSlider"></div>
+
+                <button onclick="setFilter('all', this)" class="table-status-btn active">All</button>
+                <button onclick="setFilter('available', this)" class="table-status-btn">Available</button>
+                <button onclick="setFilter('occupied', this)" class="table-status-btn">Occupied</button>
+            </div>
+
+            <button id="openDrawer"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg hover:bg-blue-700">+
+                Add Table</button>
+
         </div>
-
 
     </header>
 
@@ -242,8 +249,78 @@
         </div>
 
     </div>
+
+
+    {{-- Create Table Modal --}}
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+
+    <!-- Drawer -->
+    <div id="drawer" class="fixed top-4 right-0 w-[500px] translate-x-full transition-transform duration-300 z-50">
+
+        <div
+            class="bg-white w-full sm:max-w-lg sm:mx-4 sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[94vh] shadow-xl overflow-hidden">
+
+            <!-- HEADER -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-50 rounded-xl p-2">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-gray-800 text-base leading-tight">Add Table</h2>
+                        <p class="text-xs text-gray-400">Fill in the details below</p>
+                    </div>
+                </div>
+                <button id="closeDrawer"
+                    class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-2 transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="addTableForm" class="modal-scroll px-5 py-5 space-y-5 overflow-y-auto">
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Item Name</label>
+                    <input id="tableNumber" type="text" name="table_number" placeholder="T1, T2, T3"
+                        class="field-input" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Item Name</label>
+                    <input id="spaceArea" type="text" name="area_name" placeholder="Main Hall, Indoor, Terrace"
+                        class="field-input" />
+                </div>
+
+                <!-- FOOTER -->
+                <div class="px-5 py-4 border-t border-gray-100 bg-gray-50/80 flex-shrink-0">
+                    <div class="flex gap-3">
+                        <button onclick="closeDrawer()" type="button"
+                            class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition duration-150">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="flex-[2] bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold py-3 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Save Menu Item
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
     </div>
-    </div>
+
 
     <script>
         const allOrderDetails = [];
@@ -551,13 +628,13 @@
 
 
             ${table.total_amount>0 ? `
-                                                        <div class="mt-4">
-                                                            <p class="text-xs opacity-80">Today's Total</p>
-                                                            <p class="text-lg font-bold">Rs. ${table.total_amount}</p>
-                                                        </div>
-                                                    ` : `
-                                                        <div class="mt-6 h-6"></div>
-                                                    `}
+                                                                        <div class="mt-4">
+                                                                            <p class="text-xs opacity-80">Today's Total</p>
+                                                                            <p class="text-lg font-bold">Rs. ${table.total_amount}</p>
+                                                                        </div>
+                                                                    ` : `
+                                                                        <div class="mt-6 h-6"></div>
+                                                                    `}
         </div>
     `;
         }
@@ -760,29 +837,29 @@
                         <div id="modal-items" class="space-y-2">
                             ${isOpen && currentOrder.order_items?.length
                                 ? currentOrder.order_items.map((item, i) => `
-                                                                                                                                                                                                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-4 py-3 transition group"
-                                                                                                                                                                                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
-                                                                                                                                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                                                                                                                                <div class="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 group-hover:border-blue-300 transition">
-                                                                                                                                                                                                                                    ${item.menu_item_id}
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                <div>
-                                                                                                                                                                                                                                    <p class="font-semibold text-gray-800 text-sm">${item.menu_item.name}</p>
-                                                                                                                                                                                                                                    <p class="text-xs text-gray-400 mt-0.5">
-                                                                                                                                                                                                                                        Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}
-                                                                                                                                                                                                                                    </p>
-                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                                                                                                                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full status-${item.status}">
-                                                                                                                                                                                                                                    ${capitalize(item.status)}
-                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                <p class="font-bold text-gray-800 text-sm min-w-[68px] text-right">
-                                                                                                                                                                                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
-                                                                                                                                                                                                                                </p>
-                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                            `).join('')
+                                                                                                                                                                                                                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-4 py-3 transition group"
+                                                                                                                                                                                                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
+                                                                                                                                                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                                                                                                                                                <div class="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 group-hover:border-blue-300 transition">
+                                                                                                                                                                                                                                                    ${item.menu_item_id}
+                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                <div>
+                                                                                                                                                                                                                                                    <p class="font-semibold text-gray-800 text-sm">${item.menu_item.name}</p>
+                                                                                                                                                                                                                                                    <p class="text-xs text-gray-400 mt-0.5">
+                                                                                                                                                                                                                                                        Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}
+                                                                                                                                                                                                                                                    </p>
+                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                                                                                                                                                <span class="text-xs font-semibold px-2.5 py-1 rounded-full status-${item.status}">
+                                                                                                                                                                                                                                                    ${capitalize(item.status)}
+                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                <p class="font-bold text-gray-800 text-sm min-w-[68px] text-right">
+                                                                                                                                                                                                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
+                                                                                                                                                                                                                                                </p>
+                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                            `).join('')
                                                                                                                                                             : `<p class="text-sm text-gray-400 text-center py-4">No items ordered</p>`
                                                                                                                                                         }
                         </div>
@@ -849,6 +926,74 @@
         }
     </script>
 
+
+    <script>
+        // ---------- Add Table Drawer ----------
+        const drawer = document.getElementById('drawer');
+        const overlay = document.getElementById('overlay');
+        const form = document.getElementById('addTableForm');
+        const openDrawerBtn = document.getElementById('openDrawer');
+        const closeDrawerBtn = document.getElementById('closeDrawer');
+
+        // ---------- Drawer Functions ----------
+        function openDrawer(menu = null) {
+            console.log(menu)
+            drawer.classList.remove('translate-x-full');
+            overlay.classList.remove('hidden');
+
+        }
+
+        function closeDrawer() {
+            drawer.classList.add('translate-x-full');
+            overlay.classList.add('hidden');
+            form.reset();
+        }
+
+        openDrawerBtn.addEventListener('click', () => openDrawer());
+        closeDrawerBtn.addEventListener('click',
+            closeDrawer);
+        overlay.addEventListener('click', closeDrawer);
+
+
+        // ---------- Form Submit (Add/Edit) ----------
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const payload = {
+                'table_number': form.table_number.value,
+                'area_name': form.area_name.value,
+            };
+
+            console.log(payload);
+
+
+            try {
+                const res = await fetch('/api/v1/owner/restaurant/table/add', {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    showToast(data.message || 'Something went wrong ❌', 'error');
+                    return;
+                }
+
+                showToast(data.message, 'success');
+
+                closeDrawer();
+
+            } catch (err) {
+                console.error(err);
+                showToast('Something went wrong ❌', 'error');
+            }
+        });
+    </script>
 
 
 
