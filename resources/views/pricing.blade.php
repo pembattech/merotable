@@ -86,14 +86,30 @@
             <span class="font-display text-xl font-700 text-slate-900">Mero <span
                     class="text-brand-600">Table</span></span>
         </a>
-        <div class="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-2">
-            <div class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-700">
-                SR</div>
-            <div>
-                <p class="text-sm font-600 text-slate-800 leading-none"><span class="restro_name"></span></p>
-                <p class="text-xs text-slate-400 mt-0.5 leading-none"> <span class="subscription_plan">...loading</span>
-                    Plan · <span class="text-red-500 font-500" id="subscription_status">Expired</span></p>
+
+        <div class="flex gap-2">
+
+            <div class="flex items-center gap-2.5 bg-slate-100 rounded-xl px-3.5 py-2">
+                <div
+                    class="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-700">
+                    SR</div>
+                <div>
+                    <p class="text-sm font-600 text-slate-800 leading-none"><span class="restro_name"></span></p>
+                    <p class="text-xs text-slate-400 mt-0.5 leading-none"> <span
+                            class="subscription_plan">...loading</span>
+                        Plan · <span class="text-red-500 font-500" id="subscription_status">Expired</span></p>
+                </div>
             </div>
+
+            {{-- Logout --}}
+            <a href="javascript:void(0)" onclick="logout()"
+                class="flex items-center p-3 text-sm md:text-base text-red-400 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition">
+                <svg class="w-5 h-5 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5" />
+                </svg>
+                Logout
+            </a>
         </div>
     </nav>
 
@@ -104,7 +120,8 @@
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm flex-shrink-0">🔒
             </div>
             <div>
-                <p class="font-600 text-sm">Your <strong><span class="subscription_plan"></span> Plan</strong> has expired</p>
+                <p class="font-600 text-sm">Your <strong><span class="subscription_plan"></span> Plan</strong> has
+                    expired</p>
                 <p class="text-xs text-red-200"><span class="restro_name"></span> is currently paused — renew to go live
                     again.</p>
             </div>
@@ -571,6 +588,23 @@
 
 
     <script>
+        async function logout() {
+            const token = localStorage.getItem('auth_token');
+            try {
+                await fetch('/api/v1/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } catch (e) {
+                console.warn('Logout request failed, clearing session anyway');
+            }
+            localStorage.clear();
+            window.location.href = '/auth';
+        }
+
         document.addEventListener('DOMContentLoaded', async function() {
 
             const token = localStorage.getItem('auth_token');
@@ -611,7 +645,8 @@
                     });
 
 
-                    document.getElementById('subscription_status').textContent = data.data.subscription.status;
+                    document.getElementById('subscription_status').textContent = data.data.subscription
+                        .status;
 
                 } catch (error) {
                     console.error('Error:', error);

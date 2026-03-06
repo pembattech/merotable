@@ -9,6 +9,7 @@ use App\Http\Resources\V1\PublicStaffResource;
 use App\Http\Resources\V1\RestaurantDashboardResource;
 use App\Http\Resources\V1\RestaurantProfileResource;
 use App\Http\Resources\V1\RestaurantResource;
+use App\Http\Resources\V1\StaffAttendanceResource;
 use App\Models\Restaurant;
 use App\Models\User;
 use App\Models\OrderActivity;
@@ -329,13 +330,19 @@ class RestaurantController extends Controller
 
     public function fetchStaff()
     {
-        $restaurantId = Auth::user()->id;
-        $staffMembers = User::where('restaurant_id', $restaurantId)->get();
+        $restaurant = Auth::guard('restaurant')->user();
 
-        return response()->json([
-            'success' => true,
-            'data' => $staffMembers
-        ]);
+        $staffMembers = $restaurant->staff()
+            ->whereIn('role', ['waiter', 'kitchen', 'cashier', 'staff', 'manager'])
+            ->with('todayAttendance')
+            ->get();
+
+        // return response()->json([
+        //     'success' => true,
+        //     'data' => new StaffAttendanceResource($staffMembers),
+        // ]);
+
+        return PublicStaffResource::collection($staffMembers);
     }
 
     public function restaurantActivities(Request $request)

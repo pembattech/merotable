@@ -15,13 +15,20 @@ class PublicStaffResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
+            'email' => $this->email,
             'role' => $this->role,
+            'isActive' => $this->is_active,
+            'phone' => $this->phone,
+            'createdAt' => $this->created_at,
             'restaurant' => [
                 'name' => $this->restaurant?->name,
                 'slug' => $this->restaurant?->slug,
 
             ],
+            'todayAttendance' => $this->todayAttendance ? new StaffAttendanceResource($this->todayAttendance) : null,
+            
         ];
     }
 }

@@ -15,6 +15,7 @@ use App\Http\Controllers\API\V1\StaffController;
 use App\Http\Controllers\API\V1\TableController;
 use App\Http\Controllers\API\V1\TransactionController;
 use App\Http\Controllers\API\V1\SubscriptionController;
+use App\Http\Controllers\API\V1\AttendanceController;
 
 Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
     $restaurant = auth('restaurant')->user()
@@ -122,6 +123,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::post('/{restaurant:slug}/add-items', [OrdersController::class, 'addItem']);
     Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
     Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/status', [OrdersController::class, 'updateOrderStatus']);
+
+    Route::post('/{restaurant:slug}/attendance/check-in', [AttendanceController::class, 'checkIn']);
+    Route::post('/{restaurant:slug}/attendance/check-out', [AttendanceController::class, 'checkOut']);
 
 
 });

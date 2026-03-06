@@ -59,4 +59,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(OrderActivity::class);
     }
+
+    public function staffAttendances()
+    {
+        return $this->hasMany(StaffAttendance::class, 'staff_id');
+    }
+
+    public function todayAttendance()
+    {
+        return $this->hasOne(StaffAttendance::class, 'staff_id')
+            ->whereDate('date', today());
+    }
 }

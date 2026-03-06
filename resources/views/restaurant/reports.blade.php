@@ -34,21 +34,6 @@
                 background: #f0f4f8;
             }
 
-            /* scrollbar */
-            ::-webkit-scrollbar {
-                width: 5px;
-                height: 5px;
-            }
-
-            ::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            ::-webkit-scrollbar-thumb {
-                background: #cbd5e1;
-                border-radius: 4px;
-            }
-
             /* period tab */
             .period-btn {
                 padding: 6px 18px;

@@ -33,14 +33,14 @@
         }
 
         .plan-tier {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             letter-spacing: -0.2px;
             line-height: 1;
         }
 
         .plan-sub {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 500;
             opacity: 0.75;
             line-height: 1;
@@ -57,7 +57,7 @@
         }
 
         .expiry-top {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -66,7 +66,7 @@
         }
 
         .expiry-days {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: #e67700;
             letter-spacing: -0.2px;
@@ -77,8 +77,8 @@
         .restaurant-status {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
+            gap: 6px;
+            padding: 7px 11px;
             border-radius: 10px;
             border: 1.5px solid #bbf7d0;
             background: #f0fdf4;
@@ -139,7 +139,7 @@
         }
 
         .status-sub {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 500;
             color: #4ade80;
             line-height: 1;
@@ -148,7 +148,7 @@
         }
 
         .status-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: #15803d;
             line-height: 1;
@@ -159,8 +159,8 @@
         /* ── Notification button ── */
         .notif-btn {
             position: relative;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             border: 1.5px solid #e0e3ef;
             background: #fff;
@@ -169,6 +169,7 @@
             justify-content: center;
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+            flex-shrink: 0;
         }
 
         .notif-btn:hover {
@@ -182,8 +183,8 @@
         }
 
         .notif-btn svg {
-            width: 17px;
-            height: 17px;
+            width: 16px;
+            height: 16px;
             color: #5b6080;
             transition: color 0.2s;
         }
@@ -194,15 +195,16 @@
 
         .notif-badge {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #ef4444;
             border: 2px solid #fff;
         }
 
+        /* ── Top menu items ── */
         .top-items-container {
             display: flex;
             flex-direction: column;
@@ -213,7 +215,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             transition: transform 0.1s;
@@ -226,44 +228,96 @@
         .item-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .item-rank {
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.875rem;
             color: #4b5563;
-            /* gray-700 */
-            min-width: 24px;
+            min-width: 20px;
             text-align: center;
         }
 
         .item-name {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.875rem;
             color: #111827;
-            /* gray-900 */
         }
 
         .item-orders {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             color: #6b7280;
-            /* gray-500 */
         }
 
         .item-revenue {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.875rem;
             color: #111827;
-            /* gray-900 */
+        }
+
+        /* ── Desktop overrides ── */
+        @media (min-width: 768px) {
+            .plan-tier {
+                font-size: 13px;
+            }
+
+            .plan-sub {
+                font-size: 10px;
+            }
+
+            .expiry-top {
+                font-size: 10px;
+            }
+
+            .expiry-days {
+                font-size: 13px;
+            }
+
+            .status-sub {
+                font-size: 10px;
+            }
+
+            .status-title {
+                font-size: 12px;
+            }
+
+            .notif-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .notif-btn svg {
+                width: 17px;
+                height: 17px;
+            }
+
+            .item-rank {
+                font-size: 1rem;
+                min-width: 24px;
+            }
+
+            .item-name {
+                font-size: 1rem;
+            }
+
+            .item-orders {
+                font-size: 0.875rem;
+            }
+
+            .item-revenue {
+                font-size: 1rem;
+            }
         }
     </style>
 
-    <header class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-extrabold text-gray-800">Restaurant Overview</h1>
-        <div class="flex items-center space-x-4">
+    {{-- ── Header ── --}}
+    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8">
+        <h1 class="text-lg md:text-2xl font-extrabold text-gray-800">Restaurant Overview</h1>
 
-            <!-- Subscription -->
+        <div class="flex items-center gap-2 flex-wrap">
+
+            {{-- Subscription --}}
             <div class="subscription-pill" title="Your current plan">
                 <div class="plan-label">
                     <span class="plan-tier" id="planTier">N/A</span>
@@ -275,7 +329,7 @@
                 </div>
             </div>
 
-            <!-- Restaurant Status -->
+            {{-- Restaurant Status --}}
             <div class="restaurant-status">
                 <div class="status-indicator">
                     <div class="status-dot"></div>
@@ -287,7 +341,7 @@
                 </div>
             </div>
 
-            <!-- Notifications -->
+            {{-- Notifications --}}
             <button class="notif-btn" aria-label="Notifications">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     stroke-width="1.9">
@@ -296,91 +350,107 @@
                 </svg>
                 <span class="notif-badge"></span>
             </button>
+
         </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <p class="text-sm text-gray-500 font-medium">Today's Revenue</p>
-            <h3 class="text-3xl font-bold mt-2" id="todayRevenue">Rs. 0</h3>
-            <p class="text-xs text-green-600 mt-2 font-bold"><span id="revenueTrend"></span> <span
-                    id="revenueChangePercent"></span>% from yesterday</p>
+    {{-- ── Stat cards ── --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
+
+        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
+            <p class="text-xs md:text-sm text-gray-500 font-medium">Today's Revenue</p>
+            <h3 class="text-2xl md:text-3xl font-bold mt-1 md:mt-2" id="todayRevenue">Rs. 0</h3>
+            <p class="text-xs text-green-600 mt-1 md:mt-2 font-bold">
+                <span id="revenueTrend"></span>
+                <span id="revenueChangePercent"></span> from yesterday
+            </p>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <p class="text-sm text-gray-500 font-medium">Active Orders</p>
-            <h3 class="text-3xl font-bold mt-2" id="totalActiveOrders">0</h3>
-            <p class="text-xs text-blue-600 mt-2 font-bold">Live tracking active</p>
+
+        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
+            <p class="text-xs md:text-sm text-gray-500 font-medium">Active Orders</p>
+            <h3 class="text-2xl md:text-3xl font-bold mt-1 md:mt-2" id="totalActiveOrders">0</h3>
+            <p class="text-xs text-blue-600 mt-1 md:mt-2 font-bold">Live tracking active</p>
         </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <p class="text-sm text-gray-500 font-medium">Occupied Tables</p>
-            <h3 class="text-3xl font-bold mt-2"><span id="totalOccupiedTables"></span>/<span id="totalTables"></span></h3>
-            <p class="text-xs text-gray-400 mt-2 font-bold">Standard Capacity</p>
+
+        <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
+            <p class="text-xs md:text-sm text-gray-500 font-medium">Occupied Tables</p>
+            <h3 class="text-2xl md:text-3xl font-bold mt-1 md:mt-2">
+                <span id="totalOccupiedTables"></span>/<span id="totalTables"></span>
+            </h3>
+            <p class="text-xs text-gray-400 mt-1 md:mt-2 font-bold">Standard Capacity</p>
         </div>
+
     </div>
 
-    <section class="mb-10">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Live Table Map</h2>
-            <button class="text-sm text-blue-600 font-bold hover:underline">Refresh Status</button>
+    {{-- ── Live Table Map ── --}}
+    <section class="mb-8 md:mb-10">
+        <div class="flex justify-between items-center mb-4 md:mb-6">
+            <h2 class="text-base md:text-xl font-bold text-gray-800">Live Table Map</h2>
+            <button class="text-xs md:text-sm text-blue-600 font-bold hover:underline">Refresh Status</button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <div class="bg-blue-600 text-white p-4 rounded-xl shadow-lg border-2 border-blue-700">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+
+            <div class="bg-blue-600 text-white p-3 md:p-4 rounded-xl shadow-lg border-2 border-blue-700">
                 <div class="flex justify-between items-start">
-                    <span class="text-2xl font-black">T-01</span>
+                    <span class="text-lg md:text-2xl font-black">T-01</span>
                     <span
-                        class="text-[10px] bg-blue-800 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Occupied</span>
+                        class="text-[9px] md:text-[10px] bg-blue-800 px-1.5 md:px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                        Occupied
+                    </span>
                 </div>
-                <div class="mt-4">
-                    <p class="text-xs opacity-80">Order Amount</p>
-                    <p class="font-bold">Rs. 850</p>
+                <div class="mt-3 md:mt-4">
+                    <p class="text-[10px] md:text-xs opacity-80">Order Amount</p>
+                    <p class="text-sm md:text-base font-bold">Rs. 850</p>
                 </div>
             </div>
 
             <div
-                class="bg-white p-4 rounded-xl border border-gray-200 hover:border-blue-400 transition cursor-pointer group">
-                <span class="text-2xl font-black text-gray-300 group-hover:text-blue-500">T-02</span>
-                <p class="mt-4 text-xs font-bold text-gray-400">Available</p>
+                class="bg-white p-3 md:p-4 rounded-xl border border-gray-200 hover:border-blue-400 transition cursor-pointer group">
+                <span class="text-lg md:text-2xl font-black text-gray-300 group-hover:text-blue-500">T-02</span>
+                <p class="mt-3 md:mt-4 text-[10px] md:text-xs font-bold text-gray-400">Available</p>
             </div>
 
-            <div class="bg-blue-600 text-white p-4 rounded-xl shadow-lg border-2 border-blue-700">
+            <div class="bg-blue-600 text-white p-3 md:p-4 rounded-xl shadow-lg border-2 border-blue-700">
                 <div class="flex justify-between items-start">
-                    <span class="text-2xl font-black">T-03</span>
+                    <span class="text-lg md:text-2xl font-black">T-03</span>
                     <span
-                        class="text-[10px] bg-blue-800 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Occupied</span>
+                        class="text-[9px] md:text-[10px] bg-blue-800 px-1.5 md:px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                        Occupied
+                    </span>
                 </div>
-                <div class="mt-4">
-                    <p class="text-xs opacity-80">Order Amount</p>
-                    <p class="font-bold">Rs. 1,200</p>
+                <div class="mt-3 md:mt-4">
+                    <p class="text-[10px] md:text-xs opacity-80">Order Amount</p>
+                    <p class="text-sm md:text-base font-bold">Rs. 1,200</p>
                 </div>
             </div>
 
-            <div class="bg-white p-4 rounded-xl border border-gray-200">
-                <span class="text-2xl font-black text-gray-300">T-04</span>
-                <p class="mt-4 text-xs font-bold text-gray-400">Available</p>
+            <div class="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
+                <span class="text-lg md:text-2xl font-black text-gray-300">T-04</span>
+                <p class="mt-3 md:mt-4 text-[10px] md:text-xs font-bold text-gray-400">Available</p>
             </div>
 
-            <div class="bg-white p-4 rounded-xl border border-gray-200">
-                <span class="text-2xl font-black text-gray-300">T-05</span>
-                <p class="mt-4 text-xs font-bold text-gray-400">Available</p>
+            <div class="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
+                <span class="text-lg md:text-2xl font-black text-gray-300">T-05</span>
+                <p class="mt-3 md:mt-4 text-[10px] md:text-xs font-bold text-gray-400">Available</p>
             </div>
+
         </div>
     </section>
 
-
-    
-    <section class="mb-10">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-gray-800">Top Menu Items</h2>
+    {{-- ── Top Menu Items ── --}}
+    <section class="mb-8 md:mb-10">
+        <div class="flex justify-between items-center mb-4 md:mb-6">
+            <h2 class="text-base md:text-xl font-bold text-gray-800">Top Menu Items</h2>
         </div>
-        
         <div id="topMenuItems" class="top-items-container bg-white rounded-2xl shadow-sm border border-gray-100"></div>
     </section>
-    
+
     {{-- TODO: Add Recent Orders,  Staff on Duty --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
+            alert('Tick 1')
 
             const token = localStorage.getItem('auth_token');
 
@@ -442,9 +512,9 @@
                     topItemsContainer.innerHTML = ''; // clear previous items if any
 
                     const topItems = data.data.topItems ?? [];
-
                     if (topItems.length === 0) {
-                        topItemsContainer.innerHTML = '<p>No menu items sold today.</p>';
+                        topItemsContainer.innerHTML =
+                            '<p class="text-sm md:text-base text-gray-400 text-center py-6">No menu items sold today.</p>';
                     } else {
                         topItems.forEach((item, index) => {
                             const div = document.createElement('div');
@@ -452,7 +522,7 @@
 
                             div.innerHTML = `
             <div class="item-left">
-                <div class="item-rank">${index + 1}</div>
+                <div class="item-rank">#${index + 1}</div>
                 <div>
                     <div class="item-name">${item.name}</div>
                     <div class="item-orders">${item.total_orders} orders</div>

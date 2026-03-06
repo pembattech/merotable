@@ -18,12 +18,10 @@
         }
     </style>
 
-
     <script src="{{ asset('js/auth-guard.js') }}"></script>
     <script>
         requireAuth();
     </script>
-
 
     <title>@yield('title', 'My Laravel App')</title>
 
@@ -34,23 +32,65 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             box-sizing: border-box;
         }
+
+        /* scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a9a9a9;
+            border-radius: 5px;
+        }
+
+        /* field input */
+        .field-input {
+            width: 100%;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.6rem 0.85rem;
+            font-size: 0.875rem;
+            color: #1f2937;
+            background: #f9fafb;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s, background .15s;
+        }
+
+        .field-input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+        }
+
+        .field-input::placeholder {
+            color: #9ca3af;
+        }
     </style>
 
     {{-- Assets (Vite) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gray-50 flex h-screen overflow-hidden">
+{{--
+    On mobile: body is a block column (flex-col) so the fixed topbar
+    (rendered inside the sidebar include) sits above everything.
+    The <main> gets pt-16 on mobile to clear the fixed topbar height,
+    reset to pt-0 on md+ where the sidebar is static.
+--}}
+<body class="bg-gray-50 md:flex md:h-screen md:overflow-hidden">
 
     @include('layouts.sidebar')
 
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-6 md:p-8 pt-20 md:pt-8">
         @yield('content')
-
-
     </main>
 
-    <!-- ====== SUCCESS TOAST ====== -->
+    <!-- ====== TOAST ====== -->
     <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
         <div id="toastBox"
             class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px]">
@@ -59,12 +99,7 @@
         </div>
     </div>
 
-    {{-- @include('layouts.footer') --}}
-
-    {{-- <script src="{{ asset('js/CategoryService.js') }}"></script> --}}
-
     <script>
-        // ================= TOAST =================
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const box = document.getElementById('toastBox');
@@ -72,18 +107,9 @@
             const msg = document.getElementById('toastMsg');
 
             const styles = {
-                success: {
-                    bg: 'bg-green-600',
-                    icon: '✓'
-                },
-                error: {
-                    bg: 'bg-red-500',
-                    icon: '✕'
-                },
-                warning: {
-                    bg: 'bg-orange-500',
-                    icon: '!'
-                },
+                success: { bg: 'bg-green-600', icon: '✓' },
+                error:   { bg: 'bg-red-500',   icon: '✕' },
+                warning: { bg: 'bg-orange-500', icon: '!' },
             };
             const s = styles[type] || styles.success;
 
@@ -98,14 +124,6 @@
         }
     </script>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(function() {
-                    console.log("Service Worker Registered");
-                });
-        }
-    </script>
 </body>
 
 </html>

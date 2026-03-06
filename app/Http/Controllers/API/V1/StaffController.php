@@ -13,21 +13,6 @@ use App\Http\Resources\V1\PublicCategoryResource;
 
 class StaffController extends Controller
 {
-    // public function getStaffMenu(Restaurant $restaurant)
-    // {
-    //     $menuItems = $restaurant->menuItems()
-    //         ->where('is_available', true)
-    //         ->with('category:id,name')
-    //         ->orderBy('name')
-    //         ->get();
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'count' => $menuItems->count(),
-    //         'data' => PublicMenuItemResource::collection($menuItems),
-    //     ]);
-    // }
-
     public function getStaffMenu(Request $request, Restaurant $restaurant)
     {
         $menu = $restaurant->menuItems()
