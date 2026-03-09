@@ -44,6 +44,10 @@ Route::get('restaurant/setting', function () {
     return view('restaurant/setting');
 })->name('restaurant.setting');
 
+Route::get('restaurant/qr-stickers', function () {
+    return view('restaurant/qr');
+})->name('restaurant.qr-stickers');
+
 Route::get('staff/dashboard', function () {
     return view('staff/dashboard');
 })->name('staff.dashboard');
@@ -51,6 +55,10 @@ Route::get('staff/dashboard', function () {
 Route::get('staff/billing', function () {
     return view('staff/billing');
 })->name('staff.billing');
+
+// Route::get('test', function () {
+//     return view('pdf/qr-stickers');
+// })->name('test');
 
 // });
 

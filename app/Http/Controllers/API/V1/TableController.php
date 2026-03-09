@@ -4,7 +4,8 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Http\Resources\V1\TableResource;
 use App\Models\Table;
@@ -217,13 +218,23 @@ class TableController extends Controller
             ? optional($table->orders->first())->total_amount
             : $table->orders->sum('total_amount');
 
+
+        // ---- GENERATE QR CODE ----
+        $qrUrl = url('/qr/' . $table->qr_token);
+        $qrCode = QrCode::size(200)->generate($qrUrl); // SVG string
+
+        // Optionally, convert to base64 if you want JSON-friendly output
+        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
+
+
         return response()->json([
             'success' => true,
             'data' => [
                 'table' => new TableResource($table),
                 'total' => $totalEarning,
-                'mode' => $mode
-            ]
+                'mode' => $mode,
+                'qr_code' => $qrBase64,
+            ],
         ]);
     }
 
@@ -257,6 +268,29 @@ class TableController extends Controller
         ]);
     }
 
+    public function downloadQR()
+    {
+        $restaurant = auth('restaurant')->user();
 
+        $tables = Table::where('restaurant_id', 1)
+            ->orderBy('table_number')
+            ->get();
+
+        // Generate QR code for each table as base64
+        foreach ($tables as $table) {
+            $qrUrl = url('/qr/' . $table->qr_token);
+            $qrSvg = QrCode::size(200)->generate($qrUrl);
+            $table->qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+        }
+
+        // Load Blade view for PDF
+        $pdf = Pdf::loadView('pdf.qr-stickers', compact('tables', 'restaurant'))
+            ->setPaper('A4', 'portrait');
+
+        // Return PDF as response
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="table_qr_codes.pdf"');
+    }
 
 }

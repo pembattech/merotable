@@ -89,6 +89,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
 
         Route::post('/table/add', [TableController::class, 'store']);
         Route::get('/tables', [TableController::class, 'fetchTables']);
+        Route::get('/tables/qr-pdf', [TableController::class,'downloadQR']);
         Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 
 
@@ -295,10 +296,3 @@ Route::get('/search-tables', function (Request $request) {
         'tables' => $tables,
     ]);
 });
-
-
-
-
-
-
-

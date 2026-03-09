@@ -82,6 +82,7 @@
     The <main> gets pt-16 on mobile to clear the fixed topbar height,
     reset to pt-0 on md+ where the sidebar is static.
 --}}
+
 <body class="bg-gray-50 md:flex md:h-screen md:overflow-hidden">
 
     @include('layouts.sidebar')
@@ -101,15 +102,29 @@
 
     <script>
         function showToast(message, type = 'success') {
+            console.log(message, type)
             const toast = document.getElementById('toast');
             const box = document.getElementById('toastBox');
             const icon = document.getElementById('toastIcon');
             const msg = document.getElementById('toastMsg');
 
             const styles = {
-                success: { bg: 'bg-green-600', icon: '✓' },
-                error:   { bg: 'bg-red-500',   icon: '✕' },
-                warning: { bg: 'bg-orange-500', icon: '!' },
+                success: {
+                    bg: 'bg-green-600',
+                    icon: '✓'
+                },
+                error: {
+                    bg: 'bg-red-500',
+                    icon: '✕'
+                },
+                warning: {
+                    bg: 'bg-orange-500',
+                    icon: '!'
+                },
+                info: {
+                    bg: 'bg-blue-500',
+                    icon: 'i'
+                },
             };
             const s = styles[type] || styles.success;
 
