@@ -28,6 +28,8 @@ return new class extends Migration {
             $table->decimal('price', 8, 2); // price at order time
 
             $table->timestamps();
+
+            $table->unique(['order_id', 'menu_item_id']);
         });
     }
 

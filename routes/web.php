@@ -48,6 +48,7 @@ Route::get('restaurant/qr-stickers', function () {
     return view('restaurant/qr');
 })->name('restaurant.qr-stickers');
 
+// Staff Route
 Route::get('staff/dashboard', function () {
     return view('staff/dashboard');
 })->name('staff.dashboard');
@@ -56,8 +57,13 @@ Route::get('staff/billing', function () {
     return view('staff/billing');
 })->name('staff.billing');
 
+Route::get('qr/{token}', function () {
+    return view('customer/dashboard');
+})->name('customer.dashboard');
+
+
 // Route::get('test', function () {
-//     return view('pdf/qr-stickers');
+//     return view('test/test');
 // })->name('test');
 
 // });

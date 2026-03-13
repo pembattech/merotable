@@ -16,6 +16,9 @@ use App\Http\Controllers\API\V1\TableController;
 use App\Http\Controllers\API\V1\TransactionController;
 use App\Http\Controllers\API\V1\SubscriptionController;
 use App\Http\Controllers\API\V1\AttendanceController;
+use App\Http\Controllers\API\V1\CustomerOrderController;
+
+
 
 Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
     $restaurant = auth('restaurant')->user()
@@ -128,6 +131,18 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::post('/{restaurant:slug}/attendance/check-in', [AttendanceController::class, 'checkIn']);
     Route::post('/{restaurant:slug}/attendance/check-out', [AttendanceController::class, 'checkOut']);
 
+
+});
+
+
+// Customer Routes
+Route::prefix('v1/customer/qr')->group(function () {
+    Route::get('/{token}', [CustomerOrderController::class, 'getRestaurant']);
+    Route::get('/{token}/menu', [CustomerOrderController::class, 'getMenu']);
+    Route::get('/{token}/categories', [CustomerOrderController::class, 'fetchPublicCategories']);
+    Route::post('/{token}/order', [CustomerOrderController::class, 'placeOrder']);
+    // Route::get('/order/{orderId}', [CustomerOrderController::class, 'orderStatus']);
+    // Route::post('/{token}/call-waiter', [CustomerOrderController::class, 'callWaiter']);
 
 });
 
