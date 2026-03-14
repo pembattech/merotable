@@ -16,7 +16,7 @@ class StaffController extends Controller
     public function getStaffMenu(Request $request, Restaurant $restaurant)
     {
         $menu = $restaurant->menuItems()
-            ->where('is_available', true)
+            // ->where('is_available', true)
             ->when($request->category_id, function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             })
