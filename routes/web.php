@@ -61,6 +61,8 @@ Route::get('qr/{token}', function () {
     return view('customer/dashboard');
 })->name('customer.dashboard');
 
+Route::view('/offline', 'offline');
+
 
 // Route::get('test', function () {
 //     return view('test/test');

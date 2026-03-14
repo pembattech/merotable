@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    @include('components.pwa')
+
     <title>@yield('title', 'MeroTable — Order')</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
