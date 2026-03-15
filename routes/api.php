@@ -43,7 +43,7 @@ Route::prefix('v1/auth')->group(function () {
 
     Route::post('staff/login', [RestaurantController::class, 'loginStaff']);
 
-    Route::post('logout', [AuthController::class, 'logout']);
+    Route::middleware(['auth:sanctum'])->post('logout', [AuthController::class, 'logout']);
 
 
     // Common Routes

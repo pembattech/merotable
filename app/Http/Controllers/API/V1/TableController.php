@@ -41,6 +41,15 @@ class TableController extends Controller
             'area_name' => $validated['area_name'] ?? 'Main Hall',
         ]);
 
+        activityLog(
+            'table_created',
+            'New table added',
+            [
+                'table_id' => $table->id,
+                'table_name' => $table->name
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => "Table added successfully.",
@@ -287,6 +296,15 @@ class TableController extends Controller
         // Load Blade view for PDF
         $pdf = Pdf::loadView('pdf.qr-stickers', compact('tables', 'restaurant'))
             ->setPaper('A4', 'portrait');
+
+        activityLog(
+            'qr_generated',
+            'QR code generated for table',
+            [
+                'table_id' => $table->id,
+                'qr_token' => $table->qr_token
+            ]
+        );
 
         // Return PDF as response
         return response($pdf->output(), 200)

@@ -450,8 +450,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            alert('Tick 1')
-
             const token = localStorage.getItem('auth_token');
 
             async function loadRestro() {

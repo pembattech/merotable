@@ -146,6 +146,15 @@ class RestaurantController extends Controller
         $restaurant->update($data);
 
 
+        activityLog(
+            'restaurant_basic_settings_updated',
+            'Restaurant updated basic settings',
+            [
+                'restaurant_id' => auth()->guard('restaurant')->id(),
+                'changes' => $request->only(['name', 'owner_name', 'contact_number', 'email'])
+            ]
+        );
+
 
         return response()->json([
             'success' => true,
@@ -245,6 +254,16 @@ class RestaurantController extends Controller
             'phone' => $request->phone,
         ]);
 
+        activityLog(
+            'staff_created',
+            'New staff added',
+            [
+                'staff_id' => $staff->id,
+                'name' => $staff->name,
+                'role' => $staff->role
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Staff created successfully',
@@ -288,6 +307,16 @@ class RestaurantController extends Controller
 
         $staff->save();
 
+        activityLog(
+            'staff_updated',
+            'Staff member updated',
+            [
+                'staff_id' => $staff->id,
+                'updated_by' => auth()->guard('restaurant')->id(),
+                'changes' => $request->all()
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Staff updated successfully',
@@ -321,10 +350,21 @@ class RestaurantController extends Controller
 
         $token = $staff->createToken('staff-token')->plainTextToken;
 
+        activityLog(
+            'login_staff',
+            'Staff logged in',
+            [
+                'staff_id' => $staff->id,
+                'restaurant_id' => $staff->restaurant_id,
+                'ip' => request()->ip()
+            ]
+        );
+
         return response()->json([
             'status' => 'success',
             'staff' => new PublicStaffResource($staff),
             'token' => $token,
+            'data' => $request->user('staff')
         ]);
     }
 

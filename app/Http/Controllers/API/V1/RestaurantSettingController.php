@@ -54,6 +54,15 @@ class RestaurantSettingController extends Controller
         // Update only validated fields
         $settings->update($validated);
 
+        activityLog(
+            'restaurant_settings_updated',
+            'Restaurant updated settings',
+            [
+                'restaurant_id' => auth()->guard('restaurant')->id(),
+                'changes' => $request->all()
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Restaurant settings updated successfully.',

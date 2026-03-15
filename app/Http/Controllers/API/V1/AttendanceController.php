@@ -42,6 +42,16 @@ class AttendanceController extends Controller
             'status' => 'present'
         ]);
 
+        activityLog(
+            'staff_attendance',
+            'Staff attendance marked',
+            [
+                'staff_id' => $staff->id,
+                'status' => 'check-in',
+                'time' => now()
+            ]
+        );
+
         // TODO: create a staff attendance resource.
         return response()->json([
             'success' => true,
@@ -62,7 +72,7 @@ class AttendanceController extends Controller
         $today = Carbon::today();
 
         $attendance = StaffAttendance::where('staff_id', $staffId)
-        ->where('restaurant_id', $restaurantId)
+            ->where('restaurant_id', $restaurantId)
             ->whereDate('date', $today)
             ->first();
 
@@ -88,6 +98,16 @@ class AttendanceController extends Controller
             'check_out' => $checkOutTime,
             'total_hours' => $totalHours
         ]);
+
+        activityLog(
+            'staff_attendance',
+            'Staff attendance marked',
+            [
+                'staff_id' => $staff->id,
+                'status' => 'check-out',
+                'time' => now()
+            ]
+        );
 
         return response()->json([
             'success' => true,

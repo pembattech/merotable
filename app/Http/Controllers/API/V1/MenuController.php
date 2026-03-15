@@ -56,6 +56,15 @@ class MenuController extends Controller
 
         $menuItem->load(['restaurant', 'category']);
 
+        activityLog(
+            'menu_item_created',
+            'Menu item created',
+            [
+                'menu_item_id' => $menuItem->id,
+                'name' => $menuItem->name
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Menu item created successfully',
@@ -101,6 +110,16 @@ class MenuController extends Controller
 
         $menuItem->load(['restaurant', 'category']);
 
+        activityLog(
+            'menu_item_updated',
+            'Menu item updated',
+            [
+                'menu_item_id' => $menuItem->id,
+                'name' => $menuItem->name,
+                'changes' => $menuItem->getChanges()
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Menu item updated successfully',
@@ -127,6 +146,16 @@ class MenuController extends Controller
         $menuItem->update([
             'is_available' => $validated['is_available']
         ]);
+
+        activityLog(
+            'menu_item_updated',
+            'Menu item updated',
+            [
+                'menu_item_id' => $menuItem->id,
+                'name' => $menuItem->name,
+                'changes' => $menuItem->getChanges()
+            ]
+        );
 
         return response()->json([
             'success' => true,

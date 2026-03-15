@@ -35,6 +35,17 @@ class TransactionController extends Controller
             'billing_cycle' => $request->billing_cycle,
         ]);
 
+        activityLog(
+            'subscription_transaction',
+            'Subscription transaction completed',
+            [
+                'restaurant_id' => $transaction->restaurant_id,
+                'transaction_id' => $transaction->id,
+                'amount' => $transaction->amount,
+                'payment_method' => $transaction->payment_method
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Transaction created successfully',

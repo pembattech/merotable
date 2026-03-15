@@ -104,12 +104,21 @@ class OrdersController extends Controller
                 'status' => 'occupied'
             ]);
 
-
+            activityLog(
+                'order_created_by_staff',
+                'Staff created a new order',
+                [
+                    'restaurant_id' => $staff->restaurant_id,
+                    'staff_id' => $staff->id,
+                    'order_id' => $order->id,
+                    'table_id' => $order->table_id
+                ]
+            );
 
             return response()->json([
                 'message' => 'Order placed successfully',
                 'order_id' => $order->id,
-                'total' => $total
+                'total' => $total,
             ], 201);
         });
     }
@@ -234,6 +243,17 @@ class OrdersController extends Controller
                     ->selectRaw('SUM(quantity * price) as total')
                     ->value('total'),
             ]);
+
+            activityLog(
+                'order_items_added_by_staff',
+                'Staff added items to an existing order',
+                [
+                    'restaurant_id' => $staff->restaurant_id,
+                    'staff_id' => $staff->id,
+                    'order_id' => $order->id,
+                    'items_added' => $validated['items']
+                ]
+            );
         });
 
         return response()->json([
@@ -357,6 +377,15 @@ class OrdersController extends Controller
                     'to' => $validated['status'],
                 ],
             ]);
+
+            activityLog(
+                'order_updated',
+                'Order updated',
+                [
+                    'order_id' => $order->id,
+                    'status' => $order->status
+                ]
+            );
         });
 
         return response()->json([

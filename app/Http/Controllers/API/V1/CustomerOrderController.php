@@ -182,6 +182,16 @@ class CustomerOrderController extends Controller
                 'status' => 'occupied'
             ]);
 
+            activityLog(
+                'order_created',
+                'Customer placed an order',
+                [
+                    'order_id' => $order->id,
+                    'table_id' => $table->id,
+                    'total_items' => count($order->items)
+                ]
+            );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Order placed successfully',

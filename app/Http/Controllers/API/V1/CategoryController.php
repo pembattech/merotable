@@ -28,6 +28,16 @@ class CategoryController extends Controller
 
         $category->load(['restaurant']);
 
+        activityLog(
+            'category_created',
+            'New category added',
+            [
+                'restaurant_id' => auth()->guard('restaurant')->id(),
+                'category_id' => $category->id,
+                'name' => $category->name
+            ]
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Category created successfully',
@@ -55,6 +65,16 @@ class CategoryController extends Controller
         $category->update($validatedData);
 
         $category->load(['restaurant']);
+
+        activityLog(
+            'category_updated',
+            'Category updated',
+            [
+                'restaurant_id' => auth()->guard('restaurant')->id(),
+                'category_id' => $category->id,
+                'changes' => $request->all()
+            ]
+        );
 
         return response()->json([
             'success' => true,

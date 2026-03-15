@@ -6,15 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 use App\Models\User;
 use App\Models\Restaurant;
-use App\Models\Plan;
-use App\Models\Subscription;
-
-use Carbon\Carbon;
 
 use App\Http\Resources\V1\RestaurantResource;
-use App\Http\Resources\V1\UserAuthResource;
 use App\Http\Resources\V1\PublicStaffResource;
 
 class AuthController extends Controller
@@ -40,6 +38,14 @@ class AuthController extends Controller
             'contact_number' => $request->contact_number,
         ]);
 
+        activityLog(
+            'restaurant_registered',
+            'New restaurant registered',
+            [
+                'restaurant_id' => $restaurant->id,
+                'email' => $restaurant->email
+            ]
+        );
         return response()->json([
             'status' => 'success',
             'message' => 'Restaurant registered successfully. Waiting for admin verification.',
@@ -65,7 +71,18 @@ class AuthController extends Controller
             ]);
         }
 
+        $restaurant->tokens()->delete();
+
         $token = $restaurant->createToken('restaurant-token')->plainTextToken;
+
+        activityLog(
+            'restaurant_login',
+            'Restaurant logged in',
+            [
+                'restaurant_id' => $restaurant->id,
+                'ip' => request()->ip()
+            ]
+        );
 
         return (new RestaurantResource($restaurant))
             ->additional([
@@ -146,10 +163,42 @@ class AuthController extends Controller
      ===================================================== */
     public function logout(Request $request)
     {
+
+        // Delete current access token
         $request->user()->currentAccessToken()->delete();
 
+        $user_id = null;
+        $user_type = null;
+        $restaurant_id = null;
+
+        // Check restaurant guard
+        if (Auth::guard('restaurant')->check()) {
+            $user_type = 'restaurant';
+            $user_id = Auth::guard('restaurant')->id();
+            $restaurant_id = Auth::guard('restaurant')->id();
+        }
+
+        // Check staff guard
+        elseif (Auth::guard('staff')->check()) {
+            $user_type = 'staff';
+            $user_id = Auth::guard('staff')->id();
+            $restaurant_id = Auth::guard('staff')->user()->restaurant_id;
+        }
+
+        // Log logout activity
+        activityLog(
+            'logout',
+            'User logged out',
+            [
+                'user_type' => $user_type,
+                'user_id' => $user_id,
+                'restaurant_id' => $restaurant_id,
+                'ip_address' => $request->ip()
+            ]
+        );
+
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'message' => 'Logged out successfully'
         ]);
     }

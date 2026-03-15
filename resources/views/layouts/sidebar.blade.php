@@ -38,8 +38,7 @@
     <nav class="flex-1 px-4 space-y-2 overflow-y-auto py-2">
 
         {{-- Dashboard --}}
-        <a href="{{ route('restaurant.dashboard') }}"
-            onclick="closeSidebar()"
+        <a href="{{ route('restaurant.dashboard') }}" onclick="closeSidebar()"
             class="flex items-center p-3 rounded-lg font-semibold text-sm md:text-base
            {{ request()->routeIs('restaurant.dashboard')
                ? 'bg-blue-600 text-white'
@@ -52,8 +51,7 @@
         </a>
 
         {{-- Active Tables --}}
-        <a href="{{ route('restaurant.table') }}"
-            onclick="closeSidebar()"
+        <a href="{{ route('restaurant.table') }}" onclick="closeSidebar()"
             class="flex items-center p-3 rounded-lg text-sm md:text-base
            {{ request()->routeIs('restaurant.table*')
                ? 'bg-blue-600 text-white'
@@ -66,8 +64,7 @@
         </a>
 
         {{-- Menu Items --}}
-        <a href="{{ route('restaurant.menu') }}"
-            onclick="closeSidebar()"
+        <a href="{{ route('restaurant.menu') }}" onclick="closeSidebar()"
             class="flex items-center p-3 rounded-lg text-sm md:text-base
            {{ request()->routeIs('restaurant.menu*')
                ? 'bg-blue-600 text-white'
@@ -80,8 +77,7 @@
         </a>
 
         {{-- Sales Reports --}}
-        <a href="{{ route('restaurant.reports') }}"
-            onclick="closeSidebar()"
+        <a href="{{ route('restaurant.reports') }}" onclick="closeSidebar()"
             class="flex items-center p-3 rounded-lg text-sm md:text-base
            {{ request()->routeIs('restaurant.reports*')
                ? 'bg-blue-600 text-white'
@@ -94,8 +90,7 @@
         </a>
 
         {{-- Staff Management --}}
-        <a href="{{ route('restaurant.staff') }}"
-            onclick="closeSidebar()"
+        <a href="{{ route('restaurant.staff') }}" onclick="closeSidebar()"
             class="flex items-center p-3 rounded-lg text-sm md:text-base
            {{ request()->routeIs('restaurant.staff*')
                ? 'bg-blue-600 text-white'
@@ -111,8 +106,7 @@
         </a>
 
         {{-- Setting --}}
-        <a href="{{ route('restaurant.setting') }}"
-            onclick="closeSidebar()"
+        <a href="{{ route('restaurant.setting') }}" onclick="closeSidebar()"
             class="flex items-center p-3 rounded-lg text-sm md:text-base
            {{ request()->routeIs('restaurant.setting*')
                ? 'bg-blue-600 text-white'
@@ -188,13 +182,20 @@
         closeSidebar();
         const token = localStorage.getItem('auth_token');
         try {
-            await fetch('/api/v1/auth/logout', {
+            const res = await fetch('/api/v1/auth/logout', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
             });
+
+            const data = await res.json();
+
+            if (!data.success) {
+                showToast(data.message || 'Something went wrong ❌', 'error');
+                return;
+            }
         } catch (e) {
             console.warn('Logout request failed, clearing session anyway');
         }
