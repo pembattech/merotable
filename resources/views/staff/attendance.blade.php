@@ -488,6 +488,7 @@
 
     // ── Drawer open/close ─────────────────────────────────────────
     function openDrawer() {
+        console.log('Open attendance Drawer')
         document.getElementById('drawer').style.transform = 'translateX(0)';
         document.getElementById('drawerBackdrop').classList.add('open');
         document.body.style.overflow = 'hidden';

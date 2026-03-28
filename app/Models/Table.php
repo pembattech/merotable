@@ -23,9 +23,6 @@ class Table extends Model
         });
     }
 
-    /**
-     * A table belongs to a restaurant
-     */
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);
@@ -34,6 +31,11 @@ class Table extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
     }
 
     public function getRestaurantDetails()

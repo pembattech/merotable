@@ -9,11 +9,15 @@
         .table-card {
             transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
         }
+
         .table-card:hover {
             box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
             transform: translateY(-2px);
         }
-        .table-card.active { border-color: #22c55e; }
+
+        .table-card.active {
+            border-color: #22c55e;
+        }
 
         /* ── Payment method pills ── */
         .method-btn {
@@ -28,9 +32,23 @@
             transition: all 0.15s;
             text-align: center;
         }
-        @media (min-width: 400px) { .method-btn { padding: 12px 16px; font-size: 0.875rem; } }
-        .method-btn:hover    { border-color: #cbd5e1; }
-        .method-btn.selected { border-color: #2563eb; background: #eff6ff; color: #1d4ed8; }
+
+        @media (min-width: 400px) {
+            .method-btn {
+                padding: 12px 16px;
+                font-size: 0.875rem;
+            }
+        }
+
+        .method-btn:hover {
+            border-color: #cbd5e1;
+        }
+
+        .method-btn.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
 
         /* ── Selected item pill ── */
         .selected-item-pill {
@@ -45,14 +63,24 @@
             font-weight: 600;
             color: #1e40af;
         }
+
         .selected-item-pill .remove-btn {
-            width: 15px; height: 15px;
-            display: flex; align-items: center; justify-content: center;
-            background: #3b82f6; color: white;
-            border-radius: 50%; cursor: pointer;
-            transition: background 0.15s; flex-shrink: 0;
+            width: 15px;
+            height: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.15s;
+            flex-shrink: 0;
         }
-        .selected-item-pill .remove-btn:hover { background: #1e40af; }
+
+        .selected-item-pill .remove-btn:hover {
+            background: #1e40af;
+        }
 
         /* ── Field input ── */
         .field-input {
@@ -67,24 +95,42 @@
             outline: none;
             font-family: inherit;
         }
-        .field-input:focus { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
-        .field-input::placeholder { color: #9ca3af; }
-        textarea.field-input { resize: none; line-height: 1.5; }
+
+        .field-input:focus {
+            border-color: #3b82f6;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        .field-input::placeholder {
+            color: #9ca3af;
+        }
+
+        textarea.field-input {
+            resize: none;
+            line-height: 1.5;
+        }
 
         /* ── Order Summary — mobile bottom sheet ── */
         #summaryPanel {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             background: white;
             border-radius: 20px 20px 0 0;
-            box-shadow: 0 -8px 40px rgba(0,0,0,0.13);
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.13);
             z-index: 30;
-            transform: translateY(calc(100% - 60px)); /* peek strip height */
+            transform: translateY(calc(100% - 60px));
+            /* peek strip height */
             transition: transform 0.3s ease;
             max-height: 90vh;
             overflow-y: auto;
         }
-        #summaryPanel.expanded { transform: translateY(0); }
+
+        #summaryPanel.expanded {
+            transform: translateY(0);
+        }
 
         /* Desktop: revert to a plain sticky card */
         @media (min-width: 1024px) {
@@ -97,11 +143,16 @@
                 max-height: none;
                 overflow-y: visible;
             }
-            #summaryPeekBar { display: none; }
+
+            #summaryPeekBar {
+                display: none;
+            }
         }
 
         /* Prevent page scroll when sheet is fully open */
-        body.summary-open { overflow: hidden; }
+        body.summary-open {
+            overflow: hidden;
+        }
     </style>
 
 
@@ -143,10 +194,10 @@
                             oninput="searchByItems()"
                             class="w-full pl-9 md:pl-10 pr-4 py-2 md:py-2.5 border border-gray-200 rounded-xl
                                    text-xs md:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                        <svg class="absolute left-3 top-2.5 h-4 w-4 md:h-5 md:w-5 text-gray-400"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="absolute left-3 top-2.5 h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
                     <div id="searchResults" class="mt-3 space-y-2 max-h-48 md:max-h-64 overflow-y-auto"></div>
@@ -157,7 +208,7 @@
                     <h3 class="font-bold text-gray-800 text-sm md:text-base mb-3 md:mb-4">Select Table</h3>
                     {{-- 3 cols on xs → 4 sm → 5 md → 4 lg (sidebar takes room) → 5 xl --}}
                     <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3"
-                         id="tableGrid"></div>
+                        id="tableGrid"></div>
                 </div>
 
             </div>
@@ -183,10 +234,9 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-sm font-extrabold text-blue-600" id="totalPeek">Rs. 0</span>
-                            <svg id="peekChevron"
-                                class="h-4 w-4 text-gray-400 transition-transform duration-300"
+                            <svg id="peekChevron" class="h-4 w-4 text-gray-400 transition-transform duration-300"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
                     </div>
@@ -203,13 +253,12 @@
 
                         {{-- Order items --}}
                         <div class="border-t border-b border-gray-100 py-3 md:py-4 mb-3 md:mb-4">
-                            <div id="orderItems"
-                                class="space-y-3 max-h-56 lg:max-h-80 xl:max-h-96 overflow-y-auto">
+                            <div id="orderItems" class="space-y-3 max-h-56 lg:max-h-80 xl:max-h-96 overflow-y-auto">
                                 <div class="text-center py-8 md:py-12 text-gray-400">
-                                    <svg class="mx-auto h-10 w-10 md:h-12 md:w-12 mb-2"
-                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="mx-auto h-10 w-10 md:h-12 md:w-12 mb-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
                                     <p class="text-xs md:text-sm">No table selected</p>
                                 </div>
@@ -243,7 +292,7 @@
                                    flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
                             <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                             Proceed to Checkout
                         </button>
@@ -259,7 +308,8 @@
     {{-- ══ CHECKOUT MODAL ══ --}}
     <div id="checkoutModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center">
         <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeCheckoutModal()"></div>
-        <div class="relative bg-white w-full sm:max-w-md sm:mx-4 sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
+        <div
+            class="relative bg-white w-full sm:max-w-md sm:mx-4 sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
 
             {{-- Drag handle (mobile) --}}
             <div class="flex justify-center pt-3 pb-1 sm:hidden">
@@ -267,12 +317,14 @@
             </div>
 
             {{-- Header --}}
-            <div class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
+            <div
+                class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-50 rounded-xl p-2">
-                        <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
                     <div>
@@ -283,7 +335,7 @@
                 <button onclick="closeCheckoutModal()"
                     class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 md:p-2 transition">
                     <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -302,29 +354,34 @@
                     <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3">Payment Method</label>
                     <div class="grid grid-cols-2 gap-2 md:gap-3">
                         <button class="method-btn selected" onclick="selectMethod(this, 'cash')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                             Cash
                         </button>
                         <button class="method-btn" onclick="selectMethod(this, 'card')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                             </svg>
                             Card
                         </button>
                         <button class="method-btn" onclick="selectMethod(this, 'mobile')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                             </svg>
                             Mobile Pay
                         </button>
                         <button class="method-btn" onclick="selectMethod(this, 'other')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                             Other
                         </button>
@@ -335,9 +392,10 @@
                 <div id="cashSection">
                     <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">Amount Received</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm font-semibold">Rs.</span>
+                        <span
+                            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm font-semibold">Rs.</span>
                         <input id="amountReceived" type="number" min="0" placeholder="0"
-                            oninput="calculateChange()" class="field-input" style="padding-left: 38px;"/>
+                            oninput="calculateChange()" class="field-input" style="padding-left: 38px;" />
                     </div>
                     <div id="changeDisplay" class="mt-3 hidden">
                         <div class="bg-green-50 border border-green-200 rounded-xl p-3 md:p-4">
@@ -352,8 +410,7 @@
                     <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
                         Notes <span class="text-gray-400 font-normal">(optional)</span>
                     </label>
-                    <textarea id="paymentNotes" rows="2" placeholder="Add payment notes…"
-                        class="field-input resize-none"></textarea>
+                    <textarea id="paymentNotes" rows="2" placeholder="Add payment notes…" class="field-input resize-none"></textarea>
                 </div>
 
             </div>
@@ -368,7 +425,7 @@
                     class="flex-[2] bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 md:py-3 rounded-xl transition
                            shadow-lg shadow-green-200 flex items-center justify-center gap-2">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     Complete Payment
                 </button>
@@ -378,10 +435,11 @@
     </div>
 
     @include('staff.attendance')
+    @include('staff.invoice')
 
     <script>
         const token = localStorage.getItem('auth_token');
-        const url   = localStorage.getItem('restro_url');
+        const url = localStorage.getItem('restro_url');
 
         // ── Summary bottom sheet (mobile) ─────────────────────────
         let summaryExpanded = false;
@@ -393,7 +451,9 @@
             document.body.classList.toggle('summary-open', summaryExpanded);
         }
         // Close on Escape
-        document.addEventListener('keydown', e => { if (e.key === 'Escape' && summaryExpanded) toggleSummary(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && summaryExpanded) toggleSummary();
+        });
         // Collapse sheet when resizing to desktop
         window.addEventListener('resize', () => {
             if (window.innerWidth >= 1024 && summaryExpanded) {
@@ -405,15 +465,22 @@
 
         // ── Fetch tables ──────────────────────────────────────────
         async function fetchTables() {
-            const res  = await fetch(`/api/v1/staff/${url}/tables/overview?mode=billing`, {
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
+            const res = await fetch(`/api/v1/staff/${url}/tables/overview?mode=billing`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
             const data = await res.json();
-            if (!data.success) { showToast(data.message || 'Something went wrong ❌', 'error'); return; }
+            if (!data.success) {
+                showToast(data.message || 'Something went wrong ❌', 'error');
+                return;
+            }
             return data;
         }
 
-        let selectedTable  = null;
+        let selectedTable = null;
         let selectedMethod = 'cash';
 
         // ── Render tables ─────────────────────────────────────────
@@ -423,13 +490,29 @@
 
             const tables = response.data.tables;
             const statusStyles = {
-                available: { bg: 'bg-white',   border: 'border-gray-200',  badge: 'bg-gray-100 text-gray-600', ring: '' },
-                occupied:  { bg: 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white', border: 'border-indigo-700', badge: 'bg-white/20 text-white', ring: 'ring-2 ring-indigo-400' },
-                reserved:  { bg: 'bg-gradient-to-br from-amber-400 to-orange-400 text-white', border: 'border-amber-500', badge: 'bg-white/20 text-white', ring: 'ring-2 ring-amber-300' },
+                available: {
+                    bg: 'bg-white',
+                    border: 'border-gray-200',
+                    badge: 'bg-gray-100 text-gray-600',
+                    ring: ''
+                },
+                occupied: {
+                    bg: 'bg-gradient-to-br from-indigo-600 to-blue-600 text-white',
+                    border: 'border-indigo-700',
+                    badge: 'bg-white/20 text-white',
+                    ring: 'ring-2 ring-indigo-400'
+                },
+                reserved: {
+                    bg: 'bg-gradient-to-br from-amber-400 to-orange-400 text-white',
+                    border: 'border-amber-500',
+                    badge: 'bg-white/20 text-white',
+                    ring: 'ring-2 ring-amber-300'
+                },
             };
 
             if (!tables.length) {
-                document.getElementById('tableGrid').innerHTML = '<p class="col-span-full text-center text-gray-400 py-4 text-sm">No tables found</p>';
+                document.getElementById('tableGrid').innerHTML =
+                    '<p class="col-span-full text-center text-gray-400 py-4 text-sm">No tables found</p>';
                 return;
             }
 
@@ -451,14 +534,24 @@
 
         // ── Select table ──────────────────────────────────────────
         async function selectTable(tableId) {
-            const res  = await fetch(`/api/v1/staff/${url}/tables/${tableId}?mode=billing`, {
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
+            const res = await fetch(`/api/v1/staff/${url}/tables/${tableId}?mode=billing`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
             const data = await res.json();
-            if (!data.success) { showToast(data.message || 'Something went wrong ❌', 'error'); return; }
+            if (!data.success) {
+                showToast(data.message || 'Something went wrong ❌', 'error');
+                return;
+            }
 
             const table = data.data.table;
-            if (!table || table.status !== 'occupied') { showToast('This table has no active orders', 'warning'); return; }
+            if (!table || table.status !== 'occupied') {
+                showToast('This table has no active orders', 'warning');
+                return;
+            }
 
             selectedTable = table;
             renderOrderItems(table);
@@ -466,7 +559,10 @@
             // Update both desktop & mobile badges
             ['selectedTableBadge', 'selectedTableBadgeMobile'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) { el.textContent = 'T' + tableId; el.classList.remove('hidden'); }
+                if (el) {
+                    el.textContent = 'T' + tableId;
+                    el.classList.remove('hidden');
+                }
             });
             document.getElementById('checkoutBtn').disabled = false;
 
@@ -493,10 +589,10 @@
 
             const items = table.orders.flatMap(order =>
                 order.order_items.map(i => ({
-                    name:    i.menu_item?.name || 'Unnamed Item',
-                    price:   i.price    || 0,
-                    qty:     i.quantity || 1,
-                    total:   (i.price || 0) * (i.quantity || 1),
+                    name: i.menu_item?.name || 'Unnamed Item',
+                    price: i.price || 0,
+                    qty: i.quantity || 1,
+                    total: (i.price || 0) * (i.quantity || 1),
                     orderId: order.id,
                 }))
             );
@@ -515,14 +611,14 @@
 
         // ── Update summary totals ─────────────────────────────────
         function updateSummary(subtotal) {
-            const tax     = Math.round(subtotal * 0.13);
+            const tax = Math.round(subtotal * 0.13);
             const service = Math.round(subtotal * 0.10);
-            const total   = subtotal + tax + service;
+            const total = subtotal + tax + service;
 
-            document.getElementById('subtotal').textContent  = `Rs. ${subtotal.toLocaleString()}`;
-            document.getElementById('tax').textContent       = `Rs. ${tax.toLocaleString()}`;
-            document.getElementById('service').textContent   = `Rs. ${service.toLocaleString()}`;
-            document.getElementById('total').textContent     = `Rs. ${total.toLocaleString()}`;
+            document.getElementById('subtotal').textContent = `Rs. ${subtotal.toLocaleString()}`;
+            document.getElementById('tax').textContent = `Rs. ${tax.toLocaleString()}`;
+            document.getElementById('service').textContent = `Rs. ${service.toLocaleString()}`;
+            document.getElementById('total').textContent = `Rs. ${total.toLocaleString()}`;
             document.getElementById('totalPeek').textContent = `Rs. ${total.toLocaleString()}`;
         }
 
@@ -532,28 +628,43 @@
 
         function debounce(fn, delay) {
             let t;
-            return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), delay); };
+            return function(...args) {
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), delay);
+            };
         }
         const debouncedSearchTables = debounce(searchTables, 300);
 
         function searchByItems() {
-            const query   = document.getElementById('itemSearch').value.toLowerCase().trim();
+            const query = document.getElementById('itemSearch').value.toLowerCase().trim();
             const results = document.getElementById('searchResults');
 
-            if (query.length === 0 && selectedItemNames.size > 0) { results.innerHTML = ''; debouncedSearchTables(); return; }
-            if (query.length < 2 && selectedItemNames.size === 0)  { results.innerHTML = ''; return; }
+            if (query.length === 0 && selectedItemNames.size > 0) {
+                results.innerHTML = '';
+                debouncedSearchTables();
+                return;
+            }
+            if (query.length < 2 && selectedItemNames.size === 0) {
+                results.innerHTML = '';
+                return;
+            }
 
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(async () => {
                 if (controller) controller.abort();
                 controller = new AbortController();
                 try {
-                    const res  = await fetch(`/api/items?search=${encodeURIComponent(query)}`, {
-                        headers: { 'Authorization': `Bearer ${token}` },
+                    const res = await fetch(`/api/items?search=${encodeURIComponent(query)}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
                         signal: controller.signal,
                     });
                     const data = await res.json();
-                    if (!data.success) { results.innerHTML = '<p class="text-gray-500 text-sm py-2">No items found</p>'; return; }
+                    if (!data.success) {
+                        results.innerHTML = '<p class="text-gray-500 text-sm py-2">No items found</p>';
+                        return;
+                    }
 
                     results.innerHTML = data.items.map(item => `
                         <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50 rounded-lg px-3 py-2 cursor-pointer transition group"
@@ -568,7 +679,9 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </div>`).join('');
-                } catch (err) { if (err.name !== 'AbortError') console.error(err); }
+                } catch (err) {
+                    if (err.name !== 'AbortError') console.error(err);
+                }
             }, 250);
         }
 
@@ -580,14 +693,19 @@
             const params = new URLSearchParams();
             selectedItemNames.forEach(item => params.append('item[]', item));
 
-            const res  = await fetch(`/api/search-tables?${params.toString()}`, {
-                headers: { 'Authorization': `Bearer ${token}` },
+            const res = await fetch(`/api/search-tables?${params.toString()}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 signal: searchController.signal,
             });
             const data = await res.json();
             const container = document.getElementById('searchResults');
 
-            if (!data.tables.length) { container.innerHTML = '<p class="text-gray-400 text-sm py-2">No tables found</p>'; return; }
+            if (!data.tables.length) {
+                container.innerHTML = '<p class="text-gray-400 text-sm py-2">No tables found</p>';
+                return;
+            }
 
             container.innerHTML = data.tables.map(table => `
                 <div class="bg-gray-50 hover:bg-blue-50 rounded-xl p-3 cursor-pointer transition border border-gray-100 hover:border-blue-200"
@@ -598,12 +716,12 @@
                     </div>
                     ${table.orders.map(order =>
                         `<div class="space-y-1 pt-2">
-                            ${order.order_items.map(oi => `
+                                                ${order.order_items.map(oi => `
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-gray-600">${oi.menu_item.name} <span class="text-gray-400">×${oi.quantity}</span></span>
                                     <span class="text-gray-500 font-medium">Rs. ${(oi.price * oi.quantity).toLocaleString()}</span>
                                 </div>`).join('')}
-                        </div>`).join('')}
+                                            </div>`).join('')}
                 </div>`).join('');
         }
 
@@ -622,8 +740,11 @@
 
         function renderSelectedItems() {
             const container = document.getElementById('selectedItemsContainer');
-            const wrapper   = document.getElementById('selectedItems');
-            if (!selectedItemNames.size) { wrapper.classList.add('hidden'); return; }
+            const wrapper = document.getElementById('selectedItems');
+            if (!selectedItemNames.size) {
+                wrapper.classList.add('hidden');
+                return;
+            }
             wrapper.classList.remove('hidden');
             container.innerHTML = [...selectedItemNames].map(name => `
                 <div class="selected-item-pill">
@@ -650,22 +771,24 @@
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
-            document.getElementById('checkoutBtn').disabled    = true;
-            document.getElementById('itemSearch').value        = '';
+            document.getElementById('checkoutBtn').disabled = true;
+            document.getElementById('itemSearch').value = '';
             document.getElementById('searchResults').innerHTML = '';
             renderSelectedItems();
-            renderOrderItems({ orders: [] });
+            renderOrderItems({
+                orders: []
+            });
             if (summaryExpanded) toggleSummary();
         }
 
         // ── Checkout modal ────────────────────────────────────────
         function openCheckoutModal() {
             if (!selectedTable) return;
-            document.getElementById('modalTotal').textContent         = document.getElementById('total').textContent;
+            document.getElementById('modalTotal').textContent = document.getElementById('total').textContent;
             document.getElementById('checkoutTableLabel').textContent = `Table ${selectedTable.table_number}`;
-            document.getElementById('amountReceived').value           = '';
+            document.getElementById('amountReceived').value = '';
             document.getElementById('changeDisplay').classList.add('hidden');
-            document.getElementById('paymentNotes').value             = '';
+            document.getElementById('paymentNotes').value = '';
             document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
             document.querySelector('.method-btn').classList.add('selected');
             selectedMethod = 'cash';
@@ -685,7 +808,7 @@
         }
 
         function calculateChange() {
-            const total    = parseInt(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
+            const total = parseInt(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
             const received = parseInt(document.getElementById('amountReceived').value) || 0;
             if (received > 0 && received >= total) {
                 document.getElementById('changeAmount').textContent = `Rs. ${(received - total).toLocaleString()}`;
@@ -696,33 +819,91 @@
         }
 
         async function completePayment() {
-            const total    = parseInt(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
+            const total = parseInt(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
             if (selectedMethod === 'cash') {
                 const received = parseInt(document.getElementById('amountReceived').value) || 0;
-                if (received < total) { showToast('Amount received is less than total', 'error'); return; }
+                if (received < total) {
+                    showToast('Amount received is less than total', 'error');
+                    return;
+                }
             }
-            showToast(`Payment completed for ${selectedTable.table_number}`, 'success');
-            await updateTableStatus(selectedTable.id, selectedTable.orders[0].id, 'available');
-            closeCheckoutModal();
-            clearSelection();
-            await renderTables();
+            try {
+
+                const order = selectedTable.orders[0];
+                if (!order) {
+                    showToast('No active order found for this table', 'error');
+                    return;
+                }
+
+                const response = await fetch(`/api/v1/staff/${url}/invoice`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        order_id: order.id,
+                        table_id: selectedTable.id,
+                        subtotal: total,
+                        // TODO: Fetch the tax amount, discount amount and service charge from the restaurant setting 
+                        tax_amount: 0,
+                        discount_amount: 0,
+                        service_charge: 0,
+                        total_amount: total,
+                        payment_method: selectedMethod
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || 'Invoice failed');
+                }
+
+                openInvoiceModal(data.data)
+
+                showToast(`Payment completed for ${selectedTable.table_number}`, 'success');
+                
+                await updateTableStatus(selectedTable.id, selectedTable.orders[0].id, 'available');
+
+                closeCheckoutModal();
+                clearSelection();
+
+                await renderTables();
+
+            } catch (error) {
+                console.error(error);
+                showToast('Payment failed: ' + error.message, 'error');
+            }
         }
 
         async function updateTableStatus(tableId, orderId, status) {
-            const res  = await fetch(`/api/v1/staff/${url}/table/${tableId}/status`, {
+            const res = await fetch(`/api/v1/staff/${url}/table/${tableId}/status`, {
                 method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status }),
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status
+                }),
             });
             const data = await res.json();
             if (data.success) await updateOrderStatus(tableId, orderId, 'completed');
         }
 
         async function updateOrderStatus(tableId, orderId, status) {
-            const res  = await fetch(`/api/v1/staff/${url}/table/${tableId}/${orderId}/status`, {
+            const res = await fetch(`/api/v1/staff/${url}/table/${tableId}/${orderId}/status`, {
                 method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status }),
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status
+                }),
             });
             const data = await res.json();
             if (data.success) showToast('Payment successful. Order closed and table is now available.', 'success');

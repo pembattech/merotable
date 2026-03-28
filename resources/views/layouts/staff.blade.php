@@ -67,6 +67,22 @@
             color: #9ca3af;
         }
 
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
         /* ════════════════════════════════════════════════════════
            MOBILE DRAWER — smooth slide + fade
            ════════════════════════════════════════════════════════
@@ -111,7 +127,7 @@
             display: flex;
             flex-direction: column;
             transform: translateX(-100%);
-            transition: transform 320ms cubic-bezier(0.4,0,0.2,1);
+            transition: transform 320ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         #mobileMenuPanel.open {

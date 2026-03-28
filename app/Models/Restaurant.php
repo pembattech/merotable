@@ -86,6 +86,11 @@ class Restaurant extends Authenticatable
         return $this->hasMany(StaffAttendance::class);
     }
 
+      public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
 
     // SaaS Relationships
 

@@ -17,8 +17,7 @@ use App\Http\Controllers\API\V1\TransactionController;
 use App\Http\Controllers\API\V1\SubscriptionController;
 use App\Http\Controllers\API\V1\AttendanceController;
 use App\Http\Controllers\API\V1\CustomerOrderController;
-
-
+use App\Http\Controllers\API\V1\InvoiceController;
 
 Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
     $restaurant = auth('restaurant')->user()
@@ -92,7 +91,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
 
         Route::post('/table/add', [TableController::class, 'store']);
         Route::get('/tables', [TableController::class, 'fetchTables']);
-        Route::get('/tables/qr-pdf', [TableController::class,'downloadQR']);
+        Route::get('/tables/qr-pdf', [TableController::class, 'downloadQR']);
         Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 
 
@@ -103,16 +102,16 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
 
 // Staff Routes
 Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
-    Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
-    Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
+    // Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
+    // Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
 
-    Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
 
     Route::get('/{restaurant:slug}/menu', [StaffController::class, 'getStaffMenu']);
     Route::get('/{restaurant:slug}/categories', [StaffController::class, 'fetchPublicCategories']);
 
     // Fetch basic table info
     Route::get('/{restaurant:slug}/tables', [StaffController::class, 'fetchTables']);
+
     // Fetch table info with orders and total amounts
     Route::get('/{restaurant:slug}/tables/overview', [TableController::class, 'fetchTables']);
     Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
@@ -127,6 +126,9 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::post('/{restaurant:slug}/add-items', [OrdersController::class, 'addItem']);
     Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
     Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/status', [OrdersController::class, 'updateOrderStatus']);
+    Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
+
+    Route::post('/{restaurant:slug}/invoice', [InvoiceController::class, 'store']);
 
     Route::post('/{restaurant:slug}/attendance/check-in', [AttendanceController::class, 'checkIn']);
     Route::post('/{restaurant:slug}/attendance/check-out', [AttendanceController::class, 'checkOut']);
