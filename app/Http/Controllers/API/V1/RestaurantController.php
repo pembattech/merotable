@@ -102,7 +102,10 @@ class RestaurantController extends Controller
             ->user()
             ->load(['setting', 'documents']);
 
-        return new RestaurantProfileResource($restaurant);
+        return response()->json([
+            'success' => true,
+            'data' => new RestaurantProfileResource($restaurant),
+        ]);
     }
 
     public function update(Request $request)
@@ -113,7 +116,6 @@ class RestaurantController extends Controller
         // Validation
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:restaurants,slug,' . $restaurant->id,
             'email' => 'nullable|email|max:255|unique:restaurants,email,' . $restaurant->id,
             'contact_number' => 'nullable|string|max:20',
             'address' => 'nullable|string',
@@ -151,7 +153,7 @@ class RestaurantController extends Controller
             'Restaurant updated basic settings',
             [
                 'restaurant_id' => auth()->guard('restaurant')->id(),
-                'changes' => $request->only(['name', 'owner_name', 'contact_number', 'email'])
+                'changes' => $request->only(['name', 'contact_number', 'email', 'address', 'description'])
             ]
         );
 

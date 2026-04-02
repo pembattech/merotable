@@ -24,7 +24,10 @@ class RestaurantSettingController extends Controller
             ], 404);
         }
 
-        return new RestaurantSettingResource($settings);
+        return response()->json([
+            'success' => true,
+            'data' => new RestaurantSettingResource($settings),
+        ]);
     }
 
     public function update(Request $request)
@@ -67,6 +70,33 @@ class RestaurantSettingController extends Controller
             'success' => true,
             'message' => 'Restaurant settings updated successfully.',
             'data' => new RestaurantSettingResource($settings)
+        ]);
+    }
+
+
+    public function deactivate(Request $request)
+    {
+        $restaurant = auth('restaurant')->user();
+
+        $oldStatus = $restaurant->status;
+
+        $restaurant->status = 'inactive';
+        $restaurant->save();
+
+        activityLog(
+            'restaurant_deactivated',
+            'Restaurant account deactivated',
+            [
+                'restaurant_id' => $restaurant->id,
+                'old_status' => $oldStatus,
+                'new_status' => $restaurant->status,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Restaurant deactivated successfully',
+            'data' => $restaurant
         ]);
     }
 

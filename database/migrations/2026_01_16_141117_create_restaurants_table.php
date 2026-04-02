@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('contact_number', 50);
 
-            $table->enum('status', ['active', 'blocked', 'expired', 'pending'])
+            $table->enum('status', ['active', 'inactive', 'blocked', 'expired', 'pending'])
                   ->default('pending')
                   ->index();
 

@@ -67,11 +67,12 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
         Route::get('/', [RestaurantController::class, 'index']);
 
         Route::get('/profile', [RestaurantController::class, 'show']);
-        Route::patch('/basic-settings', [RestaurantController::class, 'update']);
+        Route::patch('/profile', [RestaurantController::class, 'update']);
 
 
         Route::get('/settings', [RestaurantSettingController::class, 'show']);
         Route::patch('/settings', [RestaurantSettingController::class, 'update']);
+        Route::patch('/deactivate', [RestaurantSettingController::class, 'deactivate']);
 
         Route::post('/staff', [RestaurantController::class, 'createStaff']);
         Route::patch('/staff/{id}', [RestaurantController::class, 'updateStaff']);

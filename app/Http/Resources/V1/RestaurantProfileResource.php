@@ -17,14 +17,16 @@ class RestaurantProfileResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'ownerName' => $this->owner_name,
             'email' => $this->email,
             'slug' => $this->slug,
-            'status' => $this->status,
-            'approvedAt' => $this->approved_at,
-            'description' => $this->description,
             'contactNumber' => $this->contact_number,
+            'status' => $this->status,
+            'isActive' => $this->status === 'active',
+            'description' => $this->description,
             'address' => $this->address,
             'logo' => $this->logo,
+            'approvedAt' => $this->approved_at,
 
             'settings' => new RestaurantSettingResource($this->whenLoaded('setting')),
 
