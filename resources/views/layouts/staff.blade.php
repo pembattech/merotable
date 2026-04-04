@@ -182,7 +182,7 @@
                 <span class="ham-line"></span>
             </button>
 
-            <h1 class="text-lg md:text-2xl font-bold text-[#3b82f6] leading-none">MeroTable</h1>
+            <img class="logo w-28 sm:w-32 md:w-40 lg:w-52"  src="{{ asset('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
             <div class="hidden md:block h-6 w-px bg-gray-700"></div>
             <p class="restroName hidden md:block text-sm md:text-lg font-medium text-gray-200 truncate max-w-[160px]">
                 loading…</p>
@@ -233,8 +233,8 @@
     <div id="mobileMenuPanel" role="dialog" aria-modal="true" aria-label="Navigation menu">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between px-4 py-4 border-b border-gray-800 flex-shrink-0">
-            <h1 class="text-lg font-bold text-[#3b82f6]">MeroTable</h1>
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
+            <img class="logo w-28" src="{{ asset('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
             <button onclick="closeMobileMenu()" class="p-1.5 rounded-lg hover:bg-gray-800 transition text-gray-400">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

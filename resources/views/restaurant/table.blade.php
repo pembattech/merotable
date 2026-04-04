@@ -51,9 +51,9 @@
         .table-status-btn {
             position: relative;
             z-index: 1;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 8px;
-            font-size: 0.75rem;
+            font-size: 0.70rem;
             font-weight: 600;
             color: #6b7280;
             cursor: pointer;
@@ -292,7 +292,7 @@
         <div class="flex items-center gap-2 flex-wrap">
 
             <button id="downloadQRBtn"
-                class="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">
+                class="flex items-center gap-2 bg-gray-900 text-white px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-bold shadow-lg hover:bg-gray-700 whitespace-nowrap">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -865,26 +865,26 @@
                         <div class="space-y-2">
                             ${isOpen && currentOrder.order_items?.length
                                 ? currentOrder.order_items.map((item, i) => `
-                                                    <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-3 md:px-4 py-2.5 md:py-3 transition group"
-                                                         style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
-                                                        <div class="flex items-center gap-2 md:gap-3 min-w-0">
-                                                            <div class="w-8 h-8 md:w-9 md:h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 flex-shrink-0">
-                                                                ${item.menu_item_id}
+                                                        <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-3 md:px-4 py-2.5 md:py-3 transition group"
+                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
+                                                            <div class="flex items-center gap-2 md:gap-3 min-w-0">
+                                                                <div class="w-8 h-8 md:w-9 md:h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 flex-shrink-0">
+                                                                    ${item.menu_item_id}
+                                                                </div>
+                                                                <div class="min-w-0">
+                                                                    <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.menu_item.name}</p>
+                                                                    <p class="text-xs text-gray-400 mt-0.5">Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}</p>
+                                                                </div>
                                                             </div>
-                                                            <div class="min-w-0">
-                                                                <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.menu_item.name}</p>
-                                                                <p class="text-xs text-gray-400 mt-0.5">Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}</p>
+                                                            <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                                                                <span class="text-xs font-semibold px-2 py-1 rounded-full status-${item.status} hidden sm:inline">
+                                                                    ${capitalize(item.status)}
+                                                                </span>
+                                                                <p class="font-bold text-gray-800 text-xs md:text-sm">
+                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
+                                                                </p>
                                                             </div>
-                                                        </div>
-                                                        <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                                                            <span class="text-xs font-semibold px-2 py-1 rounded-full status-${item.status} hidden sm:inline">
-                                                                ${capitalize(item.status)}
-                                                            </span>
-                                                            <p class="font-bold text-gray-800 text-xs md:text-sm">
-                                                                Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
-                                                            </p>
-                                                        </div>
-                                                    </div>`).join('')
+                                                        </div>`).join('')
                                 : `<p class="text-sm text-gray-400 text-center py-4">No items ordered</p>`}
                         </div>
                     </div>
@@ -898,16 +898,16 @@
                                     const c = ACT_CFG[act.action] || ACT_CFG.created;
                                     const isLast = i === activities.length - 1;
                                     return `<div class="relative flex gap-3 ${isLast ? '' : 'pb-5'} timeline-item">
-                                                        <div class="flex-shrink-0 w-7 h-7 ${c.bg} rounded-full flex items-center justify-center mt-0.5 z-10 ring-2 ring-white">
-                                                            <svg class="h-3.5 w-3.5 ${c.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.path}"/>
-                                                            </svg>
-                                                        </div>
-                                                        <div class="flex-1 min-w-0 pt-0.5">
-                                                            <p class="text-xs md:text-sm text-gray-600 leading-snug">${buildActivitySentence(act)}</p>
-                                                            <p class="text-xs text-gray-400 mt-1">${formatTime(act.created_at)}</p>
-                                                        </div>
-                                                    </div>`;
+                                                            <div class="flex-shrink-0 w-7 h-7 ${c.bg} rounded-full flex items-center justify-center mt-0.5 z-10 ring-2 ring-white">
+                                                                <svg class="h-3.5 w-3.5 ${c.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.path}"/>
+                                                                </svg>
+                                                            </div>
+                                                            <div class="flex-1 min-w-0 pt-0.5">
+                                                                <p class="text-xs md:text-sm text-gray-600 leading-snug">${buildActivitySentence(act)}</p>
+                                                                <p class="text-xs text-gray-400 mt-1">${formatTime(act.created_at)}</p>
+                                                            </div>
+                                                        </div>`;
                                 }).join('')}
                         </div>
                     </div>

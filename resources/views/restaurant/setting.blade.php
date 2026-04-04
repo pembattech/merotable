@@ -343,7 +343,11 @@
                 <div class="avatar-badge"></div>
             </div>
             <div class="profile-info">
-                <h2 id="profileName"><span class="skeleton inline-block w-40 h-5">&nbsp;</span></h2>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <h2 id="profileName"><span class="skeleton inline-block w-40 h-5">&nbsp;</span></h2>
+                    <p id="ownerName" class="text-sm text-gray-500"><span
+                            class="skeleton inline-block w-40 h-5">&nbsp;</span></p>
+                </div>
                 <div class="tagline" id="profileTagline"><span class="skeleton inline-block w-56 h-3 mt-1">&nbsp;</span>
                 </div>
                 <div class="profile-tags mt-2">
@@ -440,8 +444,9 @@
                     Save
                 </button>
             </div>
-            <div class="px-4 md:px-5 py-4 md:py-5 space-y-4">
-                <div class="grid grid-cols-2 gap-3">
+
+            <div class="px-4 md:px-5 py-4 md:py-5 space-y-3 md:space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div class="field-item">
                         <label>Tax (%)</label>
                         <input type="number" id="tax_percentage" class="field-input" placeholder="0" min="0"
@@ -615,6 +620,7 @@
 
                 // Banner
                 document.getElementById('profileName').textContent = r.name || '—';
+                document.getElementById('ownerName').textContent = '[ ' + r.ownerName + ' ]' || '—';
                 document.getElementById('profileTagline').textContent = r.slug || '';
                 const statusEl = document.getElementById('profileStatus');
                 if (r.isActive) {
@@ -746,6 +752,7 @@
                 // Refresh banner
                 const r = data.data;
                 document.getElementById('profileName').textContent = r.name || '—';
+                document.getElementById('ownerName').textContent = '[ ' + r.ownerName + ' ]' || '—';
                 if (r.logo_url) {
                     document.getElementById('bannerAvatar').innerHTML = `<img src="${r.logo_url}" alt="${r.name}"/>`;
                 }

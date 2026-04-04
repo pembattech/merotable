@@ -206,8 +206,7 @@
                 {{-- Table Grid --}}
                 <div class="bg-white rounded-2xl border border-gray-100 p-4 md:p-5">
                     <h3 class="font-bold text-gray-800 text-sm md:text-base mb-3 md:mb-4">Select Table</h3>
-                    {{-- 3 cols on xs → 4 sm → 5 md → 4 lg (sidebar takes room) → 5 xl --}}
-                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3"
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3"
                         id="tableGrid"></div>
                 </div>
 
@@ -520,15 +519,26 @@
                 const s = statusStyles[table.status] || statusStyles.available;
                 return `
                 <div onclick="selectTable(${table.id})"
-                    class="table-card ${s.bg} ${s.border} ${s.ring} p-2.5 md:p-4 rounded-2xl border shadow-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg">
-                    <div class="flex justify-between items-center">
-                        <span class="text-base md:text-xl font-extrabold tracking-wide">${table.table_number}</span>
-                        <span class="text-[8px] md:text-[9px] px-1.5 py-0.5 rounded-full font-semibold uppercase ${s.badge}">${table.status}</span>
-                    </div>
-                    ${table.status === 'occupied'
-                        ? `<div class="mt-2 md:mt-4"><p class="text-[10px] md:text-xs opacity-80">Current Bill</p><p class="text-sm md:text-lg font-bold">Rs. ${table.total_amount}</p></div>`
-                        : `<div class="mt-4 md:mt-6 h-3 md:h-6"></div>`}
-                </div>`;
+     class="table-card ${s.bg} ${s.border} ${s.ring} p-2.5 md:p-4 rounded-2xl border shadow-sm cursor-pointer transition transform hover:scale-[1.03] hover:shadow-lg">
+    
+    <!-- Table number + status -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+        <span class="text-base sm:text-lg md:text-xl font-extrabold tracking-wide">
+            ${table.table_number}
+        </span>
+        <span class="text-[8px] sm:text-[9px] md:text-xs px-2 py-1 rounded-full font-semibold uppercase ${s.badge} text-center">
+            ${table.status}
+        </span>
+    </div>
+
+    <!-- Conditional: occupied or empty -->
+    ${table.status === 'occupied'
+        ? `<div class="mt-2 md:mt-4 text-center sm:text-left">
+                           <p class="text-[10px] sm:text-xs md:text-sm opacity-80">Current Bill</p>
+                           <p class="text-sm sm:text-base md:text-lg font-bold">Rs. ${table.total_amount}</p>
+                       </div>`
+        : `<div class="mt-4 md:mt-6 h-3 md:h-6"></div>`}
+</div>`;
             }).join('');
         }
 
@@ -716,12 +726,12 @@
                     </div>
                     ${table.orders.map(order =>
                         `<div class="space-y-1 pt-2">
-                                                ${order.order_items.map(oi => `
+                                                            ${order.order_items.map(oi => `
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-gray-600">${oi.menu_item.name} <span class="text-gray-400">×${oi.quantity}</span></span>
                                     <span class="text-gray-500 font-medium">Rs. ${(oi.price * oi.quantity).toLocaleString()}</span>
                                 </div>`).join('')}
-                                            </div>`).join('')}
+                                                        </div>`).join('')}
                 </div>`).join('');
         }
 
@@ -864,7 +874,7 @@
                 openInvoiceModal(data.data)
 
                 showToast(`Payment completed for ${selectedTable.table_number}`, 'success');
-                
+
                 await updateTableStatus(selectedTable.id, selectedTable.orders[0].id, 'available');
 
                 closeCheckoutModal();

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ asset('storage/logo/merotable-LOGO.webp') }}" type="image/x-icon">
+    {{-- <img class="logo h-8 w-8 object-contain" src="{{ asset('storage/logo/merotable-LOGO.webp') }}" alt="Logo"> --}}
 
     @include('components.pwa')
 

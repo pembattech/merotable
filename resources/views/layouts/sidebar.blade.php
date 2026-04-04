@@ -1,6 +1,8 @@
 {{-- Mobile Topbar --}}
 <div class="md:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 flex items-center justify-between px-4 py-3 shadow-lg">
-    <span class="text-base md:text-xl font-extrabold text-blue-400 tracking-tight">MeroTable</span>
+    <div class="flex items-center gap-2">
+        <img class="logo w-28" src="{{ asset('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
+        </div>
     <button id="sidebar-toggle" class="text-gray-400 hover:text-white focus:outline-none" aria-label="Open menu">
         <svg id="icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -28,7 +30,7 @@
 
     {{-- Logo (desktop only — hidden on mobile since topbar shows it) --}}
     <div class="hidden md:block p-6 text-xl md:text-2xl font-extrabold text-blue-400 tracking-tight">
-        MeroTable
+            <img class="logo" src="{{ asset('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
     </div>
 
     {{-- Spacer so nav isn't hidden behind the fixed mobile topbar when drawer is open --}}

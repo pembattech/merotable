@@ -3,28 +3,38 @@
 @section('title', 'Take Order | ' . config('app.name'))
 
 @section('content')
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>
     <div class="">
         <div class="max-w-7xl mx-auto">
 
             <!-- Header -->
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-800">Take Order</h1>
-                <p class="text-gray-600 mt-1">Select items and assign to a table</p>
+                <h1 class="text-lg md:text-2xl font-extrabold text-gray-900">Take Order</h1>
+                <p class="text-xs md:text-sm text-gray-400 mt-0.5">Select items and assign to a table</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- LEFT: Menu & Categories (2/3 width) -->
-                <div class="lg:col-span-2 space-y-4">
+                <div class="lg:col-span-2 space-y-3 md:space-y-4">
 
                     <!-- Search Bar -->
-                    <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4">
                         <div class="relative">
                             <input id="searchInput" type="text" placeholder="Search menu items..."
-                                class="w-full pl-10 pr-4 py-2.5 outline-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full pl-10 pr-3 py-2 md:py-2.5 text-sm md:text-base outline-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 onkeyup="filterMenu()">
-                            <svg class="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+
+                            <svg class="absolute left-3 top-2.5 md:top-3 h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -32,16 +42,21 @@
                     </div>
 
                     <!-- Categories -->
-                    <div class="bg-white rounded-lg shadow-sm p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Categories</h3>
-                        <div class="flex gap-2 overflow-x-auto pb-2" id="categories"></div>
+                    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2 md:mb-3">Categories</h3>
+
+                        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="categories"></div>
                     </div>
 
                     <!-- Menu Items -->
-                    <div class="bg-white rounded-lg shadow-sm p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-4">Menu Items</h3>
-                        <div id="menu" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3 md:mb-4">Menu Items</h3>
+
+                        <div id="menu"
+                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                        </div>
                     </div>
+
                 </div>
 
                 <!-- RIGHT: Cart (1/3 width) -->
@@ -128,92 +143,121 @@
     </div>
 
     <!-- ====== CANCEL ORDER MODAL ======  -->
-    <div id="cancelModal" class="fixed inset-0 z-50 hidden items-center justify-center">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCancelModal()"></div>
+    <div id="cancelModal"
+    class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center">
 
-        <!-- Modal Box -->
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-modal">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onclick="closeCancelModal()"></div>
 
-            <!-- Red top bar -->
-            <div class="bg-red-500 px-6 py-5">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/20 rounded-full p-2">
-                        <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-white font-bold text-lg">Cancel Order</h2>
-                        <p class="text-red-100 text-sm" id="cancelModalSubtitle">Order item</p>
-                    </div>
+    <!-- Modal Box -->
+    <div
+        class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md mx-2 sm:mx-4 overflow-hidden animate-modal max-h-[90vh] flex flex-col">
+
+        <!-- Header -->
+        <div class="bg-red-500 px-4 sm:px-6 py-4 sm:py-5">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/20 rounded-full p-2">
+                    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </div>
-            </div>
-
-            <div class="p-6">
-
-                <!-- Cancellation Reason -->
-                <div class="mb-5">
-                    <label class="block text-sm font-semibold text-gray-700 mb-3">Why is this order being
-                        cancelled?</label>
-                    <div class="grid grid-cols-2 gap-2" id="reasonButtons">
-                        <button onclick="selectReason(this, 'Customer changed mind')"
-                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                            😕 Changed mind
-                        </button>
-                        <button onclick="selectReason(this, 'Item unavailable')"
-                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                            🚫 Item unavailable
-                        </button>
-                        <button onclick="selectReason(this, 'Wrong item ordered')"
-                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                            ❌ Wrong item
-                        </button>
-                        <button onclick="selectReason(this, 'Customer leaving')"
-                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                            🚶 Customer leaving
-                        </button>
-                        <button onclick="selectReason(this, 'Long waiting time')"
-                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                            ⏱️ Long wait time
-                        </button>
-                        <button onclick="selectReason(this, 'Other')"
-                            class="reason-btn text-left px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition duration-150">
-                            📝 Other
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Additional Notes -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Additional notes <span
-                            class="text-gray-400 font-normal">(optional)</span></label>
-                    <textarea id="cancelNotes" rows="3" placeholder="Add any extra details about the cancellation..."
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none"></textarea>
-                </div>
-
-                <!-- Error message -->
-                <p id="cancelError" class="text-red-500 text-xs mb-3 hidden">Please select a reason before cancelling.</p>
-
-                <!-- Action Buttons -->
-                <div class="flex gap-3">
-                    <button onclick="closeCancelModal()"
-                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition duration-200">
-                        Go Back
-                    </button>
-                    <button onclick="confirmCancel()"
-                        class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Confirm Cancel
-                    </button>
+                <div>
+                    <h2 class="text-white font-bold text-base sm:text-lg">Cancel Order</h2>
+                    <p class="text-red-100 text-xs sm:text-sm"
+                        id="cancelModalSubtitle">Order item</p>
                 </div>
             </div>
         </div>
+
+        <!-- Scrollable Content -->
+        <div class="p-4 sm:p-6 overflow-y-auto">
+
+            <!-- Reasons -->
+            <div class="mb-4 sm:mb-5">
+                <label class="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
+                    Why is this order being cancelled?
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                    id="reasonButtons">
+
+                    <button onclick="selectReason(this, 'Customer changed mind')"
+                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
+                        😕 Changed mind
+                    </button>
+
+                    <button onclick="selectReason(this, 'Item unavailable')"
+                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
+                        🚫 Item unavailable
+                    </button>
+
+                    <button onclick="selectReason(this, 'Wrong item ordered')"
+                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
+                        ❌ Wrong item
+                    </button>
+
+                    <button onclick="selectReason(this, 'Customer leaving')"
+                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
+                        🚶 Customer leaving
+                    </button>
+
+                    <button onclick="selectReason(this, 'Long waiting time')"
+                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
+                        ⏱️ Long wait time
+                    </button>
+
+                    <button onclick="selectReason(this, 'Other')"
+                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
+                        📝 Other
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-5 sm:mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Additional notes
+                    <span class="text-gray-400 font-normal">(optional)</span>
+                </label>
+
+                <textarea id="cancelNotes" rows="3"
+                    placeholder="Add any extra details..."
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none">
+                </textarea>
+            </div>
+
+            <!-- Error -->
+            <p id="cancelError"
+                class="text-red-500 text-xs mb-3 hidden">
+                Please select a reason before cancelling.
+            </p>
+        </div>
+
+        <!-- Sticky Buttons -->
+        <div class="p-4 border-t bg-white flex gap-2 sm:gap-3">
+            <button onclick="closeCancelModal()"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm sm:text-base font-semibold py-2 rounded-lg transition">
+                Go Back
+            </button>
+
+            <button onclick="confirmCancel()"
+                class="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm sm:text-base font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Cancel
+            </button>
+        </div>
+
     </div>
+</div>
 
     @include('staff.attendance')
 
@@ -261,9 +305,9 @@
 
             const data = await res.json();
             if (!data.success) {
-                    showToast(data.message || 'Something went wrong ❌', 'error');
-                    return;
-                }
+                showToast(data.message || 'Something went wrong ❌', 'error');
+                return;
+            }
 
             let html = `
         <button id="cat-all"
@@ -333,10 +377,10 @@
 
             const data = await res.json();
             if (!data.success) {
-                    showToast(data.message || 'Something went wrong ❌', 'error');
-                    return;
-                }
-                
+                showToast(data.message || 'Something went wrong ❌', 'error');
+                return;
+            }
+
             allMenuItems = data.data;
 
             renderMenu(allMenuItems);
@@ -373,40 +417,40 @@
                         <p class="text-blue-600 font-bold text-lg">Rs. ${item.price}</p>
                     </div>
                     ${!item.isAvailable ? `
-                                                                                                <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
-                                                                                            ` : qty > 0 ? `
-                                                                                                <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
-                                                                                            ` : ''}
+                                                                                                    <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
+                                                                                                ` : qty > 0 ? `
+                                                                                                    <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
+                                                                                                ` : ''}
                 </div>
 
                 ${
                     !item.isAvailable
                     ? `<button disabled
-                                                                                                    class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
-                                                                                                    Unavailable
-                                                                                               </button>`
+                                                                                                        class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
+                                                                                                        Unavailable
+                                                                                                   </button>`
                     : qty === 0
                     ? `<button
-                                                                                                    class="w-full bg-gradient-to-br from-indigo-600 to-blue-600 text-white py-2.5 rounded-lg hover:ring-2 hover:ring-indigo-400 transition duration-200 font-medium flex items-center justify-center gap-2"
-                                                                                                    onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                                                                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                                                                    </svg>
-                                                                                                    Add to Cart
-                                                                                               </button>`
+                                                                                                        class="w-full bg-gradient-to-br from-indigo-600 to-blue-600 text-white py-2.5 rounded-lg hover:ring-2 hover:ring-indigo-400 transition duration-200 font-medium flex items-center justify-center gap-2"
+                                                                                                        onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
+                                                                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                                                                        </svg>
+                                                                                                        Add to Cart
+                                                                                                   </button>`
                     : `<div class="flex items-center justify-between gap-2">
-                                                                                                    <button onclick="updateQty(${item.id}, -1)"
-                                                                                                        class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
-                                                                                                        −
-                                                                                                    </button>
+                                                                                                        <button onclick="updateQty(${item.id}, -1)"
+                                                                                                            class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
+                                                                                                            −
+                                                                                                        </button>
 
-                                                                                                    <span class="font-bold text-lg px-4">${qty}</span>
+                                                                                                        <span class="font-bold text-lg px-4">${qty}</span>
 
-                                                                                                    <button onclick="updateQty(${item.id}, 1)"
-                                                                                                        class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
-                                                                                                        +
-                                                                                                    </button>
-                                                                                               </div>`
+                                                                                                        <button onclick="updateQty(${item.id}, 1)"
+                                                                                                            class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
+                                                                                                            +
+                                                                                                        </button>
+                                                                                                   </div>`
                 }
             </div>`;
                 });
@@ -534,9 +578,9 @@
             });
             const data = await res.json();
             if (!data.success) {
-                    showToast(data.message || 'Something went wrong ❌', 'error');
-                    return;
-                }
+                showToast(data.message || 'Something went wrong ❌', 'error');
+                return;
+            }
 
             let html = '<option value="">Choose a table...</option>';
             data.data.forEach(t => {
@@ -640,15 +684,15 @@
                         Reorder
                     </button>
                     ${canCancel ? `
-                                                                    <span class="text-gray-300">|</span>
-                                                                    <button
-                                                                        onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
-                                                                        class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
-                                                                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                        </svg>
-                                                                        Cancel
-                                                                    </button>` : ''}
+                                                                        <span class="text-gray-300">|</span>
+                                                                        <button
+                                                                            onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
+                                                                            class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
+                                                                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                            </svg>
+                                                                            Cancel
+                                                                        </button>` : ''}
                 </div>
             </div>
         </div>`;
@@ -879,7 +923,7 @@
             }
         }
 
-// ================= INITIAL LOAD =================
+        // ================= INITIAL LOAD =================
         document.addEventListener('DOMContentLoaded', () => {
             loadCategories();
             loadMenu();

@@ -137,9 +137,8 @@
         }
 
         .logo {
-            width: 60px;
-            height: 40px;
-            object-fit: cover;
+            width: 200px;
+            height: auto;
         }
 
         .parent-company-name {
@@ -183,12 +182,11 @@
                         <table class="parent-company">
                             <tr>
                                 <td>
-                                    <img class="logo" src="{{ public_path('storage/logo/MEROTABLE-LOGO.png') }}"
-                                        alt="Logo">
+                                    <img class="logo" src="{{ public_path('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
                                 </td>
-                                <td class="parent-company-name">
+                                {{-- <td class="parent-company-name">
                                     MeroTable
-                                </td>
+                                </td> --}}
                             </tr>
                         </table>
                     </div>
