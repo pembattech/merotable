@@ -36,6 +36,10 @@ Route::get('restaurant/reports', function () {
     return view('restaurant/reports');
 })->name('restaurant.reports');
 
+Route::get('restaurant/invoices', function () {
+    return view('restaurant/invoices');
+})->name('restaurant.invoices');
+
 Route::get('restaurant/staff', function () {
     return view('restaurant/staff');
 })->name('restaurant.staff');

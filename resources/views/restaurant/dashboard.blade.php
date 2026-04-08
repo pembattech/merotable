@@ -383,7 +383,7 @@
     </div>
 
     {{-- ── Live Table Map ── --}}
-    <section class="mb-8 md:mb-10">
+    {{-- <section class="mb-8 md:mb-10">
         <div class="flex justify-between items-center mb-4 md:mb-6">
             <h2 class="text-base md:text-xl font-bold text-gray-800">Live Table Map</h2>
             <button class="text-xs md:text-sm text-blue-600 font-bold hover:underline">Refresh Status</button>
@@ -436,7 +436,7 @@
             </div>
 
         </div>
-    </section>
+    </section> --}}
 
     {{-- ── Top Menu Items ── --}}
     <section class="mb-8 md:mb-10">
@@ -488,7 +488,7 @@
                     const totalOccupiedTables = data.data.occupiedTables;
                     const totalTables = data.data.tableCount;
 
-                    const todayRevenue = data.data.todayRevenue;
+                    const todayRevenue = data.data.todayRevenue ?? 0;
                     const yesterdayRevenue = data.data.yesterdayRevenue;
                     const revenueChangePercent = data.data.revenueChangePercent;
                     const revenueTrend = todayRevenue >= yesterdayRevenue ? '↑' : '↓';

@@ -88,6 +88,30 @@
         .animate-slide-up {
             animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+
+        .d1 {
+            animation-delay: .04s
+        }
+
+        .d2 {
+            animation-delay: .08s
+        }
+
+        .d3 {
+            animation-delay: .12s
+        }
+
+        .d4 {
+            animation-delay: .16s
+        }
+
+        .d5 {
+            animation-delay: .20s
+        }
+
+        .d6 {
+            animation-delay: .24s
+        }
     </style>
 
     {{-- Assets (Vite) --}}

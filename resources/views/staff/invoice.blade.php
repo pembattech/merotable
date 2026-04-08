@@ -376,12 +376,14 @@
         document.querySelectorAll('.order-id').forEach(el => el.textContent = invoiceData.orderId);
         document.querySelectorAll('.payment-method').forEach(el => el.textContent = invoiceData.paymentMethod);
         document.querySelectorAll('.payment-status').forEach(el => el.textContent = invoiceData.paymentStatus);
-        document.querySelectorAll('.invoice-date').forEach(el => el.textContent = formattedDate);
+        document.querySelectorAll('.invoice-date').forEach(el => el.textContent = invoiceData.paidAt ? invoiceData.paidAt : formattedDate);
 
         document.getElementById('openInvoiceModal').classList.add('flex');
         document.getElementById('openInvoiceModal').classList.remove('hidden');
 
         document.body.classList.add('overflow-hidden');
+
+        console.log(document)
 
         populateInvoice(invoiceData);
 
