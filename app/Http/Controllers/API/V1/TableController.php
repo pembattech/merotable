@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\V1\PublicRestaurantResource;
+
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Http\Resources\V1\TableResource;
+use App\Http\Resources\V1\RestaurantSettingResource;
 use App\Models\Table;
 use App\Models\Restaurant;
 use Illuminate\Validation\Rule;
@@ -187,6 +188,7 @@ class TableController extends Controller
 
         // ---- ORDERS RELATION ----
         $tableQuery->with([
+            'restaurant',
             'orders' => function ($q) use ($mode, $isRestaurant) {
 
                 if ($mode === 'billing') {
@@ -199,8 +201,8 @@ class TableController extends Controller
                 $q->select('id', 'table_id', 'status', 'total_amount', 'created_at');
 
                 $q->with([
-                    'orderItems:id,order_id,menu_item_id,price,quantity,status',
-                    'orderItems.menuItem:id,name'
+                    'activities',
+                    'orderItems.menuItem'
                 ]);
 
                 if ($isRestaurant) {
@@ -223,10 +225,10 @@ class TableController extends Controller
             ], 404);
         }
 
-        // ---- TOTAL ----
-        $totalEarning = $mode === 'billing'
-            ? optional($table->orders->first())->total_amount
-            : $table->orders->sum('total_amount');
+        // // ---- TOTAL ----
+        // $totalEarning = $mode === 'billing'
+        //     ? optional($table->orders->first())->total_amount
+        //     : $table->orders->sum('total_amount');
 
 
         // ---- GENERATE QR CODE ----
@@ -237,14 +239,20 @@ class TableController extends Controller
         $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
 
 
+        $data = [
+            'table' => new TableResource($table),
+            'settings' => new RestaurantSettingResource($restaurant->setting),
+            'mode' => $mode,
+        ];
+
+        // Add qr_code only if mode is NOT billing
+        if ($mode !== 'billing') {
+            $data['qrCode'] = $qrBase64;
+        }
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'table' => new TableResource($table),
-                'total' => $totalEarning,
-                'mode' => $mode,
-                'qr_code' => $qrBase64,
-            ],
+            'data' => $data,
         ]);
     }
 

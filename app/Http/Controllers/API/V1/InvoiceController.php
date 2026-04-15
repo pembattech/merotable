@@ -10,6 +10,7 @@ use App\Http\Resources\V1\InvoiceResource;
 
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\Table;
 
 class InvoiceController extends Controller
 {
@@ -152,6 +153,8 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
+        // $staff = auth('staff')->user();
+
         $order = Order::with(['invoice', 'orderItems.menuItem'])
             ->findOrFail($request->order_id);
 
@@ -163,10 +166,12 @@ class InvoiceController extends Controller
             ], 409);
         }
 
+        $tableId = Table::getIdByTableNumber($request->table_number);
+
         $invoice = Invoice::create([
             'restaurant_id' => $order->restaurant_id,
             'order_id' => $order->id,
-            'table_id' => $request->table_id,
+            'table_id' => $tableId,
             'subtotal' => $request->subtotal,
             'tax_amount' => $request->tax_amount ?? 0,
             'discount_amount' => $request->discount_amount ?? 0,
@@ -177,7 +182,6 @@ class InvoiceController extends Controller
             'paid_at' => now(),
         ]);
 
-        // $invoice->load('order.orderItems.menuItem');
         $invoice->load(['restaurant', 'order.orderItems.menuItem', 'table']);
 
         activityLog(

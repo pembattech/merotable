@@ -42,4 +42,9 @@ class Table extends Model
     {
         return $this->restaurant;
     }
+
+    public static function getIdByTableNumber($tableNumber)
+    {
+        return self::where('table_number', $tableNumber)->value('id');
+    }
 }

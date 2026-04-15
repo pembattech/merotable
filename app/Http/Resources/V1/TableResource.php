@@ -14,6 +14,23 @@ class TableResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+
+            'restaurant' => $this->whenLoaded('restaurant', function () {
+                return [
+                    'name' => $this->restaurant->name,
+                    'slug' => $this->restaurant->slug,
+                ];
+            }),
+
+            'areaName' => $this->area_name,
+            'tableNumber' => $this->table_number,
+            'status' => $this->status,
+
+            'orders' => OrderResource::collection(
+                $this->whenLoaded('orders')
+            ),
+        ];
     }
 }

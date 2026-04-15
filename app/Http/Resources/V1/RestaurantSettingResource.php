@@ -10,7 +10,6 @@ class RestaurantSettingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
             'taxPercentage' => (float) $this->tax_percentage,
             'serviceChargePercentage' => (float) $this->service_charge_percentage,
             'taxEnabled' => (bool) $this->tax_enabled,

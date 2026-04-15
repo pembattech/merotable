@@ -383,8 +383,6 @@
 
         document.body.classList.add('overflow-hidden');
 
-        console.log(document)
-
         populateInvoice(invoiceData);
 
     }
@@ -401,11 +399,6 @@
 
 
     function populateInvoice(invoiceData) {
-
-        //TODO: get it from the restaurant setting.
-        const TAX_RATE = 0.13;
-        const SC_RATE = 0.10;
-
         const tbody = document.getElementById('itemBody');
         tbody.innerHTML = ''; // clear previous items
 
@@ -436,10 +429,6 @@
             tbody.appendChild(tr);
         });
 
-        const tax = Math.round(subtotal * TAX_RATE);
-        const sc = Math.round(subtotal * SC_RATE);
-        const grand = subtotal + tax + sc;
-
         document.getElementById('subtotalLabel').textContent =
             `Subtotal (${invoiceData.orderItems.length} items)`;
 
@@ -447,13 +436,13 @@
             `Rs. ${subtotal.toLocaleString()}`;
 
         document.getElementById('taxAmt').textContent =
-            `Rs. ${tax.toLocaleString()}`;
+            `Rs. ${invoiceData.taxAmount.toLocaleString()}`;
 
         document.getElementById('scAmt').textContent =
-            `Rs. ${sc.toLocaleString()}`;
+            `Rs. ${invoiceData.serviceCharge.toLocaleString()}`;
 
         document.getElementById('grandTotal').textContent =
-            `Rs. ${grand.toLocaleString()}`;
+            `Rs. ${invoiceData.totalAmount.toLocaleString()}`;
     }
 
     // ── Scroll hint ───────────────────────────────────────────────

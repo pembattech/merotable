@@ -271,11 +271,15 @@
                                 <span id="subtotal" class="font-semibold text-gray-800">Rs. 0</span>
                             </div>
                             <div class="flex justify-between text-xs md:text-sm">
-                                <span class="text-gray-600">Tax (13%)</span>
+                                <p class="text-gray-600">Tax
+                                    <span id="taxperc" class="text-gray-600"></span>
+                                </p>
                                 <span id="tax" class="font-semibold text-gray-800">Rs. 0</span>
                             </div>
                             <div class="flex justify-between text-xs md:text-sm">
-                                <span class="text-gray-600">Service Charge (10%)</span>
+                                <p class="text-gray-600">Service Charge
+                                    <span id="serviceperc" class="text-gray-600"></span>
+                                </p>
                                 <span id="service" class="font-semibold text-gray-800">Rs. 0</span>
                             </div>
                             <div class="flex justify-between text-base md:text-lg font-bold pt-2 border-t border-gray-200">
@@ -420,7 +424,7 @@
                     class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-2.5 md:py-3 rounded-xl transition">
                     Cancel
                 </button>
-                <button onclick="completePayment()"
+                <button onclick="completePayment()" id="completePaymentBtn"
                     class="flex-[2] bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 md:py-3 rounded-xl transition
                            shadow-lg shadow-green-200 flex items-center justify-center gap-2">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -480,6 +484,7 @@
         }
 
         let selectedTable = null;
+        let currentSettings = null;
         let selectedMethod = 'cash';
 
         // ── Render tables ─────────────────────────────────────────
@@ -534,9 +539,9 @@
     <!-- Conditional: occupied or empty -->
     ${table.status === 'occupied'
         ? `<div class="mt-2 md:mt-4 text-center sm:text-left">
-                           <p class="text-[10px] sm:text-xs md:text-sm opacity-80">Current Bill</p>
-                           <p class="text-sm sm:text-base md:text-lg font-bold">Rs. ${table.total_amount}</p>
-                       </div>`
+                                                       <p class="text-[10px] sm:text-xs md:text-sm opacity-80">Current Bill</p>
+                                                       <p class="text-sm sm:text-base md:text-lg font-bold">Rs. ${table.total_amount}</p>
+                                                   </div>`
         : `<div class="mt-4 md:mt-6 h-3 md:h-6"></div>`}
 </div>`;
             }).join('');
@@ -558,12 +563,14 @@
             }
 
             const table = data.data.table;
+            const settings = data.data.settings;
             if (!table || table.status !== 'occupied') {
                 showToast('This table has no active orders', 'warning');
                 return;
             }
 
             selectedTable = table;
+            currentSettings = settings;
             renderOrderItems(table);
 
             // Update both desktop & mobile badges
@@ -598,11 +605,11 @@
             }
 
             const items = table.orders.flatMap(order =>
-                order.order_items.map(i => ({
-                    name: i.menu_item?.name || 'Unnamed Item',
+                order.orderItems.map(i => ({
+                    name: i.menuItem?.name || 'Unnamed Item',
                     price: i.price || 0,
                     qty: i.quantity || 1,
-                    total: (i.price || 0) * (i.quantity || 1),
+                    subTotal: (i.price || 0) * (i.quantity || 1),
                     orderId: order.id,
                 }))
             );
@@ -613,23 +620,40 @@
                         <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.name}</p>
                         <p class="text-xs text-gray-400 mt-0.5">Rs. ${item.price} × ${item.qty}${item.orderId ? ` (Order #${item.orderId})` : ''}</p>
                     </div>
-                    <p class="font-bold text-gray-800 text-xs md:text-sm flex-shrink-0">Rs. ${item.total.toLocaleString()}</p>
+                    <p class="font-bold text-gray-800 text-xs md:text-sm flex-shrink-0">Rs. ${item.subTotal.toLocaleString()}</p>
                 </div>`).join('');
 
-            updateSummary(items.reduce((sum, i) => sum + i.total, 0));
+            updateSummary(items.reduce((sum, i) => sum + i.subTotal, 0));
         }
 
         // ── Update summary totals ─────────────────────────────────
         function updateSummary(subtotal) {
-            const tax = Math.round(subtotal * 0.13);
-            const service = Math.round(subtotal * 0.10);
-            const total = subtotal + tax + service;
+            let tax = 0;
+            let serviceCharge = 0;
+
+            if (currentSettings.taxEnabled) {
+                tax = (subtotal * currentSettings.taxPercentage) / 100;
+            }
+
+            if (currentSettings.serviceChargeEnabled) {
+                serviceCharge = (subtotal * currentSettings.serviceChargePercentage) / 100;
+            }
+
+            const grandTotal = subtotal + tax + serviceCharge;
+
+            let completepaymentBtn = document.querySelector("#completePaymentBtn");
+            completepaymentBtn.dataset.subtotal = subtotal;
+            completepaymentBtn.dataset.grandtotal = grandTotal;
+
+
+            document.getElementById('taxperc').textContent = `(${currentSettings.taxPercentage}%)`
+            document.getElementById('serviceperc').textContent = `(${currentSettings.serviceChargePercentage}%)`
 
             document.getElementById('subtotal').textContent = `Rs. ${subtotal.toLocaleString()}`;
             document.getElementById('tax').textContent = `Rs. ${tax.toLocaleString()}`;
-            document.getElementById('service').textContent = `Rs. ${service.toLocaleString()}`;
-            document.getElementById('total').textContent = `Rs. ${total.toLocaleString()}`;
-            document.getElementById('totalPeek').textContent = `Rs. ${total.toLocaleString()}`;
+            document.getElementById('service').textContent = `Rs. ${serviceCharge.toLocaleString()}`;
+            document.getElementById('total').textContent = `Rs. ${grandTotal.toLocaleString()}`;
+            document.getElementById('totalPeek').textContent = `Rs. ${grandTotal.toLocaleString()}`;
         }
 
         // ── Search by items ───────────────────────────────────────
@@ -726,12 +750,12 @@
                     </div>
                     ${table.orders.map(order =>
                         `<div class="space-y-1 pt-2">
-                                                            ${order.order_items.map(oi => `
+                                                                                        ${order.order_items.map(oi => `
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="text-gray-600">${oi.menu_item.name} <span class="text-gray-400">×${oi.quantity}</span></span>
                                     <span class="text-gray-500 font-medium">Rs. ${(oi.price * oi.quantity).toLocaleString()}</span>
                                 </div>`).join('')}
-                                                        </div>`).join('')}
+                                                                                    </div>`).join('')}
                 </div>`).join('');
         }
 
@@ -776,6 +800,7 @@
         // ── Clear selection ───────────────────────────────────────
         function clearSelection() {
             selectedTable = null;
+            // currentSettings = null;
             selectedItemNames.clear();
             ['selectedTableBadge', 'selectedTableBadgeMobile'].forEach(id => {
                 const el = document.getElementById(id);
@@ -785,9 +810,11 @@
             document.getElementById('itemSearch').value = '';
             document.getElementById('searchResults').innerHTML = '';
             renderSelectedItems();
-            renderOrderItems({
-                orders: []
-            });
+            renderOrderItems(
+                {
+                    orders: [],
+                }
+            );
             if (summaryExpanded) toggleSummary();
         }
 
@@ -795,7 +822,7 @@
         function openCheckoutModal() {
             if (!selectedTable) return;
             document.getElementById('modalTotal').textContent = document.getElementById('total').textContent;
-            document.getElementById('checkoutTableLabel').textContent = `Table ${selectedTable.table_number}`;
+            document.getElementById('checkoutTableLabel').textContent = `Table ${selectedTable.tableNumber}`;
             document.getElementById('amountReceived').value = '';
             document.getElementById('changeDisplay').classList.add('hidden');
             document.getElementById('paymentNotes').value = '';
@@ -829,21 +856,50 @@
         }
 
         async function completePayment() {
-            const total = parseInt(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
-            if (selectedMethod === 'cash') {
-                const received = parseInt(document.getElementById('amountReceived').value) || 0;
-                if (received < total) {
-                    showToast('Amount received is less than total', 'error');
-                    return;
-                }
-            }
             try {
+                const btn = document.querySelector("#completePaymentBtn");
 
-                const order = selectedTable.orders[0];
+                const subtotal = Number(btn.dataset.subtotal) || 0;
+                const grandTotal = Number(btn.dataset.grandtotal) || 0;
+
+                // Calculate charges safely
+                const tax = currentSettings.taxEnabled ?
+                    (subtotal * currentSettings.taxPercentage) / 100 :
+                    0;
+
+                const serviceCharge = currentSettings.serviceChargeEnabled ?
+                    (subtotal * currentSettings.serviceChargePercentage) / 100 :
+                    0;
+
+                const order = selectedTable?.orders?.[0];
+
                 if (!order) {
-                    showToast('No active order found for this table', 'error');
+                    showToast("No active order found for this table", "error");
                     return;
                 }
+
+                if (selectedMethod === "cash") {
+                    const received =
+                        Number(document.getElementById("amountReceived")?.value) || 0;
+
+                    const totalPayable = grandTotal;
+
+                    if (received < totalPayable) {
+                        showToast("Amount received is less than total", "error");
+                        return;
+                    }
+                }
+
+                const payload = {
+                    order_id: order.id,
+                    table_number: selectedTable.tableNumber,
+                    subtotal: subtotal,
+                    tax_amount: tax,
+                    discount_amount: 0,
+                    service_charge: serviceCharge,
+                    total_amount: grandTotal,
+                    payment_method: selectedMethod,
+                };
 
                 const response = await fetch(`/api/v1/staff/${url}/invoice`, {
                     method: 'POST',
@@ -852,17 +908,7 @@
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({
-                        order_id: order.id,
-                        table_id: selectedTable.id,
-                        subtotal: total,
-                        // TODO: Fetch the tax amount, discount amount and service charge from the restaurant setting 
-                        tax_amount: 0,
-                        discount_amount: 0,
-                        service_charge: 0,
-                        total_amount: total,
-                        payment_method: selectedMethod
-                    })
+                    body: JSON.stringify(payload),
                 });
 
                 const data = await response.json();
@@ -873,7 +919,7 @@
 
                 openInvoiceModal(data.data)
 
-                showToast(`Payment completed for ${selectedTable.table_number}`, 'success');
+                console.log(`Payment completed for ${selectedTable.tableNumber}`);
 
                 await updateTableStatus(selectedTable.id, selectedTable.orders[0].id, 'available');
 

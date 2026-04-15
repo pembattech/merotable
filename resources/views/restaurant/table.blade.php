@@ -511,13 +511,14 @@
                 historyModal.classList.add('flex');
 
                 const table = allOrderDetails[0].data.table;
+                console.log(table)
                 let totalOrders = table.orders.length,
                     totalCompleted = 0,
                     revenue = 0;
                 for (const o of table.orders) {
                     if (o.status === 'completed') {
                         totalCompleted++;
-                        revenue += o.total_amount;
+                        revenue += o.totalAmount;
                     }
                 }
                 document.getElementById('ohOrdersCount').textContent = totalOrders;
@@ -535,18 +536,18 @@
                         <div class="flex items-start justify-between mb-3">
                             <div>
                                 <p class="font-bold text-gray-800 text-sm">Order #${order.id}</p>
-                                <p class="text-xs text-gray-500 mt-1">${order.created_at}</p>
+                                <p class="text-xs text-gray-500 mt-1">${order.createdAt}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-base md:text-lg font-extrabold text-gray-800">Rs. ${order.total_amount}</p>
+                                <p class="text-base md:text-lg font-extrabold text-gray-800">Rs. ${order.totalAmount}</p>
                                 <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700">${order.status}</span>
                             </div>
                         </div>
                         <div class="space-y-1.5">`;
 
-                    order.order_items.forEach(oi => {
+                    order.orderItems.forEach(oi => {
                         timelineHTML += `<div class="flex justify-between text-xs md:text-sm">
-                            <span class="text-gray-600">${oi.menu_item.name} <span class="text-gray-400">×${oi.quantity}</span></span>
+                            <span class="text-gray-600">${oi.menuItem.name} <span class="text-gray-400">×${oi.quantity}</span></span>
                             <span class="font-semibold text-gray-800">Rs. ${oi.price * oi.quantity}</span>
                         </div>`;
                     });
@@ -795,6 +796,7 @@
         }
 
         function orderHTML(order) {
+            console.log(order)
             if (!order) return `<p class="text-gray-400 text-center mt-10">No active order</p>`;
 
             const table = order.table;
@@ -803,7 +805,7 @@
             const isOpen = !!activeOrder;
             const currentOrder = activeOrder ?? {};
             const activities = isOpen ? currentOrder.activities ?? [] : [];
-            const totalEarning = isOpen ? currentOrder.total_amount : '-';
+            const totalEarning = isOpen ? currentOrder.totalAmount : '-';
 
             let html = `
                 <div class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
@@ -815,7 +817,7 @@
                         </div>
                         <div>
                             <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Order Details</h2>
-                            <p class="text-xs text-gray-400">Table ${table.table_number} · ${tableStatus}</p>
+                            <p class="text-xs text-gray-400">Table ${table.tableNumber} · ${tableStatus}</p>
                         </div>
                     </div>
                     <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 md:p-2 transition">
@@ -854,7 +856,7 @@
                                 </div>
                                 <div class="text-right">
                                     <p class="text-blue-200 text-xs mb-1">Placed at</p>
-                                    <p class="text-white text-xs md:text-sm font-semibold">${isOpen ? formatTime(currentOrder.created_at) : '-'}</p>
+                                    <p class="text-white text-xs md:text-sm font-semibold">${isOpen ? formatTime(currentOrder.createdAt) : '-'}</p>
                                 </div>
                             </div>
                         </div>
@@ -863,16 +865,16 @@
                     <div>
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items Ordered</p>
                         <div class="space-y-2">
-                            ${isOpen && currentOrder.order_items?.length
-                                ? currentOrder.order_items.map((item, i) => `
+                            ${isOpen && currentOrder.orderItems?.length
+                                ? currentOrder.orderItems.map((item, i) => `
                                                         <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-3 md:px-4 py-2.5 md:py-3 transition group"
                                                              style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
                                                             <div class="flex items-center gap-2 md:gap-3 min-w-0">
                                                                 <div class="w-8 h-8 md:w-9 md:h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 flex-shrink-0">
-                                                                    ${item.menu_item_id}
+                                                                    ${item.menuItem.name}
                                                                 </div>
                                                                 <div class="min-w-0">
-                                                                    <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.menu_item.name}</p>
+                                                                    <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.menuItem.name}</p>
                                                                     <p class="text-xs text-gray-400 mt-0.5">Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}</p>
                                                                 </div>
                                                             </div>

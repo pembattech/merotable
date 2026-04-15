@@ -96,11 +96,11 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
         Route::get('/{restaurant:slug}/tables/{tableId}', [TableController::class, 'fetchTableDetails']);
 
         Route::prefix('invoices')->controller(InvoiceController::class)->group(function () {
-        Route::get('/', 'getInvoices');
-        Route::get('/{invoiceNumber}', 'getInvoice');
-        // Route::put('/{id}', 'updateInvoice');
-        // Route::delete('/{id}', 'deleteInvoice');
-    });
+            Route::get('/', 'getInvoices');
+            Route::get('/{invoiceNumber}', 'getInvoice');
+            // Route::put('/{id}', 'updateInvoice');
+            // Route::delete('/{id}', 'deleteInvoice');
+        });
 
 
     });
