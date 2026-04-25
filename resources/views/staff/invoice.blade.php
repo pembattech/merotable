@@ -376,7 +376,8 @@
         document.querySelectorAll('.order-id').forEach(el => el.textContent = invoiceData.orderId);
         document.querySelectorAll('.payment-method').forEach(el => el.textContent = invoiceData.paymentMethod);
         document.querySelectorAll('.payment-status').forEach(el => el.textContent = invoiceData.paymentStatus);
-        document.querySelectorAll('.invoice-date').forEach(el => el.textContent = invoiceData.paidAt ? invoiceData.paidAt : formattedDate);
+        document.querySelectorAll('.invoice-date').forEach(el => el.textContent = invoiceData.paidAt ? invoiceData
+            .paidAt : formattedDate);
 
         document.getElementById('openInvoiceModal').classList.add('flex');
         document.getElementById('openInvoiceModal').classList.remove('hidden');
@@ -493,14 +494,10 @@
         `;
         });
 
-        const tax = Math.round(subtotal * 0.13);
-        const sc = Math.round(subtotal * 0.10);
-        const grand = subtotal + tax + sc;
-
         document.getElementById('tSubtotal').textContent = `Rs. ${subtotal}`;
-        document.getElementById('tTax').textContent = `Rs. ${tax}`;
-        document.getElementById('tSC').textContent = `Rs. ${sc}`;
-        document.getElementById('tTotal').textContent = `Rs. ${grand}`;
+        document.getElementById('tTax').textContent = `Rs. ${invoiceData.taxAmount}`;
+        document.getElementById('tSC').textContent = `Rs. ${invoiceData.serviceCharge}`;
+        document.getElementById('tTotal').textContent = `Rs. ${invoiceData.totalAmount}`;
     }
 
     function printThermal() {
