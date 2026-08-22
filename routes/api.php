@@ -19,15 +19,140 @@ use App\Http\Controllers\API\V1\AttendanceController;
 use App\Http\Controllers\API\V1\CustomerOrderController;
 use App\Http\Controllers\API\V1\InvoiceController;
 
-Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
-    $restaurant = auth('restaurant')->user()
-        ?? auth('staff')->user()->restaurant;
+use App\Http\Controllers\API\V1\SuperAdmin\SAdminAuthController;
+use App\Http\Controllers\API\V1\SuperAdmin\DashboardController;
+use App\Http\Controllers\API\V1\SuperAdmin\SARestaurantController;
 
-    return response()->json([
-        'success' => true,
-        'days_left' => $request->subscription_days_left ?? 0, // from middleware
-    ]);
-});
+Route::prefix('super-admin')
+    ->name('super-admin.')
+    ->group(function () {
+
+        // public
+        Route::post('/login', [SAdminAuthController::class, 'login'])->name('login');
+
+        // protected
+        Route::middleware(['auth:sanctum', 'super.admin'])->group(function () {
+            Route::get('/me', [SAdminAuthController::class, 'me'])->name('me');
+
+            Route::post('/logout', [SAdminAuthController::class, 'logout'])->name('logout');
+
+            Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+            Route::get('/restaurants/pending', [SARestaurantController::class, 'pending'])->name('restaurants.pending');
+            
+            Route::apiResource('restaurants', SARestaurantController::class);
+            Route::patch('/restaurants/{restaurant}/toggle-status', [SARestaurantController::class, 'toggleStatus'])
+                ->name('restaurants.toggle-status');
+
+            Route::post('/restaurants/{slug}/approve', [SARestaurantController::class, 'approve'])->name('restaurants.approve');
+            Route::post('/restaurants/{slug}/reject', [SARestaurantController::class, 'reject'])->name('restaurants.reject');
+
+            Route::post('/restaurant/documents/{slug}/approve', [SARestaurantController::class, 'approveDocuments'])->name('restaurants.documents.approve');
+
+            Route::get('/subscription/transaction/pending', [SARestaurantController::class, 'getPendingTranscation'])->name('restaurants.documents.getPendingTranscation');
+
+            Route::post('/subscription/transaction/{slug}/approve', [SARestaurantController::class, 'approveTransaction'])->name('restaurants.documents.approveTransaction');
+        });
+    });
+
+
+
+// // Admin Routes ----> moved to super-admin 
+// Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function () {
+
+//     Route::get('/restaurants/pending', [AdminController::class, 'pending']);
+//     Route::post('/restaurants/{slug}/approve', [AdminController::class, 'approve']);
+//     Route::post('/restaurants/{slug}/reject', [AdminController::class, 'reject']);
+
+//     Route::post('/restaurant/documents/{slug}/approve', [AdminController::class, 'approveDocuments']);
+
+//     Route::get('/subscription/transaction/pending', [AdminController::class, 'getPendingTranscation']);
+
+//     Route::post('/subscription/transaction/{slug}/approve', [AdminController::class, 'approveTransaction']);
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
+//     $restaurant = auth('restaurant')->user()
+//         ?? auth('staff')->user()->restaurant;
+
+//     return response()->json([
+//         'success' => true,
+//         'days_left' => $request->subscription_days_left ?? 0, // from middleware
+//     ]);
+// });
 
 
 Route::prefix('v1/auth')->group(function () {
@@ -156,20 +281,6 @@ Route::prefix('v1/customer/qr')->group(function () {
 
 });
 
-
-// Admin Routes
-Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function () {
-
-    Route::get('/restaurants/pending', [AdminController::class, 'pending']);
-    Route::post('/restaurants/{slug}/approve', [AdminController::class, 'approve']);
-    Route::post('/restaurants/{slug}/reject', [AdminController::class, 'reject']);
-
-    Route::post('/restaurant/documents/{slug}/approve', [AdminController::class, 'approveDocuments']);
-
-    Route::get('/subscription/transaction/pending', [AdminController::class, 'getPendingTranscation']);
-
-    Route::post('/subscription/transaction/{slug}/approve', [AdminController::class, 'approveTransaction']);
-});
 
 use App\Models\OrderItem; // assuming each item is stored in OrderItem
 

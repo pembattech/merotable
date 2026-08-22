@@ -50,6 +50,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'root';
+    }
+
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);

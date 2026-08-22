@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // 'isRestaurantVerified' => \App\Http\Middleware\IsRestaurantVerified::class,
             'isRestaurantAuthenticated' => \App\Http\Middleware\IsRestaurantAuthenticated::class,
             'checkSubscription' => CheckSubscription::class,
+            'super.admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

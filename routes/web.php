@@ -11,6 +11,23 @@ Route::get('/auth', function () {
     return view('authentication');
 })->name('auth');
 
+
+// SUPER ADMIN
+Route::get('/super-admin/login', fn () => view('super-admin.login'))
+    ->name('super-admin.login-page');
+
+Route::prefix('super-admin')
+    ->name('web-super-admin.')
+    ->group(function () {
+        Route::get('/dashboard', fn () => view('super-admin.dashboard'))->name('dashboard');
+        Route::get('/restaurants', fn () => view('super-admin.restaurants'))->name('restaurants.index');
+        Route::get('/plans', fn () => view('super-admin.plans'))->name('plans.index');
+        Route::get('/subscriptions', fn () => view('super-admin.subscriptions'))->name('subscriptions.index');
+        Route::get('/transactions', fn () => view('super-admin.transactions'))->name('transactions.index');
+        Route::get('/reports', fn () => view('super-admin.reports'))->name('reports');
+        Route::get('/settings', fn () => view('super-admin.settings'))->name('settings.index');
+    });
+
 Route::get('pricing', function(){
     return view('pricing');
 })->name('pricing');
