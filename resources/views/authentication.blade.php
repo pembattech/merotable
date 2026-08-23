@@ -591,7 +591,7 @@
 
     <script>
         // Configuration
-        let API_BASE_URL = 'http://localhost:8000/api/v1/auth';
+        let API_BASE_URL = '/api/v1/auth';
         let currentUserType = 'staff'; // Default user type
 
 
