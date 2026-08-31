@@ -79,13 +79,13 @@ class SARestaurantController extends Controller
         return response()->json(['message' => 'Restaurant deleted']);
     }
 
-    public function toggleStatus(Restaurant $restaurant): JsonResponse
-    {
-        $restaurant->status = $restaurant->status === 'active' ? 'blocked' : 'active';
-        $restaurant->save();
+    // public function toggleStatus(Restaurant $restaurant): JsonResponse
+    // {
+    //     $restaurant->status = $restaurant->status === 'active' ? 'blocked' : 'active';
+    //     $restaurant->save();
 
-        return response()->json(['message' => 'Status updated', 'status' => $restaurant->status]);
-    }
+    //     return response()->json(['message' => 'Status updated', 'status' => $restaurant->status]);
+    // }
 
     /**
      * List all pending restaurants
@@ -160,6 +160,15 @@ class SARestaurantController extends Controller
                     'status' => 'trial',
                 ]
             );
+
+            $restaurant->setting()->create([
+                'tax_percentage' => 0.00,
+                'service_charge_percentage' => 0.00,
+                'tax_enabled' => true,
+                'service_charge_enabled' => true,
+                'delivery_charge' => 0.00,
+                'currency' => 'NPR'
+            ]);
 
 
             /**

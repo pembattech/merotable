@@ -144,15 +144,15 @@ Route::prefix('super-admin')
 
 
 
-// Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
-//     $restaurant = auth('restaurant')->user()
-//         ?? auth('staff')->user()->restaurant;
+Route::middleware(['auth:sanctum', 'checkSubscription'])->get('/user', function (Request $request) {
+    $restaurant = auth('restaurant')->user()
+        ?? auth('staff')->user()->restaurant;
 
-//     return response()->json([
-//         'success' => true,
-//         'days_left' => $request->subscription_days_left ?? 0, // from middleware
-//     ]);
-// });
+    return response()->json([
+        'success' => true,
+        'days_left' => $request->subscription_days_left ?? 0, // from middleware
+    ]);
+});
 
 
 Route::prefix('v1/auth')->group(function () {

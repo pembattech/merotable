@@ -1,4 +1,4 @@
-<link rel="manifest" href="{{ asset('manifest.json') }}">
+{{-- <link rel="manifest" href="{{ asset('manifest.json') }}">
 <meta name="theme-color" content="#0d6efd">
 <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
 
@@ -12,4 +12,4 @@
                 console.log("Service Worker registration failed:", error);
             });
     }
-</script>
+</script> --}}
