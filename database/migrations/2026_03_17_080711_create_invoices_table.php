@@ -25,8 +25,10 @@ return new class extends Migration {
                 ->cascadeOnDelete();
 
             $table->decimal('subtotal', 10, 2)->default(0.00);
+            $table->decimal('tax_percentage', 5, 2)->default(0);
             $table->decimal('tax_amount', 10, 2)->default(0.00);
             $table->decimal('discount_amount', 10, 2)->default(0.00);
+            $table->decimal('service_charge_percentage', 5, 2)->default(0);
             $table->decimal('service_charge', 10, 2)->default(0.00);
             $table->decimal('total_amount', 10, 2);
 

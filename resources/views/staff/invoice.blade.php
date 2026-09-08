@@ -243,11 +243,11 @@
                         <span class="font-semibold text-gray-700" id="subtotalAmt">Rs. 0</span>
                     </div>
                     <div class="flex justify-between text-[11px]">
-                        <span class="text-gray-500">Tax (13% VAT)</span>
+                        <span class="text-gray-500">Tax (<span id="taxPercent"></span>% VAT)</span>
                         <span class="font-semibold text-gray-700" id="taxAmt">Rs. 0</span>
                     </div>
                     <div class="flex justify-between text-[11px]">
-                        <span class="text-gray-500">Service charge (10%)</span>
+                        <span class="text-gray-500">Service charge (<span id="scPercent"></span>%)</span>
                         <span class="font-semibold text-gray-700" id="scAmt">Rs. 0</span>
                     </div>
                     <div class="border-t-2 border-gray-200 pt-2 flex justify-between">
@@ -350,39 +350,53 @@
 <script>
     let invoiceData = null;
 
-    function openInvoiceModal(data) {
+    function openInvoiceModal(data, mode = 'finvoice') {
         invoiceData = data;
 
         scrollEl.scrollTop = 0;
 
-        const now = new Date();
+        if (mode !== 'finvoice') {
+            // PRINTED INVOICE
 
-        const formattedDate = now.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+            document.querySelectorAll('.restro-name').forEach(el => el.textContent = invoiceData.restaurant.restaurantName);
+            document.querySelectorAll('.restro-address').forEach(el => el.textContent = invoiceData.restaurant
+                .restaurantAddress);
+            document.querySelectorAll('.restro-phone').forEach(el => el.textContent = invoiceData.restaurant
+                .restaurantContact);
+            document.querySelectorAll('.restro-vat').forEach(el => el.textContent = invoiceData.restaurant.restaurantVAT ?? '#######');
 
-        document.querySelectorAll('.restro-name').forEach(el => el.textContent = invoiceData.restaurant.restaurantName);
-        document.querySelectorAll('.restro-address').forEach(el => el.textContent = invoiceData.restaurant
-            .restaurantAddress);
-        document.querySelectorAll('.restro-phone').forEach(el => el.textContent = invoiceData.restaurant
-            .restaurantContact);
-        document.querySelectorAll('.restro-vat').forEach(el => el.textContent = "#########");
-        document.querySelectorAll('.invoice-number').forEach(el => el.textContent = invoiceData.invoiceNumber);
-        document.querySelectorAll('.table-number').forEach(el => el.textContent = invoiceData.tableNumber);
-        document.querySelectorAll('.order-id').forEach(el => el.textContent = invoiceData.orderId);
-        document.querySelectorAll('.payment-method').forEach(el => el.textContent = invoiceData.paymentMethod);
-        document.querySelectorAll('.payment-status').forEach(el => el.textContent = invoiceData.paymentStatus);
-        document.querySelectorAll('.invoice-date').forEach(el => el.textContent = invoiceData.paidAt ? invoiceData
-            .paidAt : formattedDate);
+            document.querySelectorAll('.table-number').forEach(el => el.textContent = invoiceData.order.tableNumber);
+            document.querySelectorAll('.order-id').forEach(el => el.textContent = invoiceData.order.id);
 
-        document.getElementById('openInvoiceModal').classList.add('flex');
-        document.getElementById('openInvoiceModal').classList.remove('hidden');
+            document.querySelectorAll('.payment-status').forEach(el => el.textContent = "unpaid");
+            document.querySelectorAll('.invoice-date').forEach(el => el.textContent = formatDateTime(invoiceData.order.printedAt));
 
-        document.body.classList.add('overflow-hidden');
+            document.getElementById('openInvoiceModal').classList.add('flex');
+            document.getElementById('openInvoiceModal').classList.remove('hidden');
+
+            document.body.classList.add('overflow-hidden');
+
+        } else {
+
+            // FINAL INVOICE
+            document.querySelectorAll('.restro-name').forEach(el => el.textContent = invoiceData.restaurant.restaurantName);
+            document.querySelectorAll('.restro-address').forEach(el => el.textContent = invoiceData.restaurant
+                .restaurantAddress);
+            document.querySelectorAll('.restro-phone').forEach(el => el.textContent = invoiceData.restaurant
+                .restaurantContact);
+            document.querySelectorAll('.restro-vat').forEach(el => el.textContent = invoiceData.restaurant.restaurantVAT ?? '#######');
+            document.querySelectorAll('.invoice-number').forEach(el => el.textContent = invoiceData.invoiceNumber);
+            document.querySelectorAll('.table-number').forEach(el => el.textContent = invoiceData.order.tableNumber);
+            document.querySelectorAll('.order-id').forEach(el => el.textContent = invoiceData.order.id);
+            document.querySelectorAll('.payment-method').forEach(el => el.textContent = invoiceData.order.paymentMethod);
+            document.querySelectorAll('.payment-status').forEach(el => el.textContent = invoiceData.order.paymentStatus);
+            document.querySelectorAll('.invoice-date').forEach(el => el.textContent = formatDateTime(invoiceData.order.paidAt));
+
+            document.getElementById('openInvoiceModal').classList.add('flex');
+            document.getElementById('openInvoiceModal').classList.remove('hidden');
+
+            document.body.classList.add('overflow-hidden');
+        }
 
         populateInvoice(invoiceData);
 
@@ -405,7 +419,10 @@
 
         let subtotal = 0;
 
-        invoiceData.orderItems.forEach(item => {
+        document.getElementById('taxPercent').textContent = invoiceData.order.taxPercentage;
+        document.getElementById('scPercent').textContent = invoiceData.order.serviceChargePercentage;
+
+        invoiceData.order.items.forEach(item => {
             const lineTotal = item.quantity * item.price;
             subtotal += lineTotal;
 
@@ -414,7 +431,7 @@
 
             tr.innerHTML = `
             <td class="py-1.5 text-[11px] font-medium text-gray-700">
-                ${item.menuItem?.name || 'Item'}
+                ${item.menuItem || 'Item'}
             </td>
             <td class="text-center py-1.5 text-[11px] text-gray-500">
                 ${item.quantity}
@@ -431,19 +448,19 @@
         });
 
         document.getElementById('subtotalLabel').textContent =
-            `Subtotal (${invoiceData.orderItems.length} items)`;
+            `Subtotal (${invoiceData.order.items.length} items)`;
 
         document.getElementById('subtotalAmt').textContent =
-            `Rs. ${subtotal.toLocaleString()}`;
+            `Rs. ${invoiceData.order.subtotal}`;
 
         document.getElementById('taxAmt').textContent =
-            `Rs. ${invoiceData.taxAmount.toLocaleString()}`;
+            `Rs. ${invoiceData.order.taxAmount}`;
 
         document.getElementById('scAmt').textContent =
-            `Rs. ${invoiceData.serviceCharge.toLocaleString()}`;
+            `Rs. ${invoiceData.order.serviceCharge}`;
 
         document.getElementById('grandTotal').textContent =
-            `Rs. ${invoiceData.totalAmount.toLocaleString()}`;
+            `Rs. ${invoiceData.order.totalAmount.toLocaleString()}`;
     }
 
     // ── Scroll hint ───────────────────────────────────────────────
@@ -503,8 +520,8 @@
     function printThermal() {
         if (!invoiceData) return;
 
-        const items = invoiceData.orderItems.map(item => ({
-            name: item.menuItem?.name || 'Item',
+        const items = invoiceData.order.items.map(item => ({
+            name: item.menuItem || 'Item',
             quantity: item.quantity,
             price: item.price
         }));

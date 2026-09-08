@@ -29,6 +29,10 @@ return new class extends Migration {
 
             $table->decimal('total_amount', 10, 2)->default(0);
 
+            $table->timestamp('bill_printed_at')->nullable();
+
+            $table->decimal('bill_printed_total', 10, 2)->nullable();
+
             $table->text('remarks')->nullable();
 
             $table->timestamps();

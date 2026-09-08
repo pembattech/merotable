@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\PrintBillResource;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -242,6 +243,8 @@ class OrdersController extends Controller
                 'total_amount' => $order->orderItems()
                     ->selectRaw('SUM(quantity * price) as total')
                     ->value('total'),
+                'bill_printed_at' => null,
+                'bill_printed_total' => null,
             ]);
 
             activityLog(
@@ -459,6 +462,83 @@ class OrdersController extends Controller
         return response()->json($timeline);
     }
 
+
+    public function printBill(Request $request)
+    {
+        $validated = $request->validate([
+            'table_id' => 'required|integer|exists:tables,id',
+        ]);
+
+        $staff = auth('staff')->user();
+        $restaurantId = $staff->restaurant->id;
+
+        $order = Order::where('table_id', $validated['table_id'])
+            ->where('restaurant_id', $restaurantId)
+            ->where('status', 'open')
+            ->with('orderItems.menuItem')
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No open order found for this table.',
+            ], 404);
+        }
+
+        if ($order->orderItems->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot print a bill with no items.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($order, $staff) {
+            $order->update([
+                'bill_printed_at' => now(),
+                'bill_printed_total' => $order->total_amount,
+            ]);
+
+            OrderActivity::create([
+                'order_id' => $order->id,
+                'staff_id' => $staff->id,
+                'action' => 'bill_printed',
+                'meta' => [
+                    'total_amount' => $order->total_amount,
+                ],
+            ]);
+
+            activityLog(
+                'order_bill_printed_by_staff',
+                'Staff printed the bill for an order',
+                [
+                    'restaurant_id' => $staff->restaurant_id,
+                    'staff_id' => $staff->id,
+                    'order_id' => $order->id,
+                    'total_amount' => $order->total_amount,
+                ]
+            );
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bill printed successfully',
+            'data' => new PrintBillResource($order)
+        ]);
+    }
+
+    public function showBill(Order $order)
+    {
+        $staff = auth('staff')->user();
+
+        abort_unless($order->restaurant_id === $staff->restaurant_id, 403);
+
+        $order->load('orderItems.menuItem', 'table');
+
+        return view('orders.print-bill', [
+            'order' => $order,
+            'restaurant' => $staff->restaurant,
+        ]);
+    }
 
 }
 

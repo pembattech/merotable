@@ -153,6 +153,13 @@
         body.summary-open {
             overflow: hidden;
         }
+
+        /* ── Disabled state for action buttons ── */
+        #btn-print:disabled,
+        #checkoutBtn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
     </style>
 
 
@@ -167,7 +174,7 @@
             </div>
             <button onclick="clearSelection()"
                 class="self-start sm:self-auto bg-gray-100 hover:bg-gray-200 text-gray-700
-                       font-semibold px-3 md:px-4 py-2 md:py-2.5 rounded-xl transition text-xs md:text-sm whitespace-nowrap">
+                                       font-semibold px-3 md:px-4 py-2 md:py-2.5 rounded-xl transition text-xs md:text-sm whitespace-nowrap">
                 Clear Selection
             </button>
         </div>
@@ -190,10 +197,9 @@
                     </div>
 
                     <div class="relative">
-                        <input id="itemSearch" type="text" placeholder="Search items in orders…"
-                            oninput="searchByItems()"
+                        <input id="itemSearch" type="text" placeholder="Search items in orders…" oninput="searchByItems()"
                             class="w-full pl-9 md:pl-10 pr-4 py-2 md:py-2.5 border border-gray-200 rounded-xl
-                                   text-xs md:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
+                                                   text-xs md:text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
                         <svg class="absolute left-3 top-2.5 h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -213,8 +219,8 @@
             </div>
 
             {{-- ══ RIGHT: ORDER SUMMARY ══
-                 Mobile  → fixed bottom sheet (peek 60 px, tap to expand)
-                 Desktop → sticky sidebar
+            Mobile → fixed bottom sheet (peek 60 px, tap to expand)
+            Desktop → sticky sidebar
             --}}
             <div class="lg:col-span-1">
                 <div id="summaryPanel" class="bg-white border border-gray-100">
@@ -248,6 +254,19 @@
                             <h3 class="font-bold text-gray-800">Order Summary</h3>
                             <span id="selectedTableBadge"
                                 class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 hidden">—</span>
+                        </div>
+
+                        {{-- Bill-printed notice --}}
+                        <div id="billPrintedNotice"
+                            class="hidden items-center gap-1.5 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M6 9V2h12v7" />
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                <rect x="6" y="14" width="12" height="8" />
+                            </svg>
+                            <span id="billPrintedNoticeText">Bill printed</span>
                         </div>
 
                         {{-- Order items --}}
@@ -288,155 +307,51 @@
                             </div>
                         </div>
 
-                        {{-- Checkout button --}}
-                        <button id="checkoutBtn" onclick="openCheckoutModal()" disabled
-                            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:cursor-not-allowed
-                                   text-white font-bold py-2.5 md:py-3 rounded-xl transition text-sm md:text-base
-                                   flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
-                            <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Proceed to Checkout
-                        </button>
 
-                    </div>
-                </div>
-            </div>
+                        <div class="flex gap-2 mt-5">
+                            <button id="btn-print" onclick="printBill()" disabled
+                                class="flex-1 h-10 rounded-lg border border-slate-300 text-sm font-medium flex items-center justify-center gap-2 hover:bg-slate-50 active:scale-[0.98] transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 9V2h12v7" />
+                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                                    <rect x="6" y="14" width="12" height="8" />
+                                </svg>
+                                <span id="btn-print-label">Print bill</span>
+                            </button>
 
-        </div>
-    </div>{{-- /pb-20 wrapper --}}
-
-
-    {{-- ══ CHECKOUT MODAL ══ --}}
-    <div id="checkoutModal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center">
-        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="closeCheckoutModal()"></div>
-        <div
-            class="relative bg-white w-full sm:max-w-md sm:mx-4 sm:rounded-2xl rounded-t-2xl shadow-2xl flex flex-col max-h-[92vh]">
-
-            {{-- Drag handle (mobile) --}}
-            <div class="flex justify-center pt-3 pb-1 sm:hidden">
-                <div class="w-10 h-1 bg-gray-200 rounded-full"></div>
-            </div>
-
-            {{-- Header --}}
-            <div
-                class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-50 rounded-xl p-2">
-                        <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-gray-800 text-sm md:text-base">Payment</h2>
-                        <p class="text-xs text-gray-400" id="checkoutTableLabel">—</p>
-                    </div>
-                </div>
-                <button onclick="closeCheckoutModal()"
-                    class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 md:p-2 transition">
-                    <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-            {{-- Body --}}
-            <div class="overflow-y-auto flex-1 px-4 md:px-5 py-4 md:py-5 space-y-4 md:space-y-5">
-
-                {{-- Total display --}}
-                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 md:p-5 text-white">
-                    <p class="text-blue-200 text-xs font-semibold uppercase tracking-wider mb-1">Total Amount</p>
-                    <p class="text-3xl md:text-4xl font-extrabold" id="modalTotal">Rs. 0</p>
-                </div>
-
-                {{-- Payment method --}}
-                <div>
-                    <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2 md:mb-3">Payment Method</label>
-                    <div class="grid grid-cols-2 gap-2 md:gap-3">
-                        <button class="method-btn selected" onclick="selectMethod(this, 'cash')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Cash
-                        </button>
-                        <button class="method-btn" onclick="selectMethod(this, 'card')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
-                            Card
-                        </button>
-                        <button class="method-btn" onclick="selectMethod(this, 'mobile')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            Mobile Pay
-                        </button>
-                        <button class="method-btn" onclick="selectMethod(this, 'other')">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 mx-auto mb-1" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Other
-                        </button>
-                    </div>
-                </div>
-
-                {{-- Cash section --}}
-                <div id="cashSection">
-                    <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">Amount Received</label>
-                    <div class="relative">
-                        <span
-                            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs md:text-sm font-semibold">Rs.</span>
-                        <input id="amountReceived" type="number" min="0" placeholder="0"
-                            oninput="calculateChange()" class="field-input" style="padding-left: 38px;" />
-                    </div>
-                    <div id="changeDisplay" class="mt-3 hidden">
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-3 md:p-4">
-                            <p class="text-xs text-green-600 font-semibold mb-1">Change to Return</p>
-                            <p class="text-xl md:text-2xl font-extrabold text-green-700" id="changeAmount">Rs. 0</p>
+                            <button id="checkoutBtn" onclick="openCheckoutModal()" disabled
+                                class="disabled:opacity-50 disabled:cursor-not-allowed flex-1 h-10 rounded-lg bg-indigo-600 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-indigo-700 active:scale-[0.98] transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" />
+                                    <line x1="1" y1="10" x2="23" y2="10" />
+                                </svg>
+                                Checkout
+                            </button>
                         </div>
+
+
+                        <p class="flex items-start gap-1.5 text-[11px] text-slate-400 mt-3 leading-snug">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0 mt-0.5" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
+                            Print bill keeps the table open. Checkout closes it and records payment.
+                        </p>
+
                     </div>
                 </div>
-
-                {{-- Notes --}}
-                <div>
-                    <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
-                        Notes <span class="text-gray-400 font-normal">(optional)</span>
-                    </label>
-                    <textarea id="paymentNotes" rows="2" placeholder="Add payment notes…" class="field-input resize-none"></textarea>
-                </div>
-
-            </div>
-
-            {{-- Footer --}}
-            <div class="px-4 md:px-5 py-3 md:py-4 border-t border-gray-100 flex-shrink-0 flex gap-3">
-                <button onclick="closeCheckoutModal()"
-                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-2.5 md:py-3 rounded-xl transition">
-                    Cancel
-                </button>
-                <button onclick="completePayment()" id="completePaymentBtn"
-                    class="flex-[2] bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2.5 md:py-3 rounded-xl transition
-                           shadow-lg shadow-green-200 flex items-center justify-center gap-2">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Complete Payment
-                </button>
             </div>
 
         </div>
     </div>
 
+
+    @include('restaurant.partial.checkout_model')
     @include('staff.attendance')
     @include('staff.invoice')
 
@@ -465,6 +380,16 @@
                 document.body.classList.remove('summary-open');
             }
         });
+
+        function showToast(message, type = 'info') {
+            // Assumes a global toast helper exists elsewhere in the layout.
+            // Fallback so this file never silently no-ops.
+            if (typeof window.toast === 'function') {
+                window.toast(message, type);
+            } else {
+                console[type === 'error' ? 'error' : 'log'](message);
+            }
+        }
 
         // ── Fetch tables ──────────────────────────────────────────
         async function fetchTables() {
@@ -522,29 +447,47 @@
 
             document.getElementById('tableGrid').innerHTML = tables.map(table => {
                 const s = statusStyles[table.status] || statusStyles.available;
-                return `
-                <div onclick="selectTable(${table.id})"
-     class="table-card ${s.bg} ${s.border} ${s.ring} p-2.5 md:p-4 rounded-2xl border shadow-sm cursor-pointer transition transform hover:scale-[1.03] hover:shadow-lg">
-    
-    <!-- Table number + status -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-        <span class="text-base sm:text-lg md:text-xl font-extrabold tracking-wide">
-            ${table.table_number}
-        </span>
-        <span class="text-[8px] sm:text-[9px] md:text-xs px-2 py-1 rounded-full font-semibold uppercase ${s.badge} text-center">
-            ${table.status}
-        </span>
-    </div>
+                // "bill_printed_at" is expected on the order tied to this table
+                // (nullable timestamp — see orders.bill_printed_at migration).
+                const billPrinted = table.status === 'occupied' && !!table.bill_printed_at;
 
-    <!-- Conditional: occupied or empty -->
-    ${table.status === 'occupied'
-        ? `<div class="mt-2 md:mt-4 text-center sm:text-left">
-                                                       <p class="text-[10px] sm:text-xs md:text-sm opacity-80">Current Bill</p>
-                                                       <p class="text-sm sm:text-base md:text-lg font-bold">Rs. ${table.total_amount}</p>
-                                                   </div>`
-        : `<div class="mt-4 md:mt-6 h-3 md:h-6"></div>`}
-</div>`;
+                return `
+                                <div onclick="selectTable(${table.id})"
+                     class="table-card ${s.bg} ${s.border} ${s.ring} p-2.5 md:p-4 rounded-2xl border shadow-sm cursor-pointer transition transform hover:scale-[1.03] hover:shadow-lg">
+
+                    <!-- Table number + status -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+                        <span class="text-base sm:text-lg md:text-xl font-extrabold tracking-wide">
+                            ${table.table_number}
+                        </span>
+                        ${billPrinted
+                        ? `<span class="text-[8px] sm:text-[9px] md:text-xs px-2 py-1 rounded-full font-semibold uppercase bg-amber-100 text-amber-700 text-center flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                                                    Billed
+                                                </span>`
+                        : `<span class="text-[8px] sm:text-[9px] md:text-xs px-2 py-1 rounded-full font-semibold uppercase ${s.badge} text-center">
+                                                    ${table.status}
+                                                </span>`}
+                    </div>
+
+                    <!-- Conditional: occupied or empty -->
+                    ${table.status === 'occupied'
+                        ? `<div class="mt-2 md:mt-4 text-center sm:text-left">
+                                                                       <p class="text-[10px] sm:text-xs md:text-sm opacity-80">Current Bill</p>
+                                                                       <p class="text-sm sm:text-base md:text-lg font-bold">Rs. ${table.total_amount}</p>
+                                                                       ${billPrinted ? `<p class="text-[9px] sm:text-[10px] opacity-70 mt-0.5">Printed ${formatTime(table.bill_printed_at)}</p>` : ''}
+                                                                   </div>`
+                        : `<div class="mt-4 md:mt-6 h-3 md:h-6"></div>`}
+                </div>`;
             }).join('');
+        }
+
+        function formatTime(isoString) {
+            try {
+                return new Date(isoString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            } catch (e) {
+                return '';
+            }
         }
 
         // ── Select table ──────────────────────────────────────────
@@ -571,20 +514,42 @@
 
             selectedTable = table;
             currentSettings = settings;
+            console.log(selectedTable)
             renderOrderItems(table);
+            renderBillPrintedNotice(table);
 
             // Update both desktop & mobile badges
             ['selectedTableBadge', 'selectedTableBadgeMobile'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
-                    el.textContent = 'T' + tableId;
+                    el.textContent = selectedTable.tableNumber;
                     el.classList.remove('hidden');
                 }
             });
             document.getElementById('checkoutBtn').disabled = false;
+            document.getElementById('btn-print').disabled = false;
 
             // Auto-expand summary sheet on mobile after selecting a table
             if (window.innerWidth < 1024 && !summaryExpanded) toggleSummary();
+        }
+
+        // ── Bill-printed notice ─────────────────────────────────────
+        function renderBillPrintedNotice(table) {
+            const notice = document.getElementById('billPrintedNotice');
+            const text = document.getElementById('billPrintedNoticeText');
+            const printLabel = document.getElementById('btn-print-label');
+            const billPrintedAt = table?.orders[0]?.billPrintedAt;
+            
+            if (billPrintedAt) {
+                text.textContent = `Bill printed at ${formatTime(billPrintedAt)}`;
+                notice.classList.remove('hidden');
+                notice.classList.add('flex');
+                printLabel.textContent = 'Reprint bill';
+            } else {
+                notice.classList.add('hidden');
+                notice.classList.remove('flex');
+                printLabel.textContent = 'Print bill';
+            }
         }
 
         // ── Render order items ────────────────────────────────────
@@ -593,20 +558,23 @@
 
             if (!table.orders?.length) {
                 container.innerHTML = `
-                    <div class="text-center py-8 text-gray-400">
-                        <svg class="mx-auto h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                        <p class="text-sm">No orders</p>
-                    </div>`;
+                                    <div class="text-center py-8 text-gray-400">
+                                        <svg class="mx-auto h-10 w-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                        <p class="text-sm">No orders</p>
+                                    </div>`;
                 updateSummary(0);
                 return;
             }
 
+            // NOTE: expects order.orderItems (camelCase) — keep this consistent
+            // with whatever casing /tables/{id} actually returns. If your API
+            // returns order_items instead, change the two references below.
             const items = table.orders.flatMap(order =>
-                order.orderItems.map(i => ({
-                    name: i.menuItem?.name || 'Unnamed Item',
+                (order.orderItems || []).map(i => ({
+                    name: i.menuItem || 'Unnamed Item',
                     price: i.price || 0,
                     qty: i.quantity || 1,
                     subTotal: (i.price || 0) * (i.quantity || 1),
@@ -615,19 +583,32 @@
             );
 
             container.innerHTML = items.map(item => `
-                <div class="flex justify-between items-start gap-2">
-                    <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.name}</p>
-                        <p class="text-xs text-gray-400 mt-0.5">Rs. ${item.price} × ${item.qty}${item.orderId ? ` (Order #${item.orderId})` : ''}</p>
-                    </div>
-                    <p class="font-bold text-gray-800 text-xs md:text-sm flex-shrink-0">Rs. ${item.subTotal.toLocaleString()}</p>
-                </div>`).join('');
+                                <div class="flex justify-between items-start gap-2">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.name}</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Rs. ${item.price} × ${item.qty}${item.orderId ? ` (Order #${item.orderId})` : ''}</p>
+                                    </div>
+                                    <p class="font-bold text-gray-800 text-xs md:text-sm flex-shrink-0">Rs. ${item.subTotal.toLocaleString()}</p>
+                                </div>`).join('');
 
             updateSummary(items.reduce((sum, i) => sum + i.subTotal, 0));
         }
 
         // ── Update summary totals ─────────────────────────────────
         function updateSummary(subtotal) {
+            // Guard against calls before any table (and therefore settings) has
+            // ever been loaded — e.g. hitting "Clear Selection" on first load.
+            if (!currentSettings) {
+                document.getElementById('taxperc').textContent = '';
+                document.getElementById('serviceperc').textContent = '';
+                document.getElementById('subtotal').textContent = `Rs. 0`;
+                document.getElementById('tax').textContent = `Rs. 0`;
+                document.getElementById('service').textContent = `Rs. 0`;
+                document.getElementById('total').textContent = `Rs. 0`;
+                document.getElementById('totalPeek').textContent = `Rs. 0`;
+                return;
+            }
+
             let tax = 0;
             let serviceCharge = 0;
 
@@ -641,13 +622,14 @@
 
             const grandTotal = subtotal + tax + serviceCharge;
 
-            let completepaymentBtn = document.querySelector("#completePaymentBtn");
-            completepaymentBtn.dataset.subtotal = subtotal;
-            completepaymentBtn.dataset.grandtotal = grandTotal;
+            const completepaymentBtn = document.querySelector("#completePaymentBtn");
+            if (completepaymentBtn) {
+                completepaymentBtn.dataset.subtotal = subtotal;
+                completepaymentBtn.dataset.grandtotal = grandTotal;
+            }
 
-
-            document.getElementById('taxperc').textContent = `(${currentSettings.taxPercentage}%)`
-            document.getElementById('serviceperc').textContent = `(${currentSettings.serviceChargePercentage}%)`
+            document.getElementById('taxperc').textContent = `(${currentSettings.taxPercentage}%)`;
+            document.getElementById('serviceperc').textContent = `(${currentSettings.serviceChargePercentage}%)`;
 
             document.getElementById('subtotal').textContent = `Rs. ${subtotal.toLocaleString()}`;
             document.getElementById('tax').textContent = `Rs. ${tax.toLocaleString()}`;
@@ -656,13 +638,62 @@
             document.getElementById('totalPeek').textContent = `Rs. ${grandTotal.toLocaleString()}`;
         }
 
+        // ── Print bill ──────────────────────────────────────────────
+        let printInFlight = false;
+
+        async function printBill() {
+            if (!selectedTable || printInFlight) return;
+
+            printInFlight = true;
+            const btn = document.getElementById('btn-print');
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/v1/staff/${url}/orders/print-bill`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ table_id: selectedTable.id })
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    showToast(data.message || 'Could not print bill ❌', 'error');
+                    return;
+                }
+
+                console.log(data)
+
+                // Reflect the printed state immediately without waiting on the next poll cycle.
+                selectedTable.bill_printed_at = data.data.printed_at;
+                renderBillPrintedNotice(selectedTable);
+                renderTables();
+
+                openInvoiceModal(data.data, "printbill");
+
+                // // Open the printable receipt in a new tab for the actual print.
+                // window.open(`/${url}/orders/${data.data.order_id}/bill`, '_blank');
+
+                showToast('Bill printed — table stays open', 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('Could not print bill ❌', 'error');
+            } finally {
+                printInFlight = false;
+                btn.disabled = !selectedTable;
+            }
+        }
+
         // ── Search by items ───────────────────────────────────────
         let selectedItemNames = new Set();
         let searchTimeout, controller, searchController;
 
         function debounce(fn, delay) {
             let t;
-            return function(...args) {
+            return function (...args) {
                 clearTimeout(t);
                 t = setTimeout(() => fn.apply(this, args), delay);
             };
@@ -701,18 +732,18 @@
                     }
 
                     results.innerHTML = data.items.map(item => `
-                        <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50 rounded-lg px-3 py-2 cursor-pointer transition group"
-                            onclick="addItemToSearch('${item.replace(/'/g, "\\'")}'); document.getElementById('itemSearch').value='';">
-                            <div class="flex items-center gap-2">
-                                <svg class="h-3.5 w-3.5 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                </svg>
-                                <p class="text-xs md:text-sm font-semibold text-gray-800">${item}</p>
-                            </div>
-                            <svg class="h-3.5 w-3.5 text-blue-500 opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </div>`).join('');
+                                        <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50 rounded-lg px-3 py-2 cursor-pointer transition group"
+                                            onclick="addItemToSearch('${item.replace(/'/g, "\\'")}'); document.getElementById('itemSearch').value='';">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="h-3.5 w-3.5 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                </svg>
+                                                <p class="text-xs md:text-sm font-semibold text-gray-800">${item}</p>
+                                            </div>
+                                            <svg class="h-3.5 w-3.5 text-blue-500 opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </div>`).join('');
                 } catch (err) {
                     if (err.name !== 'AbortError') console.error(err);
                 }
@@ -741,22 +772,26 @@
                 return;
             }
 
+            // NOTE: this endpoint returns order_items (snake_case) while
+            // /tables/{id} returns orderItems (camelCase) above. Confirm which
+            // one your backend actually sends and make both consistent —
+            // left as-is here since it reflects the original response shape.
             container.innerHTML = data.tables.map(table => `
-                <div class="bg-gray-50 hover:bg-blue-50 rounded-xl p-3 cursor-pointer transition border border-gray-100 hover:border-blue-200"
-                    onclick="selectTableFromSearch('${table.id}')">
-                    <div class="flex items-center justify-between mb-2">
-                        <p class="font-bold text-gray-800 text-xs md:text-sm">Table ${table.table_number}</p>
-                        <p class="text-xs md:text-sm font-bold text-blue-600">Rs. ${table.orders?.[0]?.total_amount.toLocaleString() ?? 0}</p>
-                    </div>
-                    ${table.orders.map(order =>
-                        `<div class="space-y-1 pt-2">
-                                                                                        ${order.order_items.map(oi => `
-                                <div class="flex items-center justify-between text-xs">
-                                    <span class="text-gray-600">${oi.menu_item.name} <span class="text-gray-400">×${oi.quantity}</span></span>
-                                    <span class="text-gray-500 font-medium">Rs. ${(oi.price * oi.quantity).toLocaleString()}</span>
-                                </div>`).join('')}
-                                                                                    </div>`).join('')}
-                </div>`).join('');
+                                <div class="bg-gray-50 hover:bg-blue-50 rounded-xl p-3 cursor-pointer transition border border-gray-100 hover:border-blue-200"
+                                    onclick="selectTableFromSearch('${table.id}')">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <p class="font-bold text-gray-800 text-xs md:text-sm">Table ${table.table_number}</p>
+                                        <p class="text-xs md:text-sm font-bold text-blue-600">Rs. ${table.orders?.[0]?.total_amount.toLocaleString() ?? 0}</p>
+                                    </div>
+                                    ${(table.orders || []).map(order =>
+                `<div class="space-y-1 pt-2">
+                                                                                                        ${(order.order_items || []).map(oi => `
+                                                <div class="flex items-center justify-between text-xs">
+                                                    <span class="text-gray-600">${oi.menu_item.name} <span class="text-gray-400">×${oi.quantity}</span></span>
+                                                    <span class="text-gray-500 font-medium">Rs. ${(oi.price * oi.quantity).toLocaleString()}</span>
+                                                </div>`).join('')}
+                                                                                                    </div>`).join('')}
+                                </div>`).join('');
         }
 
         function addItemToSearch(itemName) {
@@ -781,14 +816,14 @@
             }
             wrapper.classList.remove('hidden');
             container.innerHTML = [...selectedItemNames].map(name => `
-                <div class="selected-item-pill">
-                    <span>${name}</span>
-                    <div class="remove-btn" onclick="removeItemFromSearch('${name.replace(/'/g, "\\'")}')">
-                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </div>
-                </div>`).join('');
+                                <div class="selected-item-pill">
+                                    <span>${name}</span>
+                                    <div class="remove-btn" onclick="removeItemFromSearch('${name.replace(/'/g, "\\'")}')">
+                                        <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </div>
+                                </div>`).join('');
         }
 
         function selectTableFromSearch(tableId) {
@@ -800,16 +835,19 @@
         // ── Clear selection ───────────────────────────────────────
         function clearSelection() {
             selectedTable = null;
-            // currentSettings = null;
+            // currentSettings intentionally kept — it's restaurant-wide config,
+            // not per-table, so no need to re-fetch it on every table switch.
             selectedItemNames.clear();
             ['selectedTableBadge', 'selectedTableBadgeMobile'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
             });
             document.getElementById('checkoutBtn').disabled = true;
+            document.getElementById('btn-print').disabled = true;
             document.getElementById('itemSearch').value = '';
             document.getElementById('searchResults').innerHTML = '';
             renderSelectedItems();
+            renderBillPrintedNotice(null);
             renderOrderItems(
                 {
                     orders: [],
@@ -818,155 +856,11 @@
             if (summaryExpanded) toggleSummary();
         }
 
-        // ── Checkout modal ────────────────────────────────────────
-        function openCheckoutModal() {
-            if (!selectedTable) return;
-            document.getElementById('modalTotal').textContent = document.getElementById('total').textContent;
-            document.getElementById('checkoutTableLabel').textContent = `Table ${selectedTable.tableNumber}`;
-            document.getElementById('amountReceived').value = '';
-            document.getElementById('changeDisplay').classList.add('hidden');
-            document.getElementById('paymentNotes').value = '';
-            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
-            document.querySelector('.method-btn').classList.add('selected');
-            selectedMethod = 'cash';
-            document.getElementById('cashSection').style.display = 'block';
-            document.getElementById('checkoutModal').classList.replace('hidden', 'flex');
-        }
 
-        function closeCheckoutModal() {
-            document.getElementById('checkoutModal').classList.replace('flex', 'hidden');
-        }
-
-        function selectMethod(btn, method) {
-            document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedMethod = method;
-            document.getElementById('cashSection').style.display = method === 'cash' ? 'block' : 'none';
-        }
-
-        function calculateChange() {
-            const total = parseInt(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
-            const received = parseInt(document.getElementById('amountReceived').value) || 0;
-            if (received > 0 && received >= total) {
-                document.getElementById('changeAmount').textContent = `Rs. ${(received - total).toLocaleString()}`;
-                document.getElementById('changeDisplay').classList.remove('hidden');
-            } else {
-                document.getElementById('changeDisplay').classList.add('hidden');
-            }
-        }
-
-        async function completePayment() {
-            try {
-                const btn = document.querySelector("#completePaymentBtn");
-
-                const subtotal = Number(btn.dataset.subtotal) || 0;
-                const grandTotal = Number(btn.dataset.grandtotal) || 0;
-
-                // Calculate charges safely
-                const tax = currentSettings.taxEnabled ?
-                    (subtotal * currentSettings.taxPercentage) / 100 :
-                    0;
-
-                const serviceCharge = currentSettings.serviceChargeEnabled ?
-                    (subtotal * currentSettings.serviceChargePercentage) / 100 :
-                    0;
-
-                const order = selectedTable?.orders?.[0];
-
-                if (!order) {
-                    showToast("No active order found for this table", "error");
-                    return;
-                }
-
-                if (selectedMethod === "cash") {
-                    const received =
-                        Number(document.getElementById("amountReceived")?.value) || 0;
-
-                    const totalPayable = grandTotal;
-
-                    if (received < totalPayable) {
-                        showToast("Amount received is less than total", "error");
-                        return;
-                    }
-                }
-
-                const payload = {
-                    order_id: order.id,
-                    table_number: selectedTable.tableNumber,
-                    subtotal: subtotal,
-                    tax_amount: tax,
-                    discount_amount: 0,
-                    service_charge: serviceCharge,
-                    total_amount: grandTotal,
-                    payment_method: selectedMethod,
-                };
-
-                const response = await fetch(`/api/v1/staff/${url}/invoice`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(payload),
-                });
-
-                const data = await response.json();
-
-                if (!data.success) {
-                    throw new Error(data.message || 'Invoice failed');
-                }
-
-                openInvoiceModal(data.data)
-
-                console.log(`Payment completed for ${selectedTable.tableNumber}`);
-
-                await updateTableStatus(selectedTable.id, selectedTable.orders[0].id, 'available');
-
-                closeCheckoutModal();
-                clearSelection();
-
-                await renderTables();
-
-            } catch (error) {
-                console.error(error);
-                showToast('Payment failed: ' + error.message, 'error');
-            }
-        }
-
-        async function updateTableStatus(tableId, orderId, status) {
-            const res = await fetch(`/api/v1/staff/${url}/table/${tableId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status
-                }),
-            });
-            const data = await res.json();
-            if (data.success) await updateOrderStatus(tableId, orderId, 'completed');
-        }
-
-        async function updateOrderStatus(tableId, orderId, status) {
-            const res = await fetch(`/api/v1/staff/${url}/table/${tableId}/${orderId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status
-                }),
-            });
-            const data = await res.json();
-            if (data.success) showToast('Payment successful. Order closed and table is now available.', 'success');
-        }
 
         // ── Init ──────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-print').disabled = true;
             renderTables();
             setInterval(renderTables, 10000);
         });

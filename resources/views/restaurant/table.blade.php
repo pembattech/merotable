@@ -790,6 +790,8 @@
                     return `${actor} cancelled order${meta.reason?` <span class="text-gray-400">— ${meta.reason}</span>`:''}`;
                 case 'checkout':
                     return `${actor} completed checkout`;
+                case 'bill_printed':
+                    return `${actor} printed a bill for Rs. <span class="font-semibold text-gray-800">${meta.total_amount}</span>`;
                 default:
                     return `${actor} ${act.action.replace(/_/g,' ')}`;
             }

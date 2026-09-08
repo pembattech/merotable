@@ -20,6 +20,9 @@ class OrderResource extends JsonResource
             'createdAt' => $this->created_at,
             'totalAmount' => $this->total_amount,
             'itemsCount' => $this->orderItems->count(),
+            'billPrintedAt' => $this->bill_printed_at,
+            'billPrintedTotal' => $this->bill_printed_total,
+
 
             // ✅ Use Resource for order items
             'orderItems' => OrderItemsResource::collection(

@@ -164,7 +164,7 @@
 <body class="bg-gray-50">
 
     {{-- ══════════════════════════════════════════
-         TOP NAVBAR
+    TOP NAVBAR
     ══════════════════════════════════════════ --}}
     <nav
         class="sticky top-0 z-50 flex items-center justify-between px-4 md:px-6 py-3 bg-[#0f172a] text-white border-b border-gray-800">
@@ -182,7 +182,8 @@
                 <span class="ham-line"></span>
             </button>
 
-            <img class="logo w-28 sm:w-32 md:w-40 lg:w-52"  src="{{ asset('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
+            <img class="logo w-28 sm:w-32 md:w-40 lg:w-52" src="{{ asset('storage/logo/merotable-logo-gray.png') }}"
+                alt="Logo">
             <div class="hidden md:block h-6 w-px bg-gray-700"></div>
             <p class="restroName hidden md:block text-sm md:text-lg font-medium text-gray-200 truncate max-w-[160px]">
                 loading…</p>
@@ -221,9 +222,9 @@
 
 
     {{-- ══════════════════════════════════════════
-         MOBILE DRAWER
-         Both elements stay in the DOM at all times
-         so CSS transitions can fire in both directions.
+    MOBILE DRAWER
+    Both elements stay in the DOM at all times
+    so CSS transitions can fire in both directions.
     ══════════════════════════════════════════ --}}
 
     {{-- Dimmed backdrop --}}
@@ -289,7 +290,7 @@
 
 
     {{-- ══════════════════════════════════════════
-         MAIN CONTENT
+    MAIN CONTENT
     ══════════════════════════════════════════ --}}
     <main class="p-4 md:p-8 min-h-[calc(100vh-57px)] overflow-y-auto">
         @yield('content')
@@ -297,7 +298,7 @@
 
 
     {{-- ══════════════════════════════════════════
-         TOAST (z-[70] so it stays above the drawer)
+    TOAST (z-[70] so it stays above the drawer)
     ══════════════════════════════════════════ --}}
     <div id="toast" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[70] hidden">
         <div id="toastBox"
@@ -403,6 +404,21 @@
             toast.classList.remove('hidden');
             clearTimeout(toast._timer);
             toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+
+            const date = new Date(dateString.replace(' ', 'T'));
+
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
         }
     </script>
 

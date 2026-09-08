@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('staff_id')->constrained('users')->onDelete('set null');
-            $table->enum('action', ['created', 'item_added', 'item_removed', 'updated', 'cancelled', 'paid']);
+            $table->enum('action', ['created', 'item_added', 'item_removed', 'updated', 'cancelled', 'paid', 'bill_printed']);
             $table->json('meta');
             $table->timestamps();
         });

@@ -265,8 +265,8 @@
 
             grid.innerHTML = list.map((inv, i) => {
                 const delay = delays[i % delays.length];
-                const statusClass = `status-${inv.paymentStatus}`;
-                const statusText = inv.paymentStatus.charAt(0).toUpperCase() + inv.paymentStatus.slice(1);
+                const statusClass = `status-${inv.order.paymentStatus}`;
+                const statusText = inv.order.paymentStatus.charAt(0).toUpperCase() + inv.order.paymentStatus.slice(1);
 
 
                 return `
@@ -274,11 +274,11 @@
       <div class="flex items-start justify-between mb-3">
         <div>
           <p class="font-bold text-gray-800">${inv.invoiceNumber}</p>
-          <p class="text-xs text-gray-400 mt-1">${formatDate(inv.paidAt)}</p>
+          <p class="text-xs text-gray-400 mt-1">${formatDate(inv.order.paidAt)}</p>
         </div>
 
         <div>
-        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-green-50">${inv.paymentMethod.charAt(0).toUpperCase() + inv.paymentMethod.slice(1)}</span>
+        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-green-50">${inv.order.paymentMethod.charAt(0).toUpperCase() + inv.order.paymentMethod.slice(1)}</span>
         <span class="text-xs font-bold px-2.5 py-1 rounded-full ${statusClass}">${statusText}</span>
       </div>
       </div>
@@ -286,21 +286,21 @@
       <div class="space-y-2 mb-3">
         <div class="flex justify-between text-sm">
           <span class="text-gray-500">Table</span>
-          <span class="font-semibold text-gray-800">${inv.tableNumber}</span>
+          <span class="font-semibold text-gray-800">${inv.order.tableNumber}</span>
         </div>
         <div class="flex justify-between text-sm">
           <span class="text-gray-500">Order #</span>
-          <span class="font-semibold text-gray-800">${inv.orderId}</span>
+          <span class="font-semibold text-gray-800">${inv.order.id}</span>
         </div>
         <div class="flex justify-between text-sm">
           <span class="text-gray-500">Items</span>
-          <span class="font-semibold text-gray-800">${inv.orderItems.length} items</span>
+          <span class="font-semibold text-gray-800">${inv.order.items.length} items</span>
         </div>
       </div>
       
       <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
-        <span class="text-xs text-gray-400">${inv.customer?? 'Walk-in'}</span>
-        <span class="text-lg font-extrabold text-gray-800">Rs. ${inv.totalAmount.toLocaleString()}</span>
+        <span class="text-xs text-gray-400">${inv.order.customer?? 'Walk-in'}</span>
+        <span class="text-lg font-extrabold text-gray-800">Rs. ${inv.order.totalAmount.toLocaleString()}</span>
       </div>
     </div>`;
             }).join('');
@@ -335,7 +335,6 @@
 
         function viewInvoice(invoice_number) {
             const invoiceData = INVOICES.find(inv => inv.invoiceNumber === invoice_number);
-            console.log(invoiceData)
             if (!invoiceData) return;
             openInvoiceModal(invoiceData)
         }

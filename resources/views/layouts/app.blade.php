@@ -119,68 +119,84 @@
 </head>
 
 {{--
-    On mobile: body is a block column (flex-col) so the fixed topbar
-    (rendered inside the sidebar include) sits above everything.
-    The <main> gets pt-16 on mobile to clear the fixed topbar height,
+On mobile: body is a block column (flex-col) so the fixed topbar
+(rendered inside the sidebar include) sits above everything.
+The <main> gets pt-16 on mobile to clear the fixed topbar height,
     reset to pt-0 on md+ where the sidebar is static.
---}}
+    --}}
 
-<body class="bg-gray-50 md:flex md:h-screen md:overflow-hidden">
+    <body class="bg-gray-50 md:flex md:h-screen md:overflow-hidden">
 
-    @include('layouts.sidebar')
+        @include('layouts.sidebar')
 
-    <main class="flex-1 overflow-y-auto p-6 md:p-8 pt-20 md:pt-8">
-        @yield('content')
-    </main>
+        <main class="flex-1 overflow-y-auto p-6 md:p-8 pt-20 md:pt-8">
+            @yield('content')
+        </main>
 
-    <!-- ====== TOAST ====== -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
-        <div id="toastBox"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px]">
-            <span id="toastIcon" class="text-lg"></span>
-            <span id="toastMsg"></span>
+        <!-- ====== TOAST ====== -->
+        <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+            <div id="toastBox"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px]">
+                <span id="toastIcon" class="text-lg"></span>
+                <span id="toastMsg"></span>
+            </div>
         </div>
-    </div>
 
-    <script>
-        function showToast(message, type = 'success') {
-            console.log(message, type)
-            const toast = document.getElementById('toast');
-            const box = document.getElementById('toastBox');
-            const icon = document.getElementById('toastIcon');
-            const msg = document.getElementById('toastMsg');
+        <script>
+            function showToast(message, type = 'success') {
+                console.log(message, type)
+                const toast = document.getElementById('toast');
+                const box = document.getElementById('toastBox');
+                const icon = document.getElementById('toastIcon');
+                const msg = document.getElementById('toastMsg');
 
-            const styles = {
-                success: {
-                    bg: 'bg-green-600',
-                    icon: '✓'
-                },
-                error: {
-                    bg: 'bg-red-500',
-                    icon: '✕'
-                },
-                warning: {
-                    bg: 'bg-orange-500',
-                    icon: '!'
-                },
-                info: {
-                    bg: 'bg-blue-500',
-                    icon: 'i'
-                },
-            };
-            const s = styles[type] || styles.success;
+                const styles = {
+                    success: {
+                        bg: 'bg-green-600',
+                        icon: '✓'
+                    },
+                    error: {
+                        bg: 'bg-red-500',
+                        icon: '✕'
+                    },
+                    warning: {
+                        bg: 'bg-orange-500',
+                        icon: '!'
+                    },
+                    info: {
+                        bg: 'bg-blue-500',
+                        icon: 'i'
+                    },
+                };
+                const s = styles[type] || styles.success;
 
-            box.className =
-                `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px] ${s.bg}`;
-            icon.textContent = s.icon;
-            msg.textContent = message;
+                box.className =
+                    `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px] ${s.bg}`;
+                icon.textContent = s.icon;
+                msg.textContent = message;
 
-            toast.classList.remove('hidden');
-            clearTimeout(toast._timer);
-            toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
-        }
-    </script>
+                toast.classList.remove('hidden');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
+            }
 
-</body>
+
+            function formatDateTime(dateString) {
+                if (!dateString) return '-';
+
+                const date = new Date(dateString.replace(' ', 'T'));
+
+                return date.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+        </script>
+
+    </body>
 
 </html>

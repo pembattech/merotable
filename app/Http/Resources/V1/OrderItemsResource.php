@@ -17,9 +17,7 @@ class OrderItemsResource extends JsonResource
         return [
 
             // Menu item info
-            'menuItem' => [
-                'name' => $this->whenLoaded('menuItem')?->name,
-            ],
+            'menuItem' => $this->whenLoaded('menuItem')?->name,
 
             'status' => $this->status,
 

@@ -120,7 +120,7 @@ class TableController extends Controller
                     if ($mode === 'billing') {
                         // Only open orders
                         $query->where('status', 'open')
-                            ->select('id', 'table_id', 'total_amount', 'status', 'created_at');
+                            ->select('id', 'table_id', 'total_amount', 'status', 'created_at', 'bill_printed_at', 'bill_printed_total');
                     } else {
                         // Today's orders
                         $query->whereDate('created_at', today())
@@ -151,6 +151,8 @@ class TableController extends Controller
                 'table_number' => $table->table_number,
                 'status' => $table->status,
                 'total_amount' => $amount,
+                'bill_printed_at' => $table->orders->first()?->bill_printed_at,
+                'bill_printed_total' => $table->orders->first()?->bill_printed_total,
             ];
         });
 
@@ -198,7 +200,7 @@ class TableController extends Controller
                         ->whereDate('created_at', today());
                 }
 
-                $q->select('id', 'table_id', 'status', 'total_amount', 'created_at');
+                $q->select('id', 'table_id', 'status', 'total_amount', 'created_at', 'bill_printed_at', 'bill_printed_total');
 
                 $q->with([
                     'activities',

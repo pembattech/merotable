@@ -39,7 +39,7 @@ Route::prefix('super-admin')
             Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
             Route::get('/restaurants/pending', [SARestaurantController::class, 'pending'])->name('restaurants.pending');
-            
+
             Route::apiResource('restaurants', SARestaurantController::class);
             Route::patch('/restaurants/{restaurant}/toggle-status', [SARestaurantController::class, 'toggleStatus'])
                 ->name('restaurants.toggle-status');
@@ -257,11 +257,16 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
 
     Route::post('/{restaurant:slug}/orders', [OrdersController::class, 'store']);
     Route::post('/{restaurant:slug}/add-items', [OrdersController::class, 'addItem']);
+
+    Route::post('/{restaurant:slug}/orders/print-bill', [OrdersController::class, 'printBill']);
+    Route::get('/{restaurant:slug}/orders/{order}/bill', [OrdersController::class, 'showBill'])->name('orders.bill');
+
+
     Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
     Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/status', [OrdersController::class, 'updateOrderStatus']);
     Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
 
-    Route::post('/{restaurant:slug}/invoice', [InvoiceController::class, 'store']);
+    Route::post('/{restaurant:slug}/invoice', [InvoiceController::class, 'store'])->name('invoice.checkout');
 
     Route::post('/{restaurant:slug}/attendance/check-in', [AttendanceController::class, 'checkIn']);
     Route::post('/{restaurant:slug}/attendance/check-out', [AttendanceController::class, 'checkOut']);

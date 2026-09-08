@@ -16,6 +16,8 @@ class Order extends Model
         'status',
         'total_amount',
         'remarks',
+        'bill_printed_at',
+        'bill_printed_total',
     ];
 
 
