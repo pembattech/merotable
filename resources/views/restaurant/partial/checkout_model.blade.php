@@ -169,18 +169,6 @@
         try {
             const btn = document.querySelector("#completePaymentBtn");
 
-            // const subtotal = Number(btn.dataset.subtotal) || 0;
-            // const grandTotal = Number(btn.dataset.grandtotal) || 0;
-
-            // // Calculate charges safely
-            // const tax = currentSettings.taxEnabled ?
-            //     (subtotal * currentSettings.taxPercentage) / 100 :
-            //     0;
-
-            // const serviceCharge = currentSettings.serviceChargeEnabled ?
-            //     (subtotal * currentSettings.serviceChargePercentage) / 100 :
-            //     0;
-
             const order = selectedTable?.orders?.[0];
 
             if (!order) {
@@ -203,11 +191,6 @@
             const payload = {
                 order_id: order.id,
                 table_number: selectedTable.tableNumber,
-                // subtotal: subtotal,
-                // tax_amount: tax,
-                // discount_amount: 0,
-                // service_charge: serviceCharge,
-                // total_amount: grandTotal,
                 payment_method: selectedMethod,
             };
 
@@ -229,7 +212,7 @@
 
             openInvoiceModal(data.data)
 
-            await updateTableStatus(selectedTable.id, selectedTable.orders[0].id, 'available');
+            await completeOrder(selectedTable.id, selectedTable.orders[0].id, 'available');
 
             closeCheckoutModal();
             clearSelection();
@@ -242,34 +225,55 @@
         }
     }
 
-    async function updateTableStatus(tableId, orderId, status) {
-        const res = await fetch(`/api/v1/staff/${url}/table/${tableId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                status
-            }),
-        });
-        const data = await res.json();
-        if (data.success) await updateOrderStatus(tableId, orderId, 'completed');
-    }
+    async function completeOrder(tableId, orderId) {
+        try {
+            // 1. Update table status
+            const tableRes = await fetch(`/api/v1/staff/${url}/table/${tableId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: 'available'
+                })
+            });
 
-    async function updateOrderStatus(tableId, orderId, status) {
-        const res = await fetch(`/api/v1/staff/${url}/table/${tableId}/${orderId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                status
-            }),
-        });
-        const data = await res.json();
-        if (data.success) showToast('Payment successful. Order closed and table is now available.', 'success');
+            const tableData = await tableRes.json();
+
+            if (!tableData.success) {
+                showToast(tableData.message || 'Failed to update table status.', 'error');
+                return;
+            }
+
+            // 2. Update order status
+            const orderRes = await fetch(`/api/v1/staff/${url}/table/${tableId}/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: 'completed'
+                })
+            });
+
+            const orderData = await orderRes.json();
+
+            if (orderData.success) {
+                showToast(
+                    'Payment successful. Order closed and table is now available.',
+                    'success'
+                );
+            } else {
+                showToast(orderData.message || 'Failed to close order.', 'error');
+            }
+
+        } catch (error) {
+            console.error('Error completing order:', error);
+            showToast('Something went wrong. Please try again.', 'error');
+        }
     }
 </script>

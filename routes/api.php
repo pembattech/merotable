@@ -223,6 +223,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
         Route::prefix('invoices')->controller(InvoiceController::class)->group(function () {
             Route::get('/', 'getInvoices');
             Route::get('/{invoiceNumber}', 'getInvoice');
+            Route::get('/export', 'exportInvoices');
             // Route::put('/{id}', 'updateInvoice');
             // Route::delete('/{id}', 'deleteInvoice');
         });

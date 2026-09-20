@@ -386,8 +386,7 @@
         <div class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-50 rounded-xl p-2">
-                    <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
+                    <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
@@ -410,8 +409,7 @@
             <button class="mode-tab active" id="tabSingle" onclick="switchMode('single')">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor"
-                        stroke-width="2" fill="none" />
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="2" fill="none" />
                 </svg>
                 Single Table
             </button>
@@ -430,8 +428,8 @@
                 <div>
                     <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2" for="tableNumber">Table
                         Number</label>
-                    <input class="field-input text-sm" type="text" id="tableNumber" name="table_number"
-                        maxlength="5" placeholder="e.g. T16 or A1" autocomplete="off" required>
+                    <input class="field-input text-sm" type="text" id="tableNumber" name="table_number" maxlength="5"
+                        placeholder="e.g. T16 or A1" autocomplete="off" required>
                 </div>
                 <div>
                     <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2" for="spaceArea">Space
@@ -468,13 +466,13 @@
                 <div class="bulk-row">
                     <div>
                         <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">From</label>
-                        <input class="field-input text-sm" type="number" id="bulkFrom" min="1" max="999"
-                            placeholder="1" oninput="updatePreview()">
+                        <input class="field-input text-sm" type="number" id="bulkFrom" min="1" max="999" placeholder="1"
+                            oninput="updatePreview()">
                     </div>
                     <div>
                         <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">To</label>
-                        <input class="field-input text-sm" type="number" id="bulkTo" min="1" max="999"
-                            placeholder="20" oninput="updatePreview()">
+                        <input class="field-input text-sm" type="number" id="bulkTo" min="1" max="999" placeholder="20"
+                            oninput="updatePreview()">
                     </div>
                 </div>
                 <div class="range-preview" id="rangePreview">
@@ -533,54 +531,54 @@
                 sortedOrders.forEach(order => {
                     const ring = order.status === 'open' ? 'ring-2 ring-blue-100' : '';
                     timelineHTML += `<div class="border border-green-200 bg-green-50 rounded-xl p-3 md:p-4 mb-2 ${ring}">
-                        <div class="flex items-start justify-between mb-3">
-                            <div>
-                                <p class="font-bold text-gray-800 text-sm">Order #${order.id}</p>
-                                <p class="text-xs text-gray-500 mt-1">${order.createdAt}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-base md:text-lg font-extrabold text-gray-800">Rs. ${order.totalAmount}</p>
-                                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700">${order.status}</span>
-                            </div>
-                        </div>
-                        <div class="space-y-1.5">`;
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <p class="font-bold text-gray-800 text-sm">Order #${order.id}</p>
+                                        <p class="text-xs text-gray-500 mt-1">${formatDateTime(order.createdAt)}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-base md:text-lg font-extrabold text-gray-800">Rs. ${order.totalAmount}</p>
+                                        <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700">${order.status}</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5">`;
 
                     order.orderItems.forEach(oi => {
                         timelineHTML += `<div class="flex justify-between text-xs md:text-sm">
-                            <span class="text-gray-600">${oi.menuItem.name} <span class="text-gray-400">×${oi.quantity}</span></span>
-                            <span class="font-semibold text-gray-800">Rs. ${oi.price * oi.quantity}</span>
-                        </div>`;
+                                    <span class="text-gray-600">${oi.menuItem} <span class="text-gray-400">×${oi.quantity}</span></span>
+                                    <span class="font-semibold text-gray-800">Rs. ${oi.price * oi.quantity}</span>
+                                </div>`;
                     });
 
                     timelineHTML += `</div>
-                        <div class="mt-3 pt-3 border-t border-green-200 flex items-center justify-between">
-                            <p class="text-xs text-gray-500">Completed</p>
-                            <button onclick="toggleActivities()" class="flex items-center gap-1 text-xs font-semibold text-green-600 hover:text-green-700 transition">
-                                <span id="activityBtnText">View Activities</span>
-                                <svg id="chevronIcon" class="h-3.5 w-3.5 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div id="activitiesSection" class="activities-collapse">
-                            <div class="mt-3 pt-3 border-t border-green-200">
-                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Order Activity</p>
-                                <div class="relative space-y-0">`;
+                                <div class="mt-3 pt-3 border-t border-green-200 flex items-center justify-between">
+                                    <p class="text-xs text-gray-500">Completed</p>
+                                    <button onclick="toggleActivities()" class="flex items-center gap-1 text-xs font-semibold text-green-600 hover:text-green-700 transition">
+                                        <span id="activityBtnText">View Activities</span>
+                                        <svg id="chevronIcon" class="h-3.5 w-3.5 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div id="activitiesSection" class="activities-collapse">
+                                    <div class="mt-3 pt-3 border-t border-green-200">
+                                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Order Activity</p>
+                                        <div class="relative space-y-0">`;
 
                     timelineHTML += order.activities.map((act, i) => {
                         const c = ACT_CFG[act.action] || ACT_CFG.created;
                         const isLast = i === order.activities.length - 1;
                         return `<div class="relative flex gap-3 ${isLast ? '' : 'pb-5'} timeline-item">
-                            <div class="flex-shrink-0 w-7 h-7 ${c.bg} rounded-full flex items-center justify-center mt-0.5 z-10 ring-2 ring-white">
-                                <svg class="h-3.5 w-3.5 ${c.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.path}"/>
-                                </svg>
-                            </div>
-                            <div class="flex-1 min-w-0 pt-0.5">
-                                <p class="text-xs md:text-sm text-gray-600 leading-snug">${buildActivitySentence(act)}</p>
-                                <p class="text-xs text-gray-400 mt-1">${formatTime(act.created_at)}</p>
-                            </div>
-                        </div>`;
+                                    <div class="flex-shrink-0 w-7 h-7 ${c.bg} rounded-full flex items-center justify-center mt-0.5 z-10 ring-2 ring-white">
+                                        <svg class="h-3.5 w-3.5 ${c.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.path}"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0 pt-0.5">
+                                        <p class="text-xs md:text-sm text-gray-600 leading-snug">${buildActivitySentence(act)}</p>
+                                        <p class="text-xs text-gray-400 mt-1">${formatTime(act.created_at)}</p>
+                                    </div>
+                                </div>`;
                     }).join('');
 
                     timelineHTML += `</div></div></div></div>`;
@@ -622,10 +620,6 @@
                 minute: '2-digit',
                 hour12: true
             });
-        }
-
-        function capitalize(s) {
-            return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
         }
 
         async function fetchTables() {
@@ -686,7 +680,7 @@
                     badge: 'bg-white/20 text-white',
                     ring: 'ring-2 ring-amber-300'
                 },
-            } [table.status] || {
+            }[table.status] || {
                 bg: 'bg-white',
                 border: 'border-gray-200',
                 badge: 'bg-gray-100 text-gray-600',
@@ -694,15 +688,15 @@
             };
 
             return `<div onclick="openOrderModal(${table.id})"
-                class="${s.bg} ${s.border} ${s.ring} p-3 md:p-4 rounded-2xl border shadow-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg">
-                <div class="flex justify-between items-center">
-                    <span class="text-xl md:text-2xl font-extrabold tracking-wide">${table.table_number}</span>
-                    <span class="text-[9px] md:text-[10px] px-1.5 md:px-2 py-1 rounded-full font-semibold uppercase ${s.badge}">${table.status}</span>
-                </div>
-                ${table.total_amount > 0
+                        class="${s.bg} ${s.border} ${s.ring} p-3 md:p-4 rounded-2xl border shadow-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xl md:text-2xl font-extrabold tracking-wide">${table.table_number}</span>
+                            <span class="text-[9px] md:text-[10px] px-1.5 md:px-2 py-1 rounded-full font-semibold uppercase ${s.badge}">${table.status}</span>
+                        </div>
+                        ${table.total_amount > 0
                     ? `<div class="mt-3 md:mt-4"><p class="text-xs opacity-80">Today's Total</p><p class="text-base md:text-lg font-bold">Rs. ${table.total_amount}</p></div>`
                     : `<div class="mt-5 md:mt-6 h-4 md:h-6"></div>`}
-            </div>`;
+                    </div>`;
         }
 
         async function openOrderModal(tableId) {
@@ -721,6 +715,10 @@
                 showToast(data.message || 'Something went wrong ❌', 'error');
                 return;
             }
+
+            console.log('0')
+            console.log(data)
+            console.log('0')
 
             allOrderDetails.push(data);
             document.getElementById('orderContent').innerHTML = orderHTML(data.data);
@@ -753,7 +751,7 @@
                 icon: 'text-orange-500',
                 path: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
             },
-            qty_updated: {
+            updated: {
                 bg: 'bg-blue-100',
                 icon: 'text-blue-500',
                 path: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
@@ -768,6 +766,23 @@
                 icon: 'text-purple-600',
                 path: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
             },
+            paid: {
+                bg: 'bg-green-100',
+                icon: 'text-green-600',
+                path: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 3a9 9 0 100 18 9 9 0 000-18z'
+            },
+
+            bill_printed: {
+                bg: 'bg-blue-100',
+                icon: 'text-blue-600',
+                path: 'M17 17h2a2 2 0 002-2V9a2 2 0 00-2-2h-1V5a2 2 0 00-2-2H8a2 2 0 00-2 2v2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m10 0v2a2 2 0 01-2 2H9a2 2 0 01-2-2v-2m10 0H7m5-10h.01'
+            },
+
+            bill_invalidated: {
+                bg: 'bg-red-100',
+                icon: 'text-red-500',
+                path: 'M6 18L18 6M6 6l12 12'
+            },
         };
 
         function buildActivitySentence(act) {
@@ -781,19 +796,21 @@
                 case 'created':
                     return `${actor} created the order`;
                 case 'item_added':
-                    return `${actor} added <span class="font-semibold text-gray-800">${meta.name||'item'}</span>${meta.quantity?` <span class="text-blue-600 font-semibold">×${meta.quantity}</span>`:''}`;
+                    return `${actor} added <span class="font-semibold text-gray-800">${meta.name || 'item'}</span>${meta.quantity ? ` <span class="text-blue-600 font-semibold">×${meta.quantity}</span>` : ''}`;
                 case 'item_removed':
-                    return `${actor} removed <span class="font-semibold text-gray-800">${meta.name||'item'}</span>`;
+                    return `${actor} removed <span class="font-semibold text-gray-800">${meta.name || 'item'}</span>`;
                 case 'qty_updated':
-                    return `${actor} updated <span class="font-semibold text-gray-800">${meta.name||'item'}</span> qty${meta.from!==undefined?` <span class="text-gray-400">(${meta.from} → <span class="text-blue-600 font-semibold">${meta.to}</span>)</span>`:''}`;
+                    return `${actor} updated <span class="font-semibold text-gray-800">${meta.name || 'item'}</span> qty${meta.from !== undefined ? ` <span class="text-gray-400">(${meta.from} → <span class="text-blue-600 font-semibold">${meta.to}</span>)</span>` : ''}`;
                 case 'cancelled':
-                    return `${actor} cancelled order${meta.reason?` <span class="text-gray-400">— ${meta.reason}</span>`:''}`;
+                    return `${actor} cancelled order${meta.reason ? ` <span class="text-gray-400">— ${meta.reason}</span>` : ''}`;
                 case 'checkout':
                     return `${actor} completed checkout`;
                 case 'bill_printed':
                     return `${actor} printed a bill for Rs. <span class="font-semibold text-gray-800">${meta.total_amount}</span>`;
+                case 'bill_invalidated':
+                    return `${actor} added items after bill printing <span class="font-semibold text-gray-800">- bill invalidated</span>`;
                 default:
-                    return `${actor} ${act.action.replace(/_/g,' ')}`;
+                    return `${actor} ${act.action.replace(/_/g, ' ')}`;
             }
         }
 
@@ -810,127 +827,127 @@
             const totalEarning = isOpen ? currentOrder.totalAmount : '-';
 
             let html = `
-                <div class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-blue-50 rounded-xl p-2">
-                            <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        <div class="flex items-center justify-between px-4 md:px-5 py-3 md:py-4 border-b border-gray-100 flex-shrink-0">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-blue-50 rounded-xl p-2">
+                                    <svg class="h-4 w-4 md:h-5 md:w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Order Details</h2>
+                                    <p class="text-xs text-gray-400">Table ${table.tableNumber} · ${tableStatus}</p>
+                                </div>
+                            </div>
+                            <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 md:p-2 transition">
+                                <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <button onclick="toggleHistory()"
+                            class="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold py-2 md:py-2.5 transition text-xs md:text-sm border-b border-gray-200">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                        </div>
-                        <div>
-                            <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Order Details</h2>
-                            <p class="text-xs text-gray-400">Table ${table.tableNumber} · ${tableStatus}</p>
-                        </div>
-                    </div>
-                    <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 md:p-2 transition">
-                        <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
+                            View All Orders Today
+                        </button>
 
-                <button onclick="toggleHistory()"
-                    class="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold py-2 md:py-2.5 transition text-xs md:text-sm border-b border-gray-200">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    View All Orders Today
-                </button>
+                        <div class="overflow-y-auto flex-1 px-4 md:px-5 py-4 space-y-4 md:space-y-5">
 
-                <div class="overflow-y-auto flex-1 px-4 md:px-5 py-4 space-y-4 md:space-y-5">
-
-                    <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 md:p-5 text-white relative overflow-hidden">
-                        <div class="absolute -right-6 -top-6 w-28 h-28 bg-white/10 rounded-full"></div>
-                        <div class="relative">
-                            <div class="flex items-start justify-between mb-4 md:mb-5">
-                                <div>
-                                    <p class="text-blue-200 text-xs font-medium uppercase tracking-wider mb-1">Order ID</p>
-                                    <p class="text-white font-extrabold text-xl md:text-2xl">${isOpen ? `#${currentOrder.id}` : 'N/A'}</p>
-                                </div>
-                                <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full capitalize">
-                                    ${isOpen ? currentOrder.status : 'N/A'}
-                                </span>
-                            </div>
-                            <div class="flex items-end justify-between">
-                                <div>
-                                    <p class="text-blue-200 text-xs mb-1">Total Amount</p>
-                                    <p class="text-white font-extrabold text-2xl md:text-3xl">Rs. ${totalEarning}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-blue-200 text-xs mb-1">Placed at</p>
-                                    <p class="text-white text-xs md:text-sm font-semibold">${isOpen ? formatTime(currentOrder.createdAt) : '-'}</p>
+                            <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 md:p-5 text-white relative overflow-hidden">
+                                <div class="absolute -right-6 -top-6 w-28 h-28 bg-white/10 rounded-full"></div>
+                                <div class="relative">
+                                    <div class="flex items-start justify-between mb-4 md:mb-5">
+                                        <div>
+                                            <p class="text-blue-200 text-xs font-medium uppercase tracking-wider mb-1">Order ID</p>
+                                            <p class="text-white font-extrabold text-xl md:text-2xl">${isOpen ? `#${currentOrder.id}` : 'N/A'}</p>
+                                        </div>
+                                        <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full capitalize">
+                                            ${isOpen ? currentOrder.status : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-end justify-between">
+                                        <div>
+                                            <p class="text-blue-200 text-xs mb-1">Total Amount</p>
+                                            <p class="text-white font-extrabold text-2xl md:text-3xl">Rs. ${totalEarning}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-blue-200 text-xs mb-1">Placed at</p>
+                                            <p class="text-white text-xs md:text-sm font-semibold">${isOpen ? formatTime(currentOrder.createdAt) : '-'}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items Ordered</p>
-                        <div class="space-y-2">
-                            ${isOpen && currentOrder.orderItems?.length
-                                ? currentOrder.orderItems.map((item, i) => `
-                                                        <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-3 md:px-4 py-2.5 md:py-3 transition group"
-                                                             style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
-                                                            <div class="flex items-center gap-2 md:gap-3 min-w-0">
-                                                                <div class="w-8 h-8 md:w-9 md:h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 flex-shrink-0">
-                                                                    ${item.menuItem.name}
-                                                                </div>
-                                                                <div class="min-w-0">
-                                                                    <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.menuItem.name}</p>
-                                                                    <p class="text-xs text-gray-400 mt-0.5">Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
-                                                                <span class="text-xs font-semibold px-2 py-1 rounded-full status-${item.status} hidden sm:inline">
-                                                                    ${capitalize(item.status)}
-                                                                </span>
-                                                                <p class="font-bold text-gray-800 text-xs md:text-sm">
-                                                                    Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
-                                                                </p>
-                                                            </div>
-                                                        </div>`).join('')
-                                : `<p class="text-sm text-gray-400 text-center py-4">No items ordered</p>`}
-                        </div>
-                    </div>
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Items Ordered</p>
+                                <div class="space-y-2">
+                                    ${isOpen && currentOrder.orderItems?.length
+                    ? currentOrder.orderItems.map((item, i) => `
+                                                                <div class="flex items-center justify-between bg-gray-50 hover:bg-blue-50/60 rounded-xl px-3 md:px-4 py-2.5 md:py-3 transition group"
+                                                                     style="animation: slideUp ${0.1 + i * 0.06}s ease both;">
+                                                                    <div class="flex items-center gap-2 md:gap-3 min-w-0">
+                                                                        <div class="w-8 h-8 md:w-9 md:h-9 bg-white rounded-lg shadow-sm flex items-center justify-center text-xs font-bold text-blue-600 border border-gray-200 flex-shrink-0">
+                                                                            ${item.menuItem}
+                                                                        </div>
+                                                                        <div class="min-w-0">
+                                                                            <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.menuItem}</p>
+                                                                            <p class="text-xs text-gray-400 mt-0.5">Rs.&nbsp;${item.price.toLocaleString()} &times; ${item.quantity}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
+                                                                        <span class="text-xs font-semibold px-2 py-1 rounded-full status-${item.status} hidden sm:inline">
+                                                                            ${capitalize(item.status)}
+                                                                        </span>
+                                                                        <p class="font-bold text-gray-800 text-xs md:text-sm">
+                                                                            Rs.&nbsp;${(item.price * item.quantity).toLocaleString()}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>`).join('')
+                    : `<p class="text-sm text-gray-400 text-center py-4">No items ordered</p>`}
+                                </div>
+                            </div>
 
-                    <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Order Activity</p>
-                        <div class="relative space-y-0">
-                            ${!isOpen || !activities.length
-                                ? `<p class="text-sm text-gray-400 text-center py-4">No activity recorded</p>`
-                                : activities.map((act, i) => {
-                                    const c = ACT_CFG[act.action] || ACT_CFG.created;
-                                    const isLast = i === activities.length - 1;
-                                    return `<div class="relative flex gap-3 ${isLast ? '' : 'pb-5'} timeline-item">
-                                                            <div class="flex-shrink-0 w-7 h-7 ${c.bg} rounded-full flex items-center justify-center mt-0.5 z-10 ring-2 ring-white">
-                                                                <svg class="h-3.5 w-3.5 ${c.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.path}"/>
-                                                                </svg>
-                                                            </div>
-                                                            <div class="flex-1 min-w-0 pt-0.5">
-                                                                <p class="text-xs md:text-sm text-gray-600 leading-snug">${buildActivitySentence(act)}</p>
-                                                                <p class="text-xs text-gray-400 mt-1">${formatTime(act.created_at)}</p>
-                                                            </div>
-                                                        </div>`;
-                                }).join('')}
+                            <div>
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Order Activity</p>
+                                <div class="relative space-y-0">
+                                    ${!isOpen || !activities.length
+                    ? `<p class="text-sm text-gray-400 text-center py-4">No activity recorded</p>`
+                    : activities.map((act, i) => {
+                        const c = ACT_CFG[act.action] || ACT_CFG.created;
+                        const isLast = i === activities.length - 1;
+                        return `<div class="relative flex gap-3 ${isLast ? '' : 'pb-5'} timeline-item">
+                                                                    <div class="flex-shrink-0 w-7 h-7 ${c.bg} rounded-full flex items-center justify-center mt-0.5 z-10 ring-2 ring-white">
+                                                                        <svg class="h-3.5 w-3.5 ${c.icon}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${c.path}"/>
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div class="flex-1 min-w-0 pt-0.5">
+                                                                        <p class="text-xs md:text-sm text-gray-600 leading-snug">${buildActivitySentence(act)}</p>
+                                                                        <p class="text-xs text-gray-400 mt-1">${formatTime(act.created_at)}</p>
+                                                                    </div>
+                                                                </div>`;
+                    }).join('')}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="px-4 md:px-5 py-3 md:py-4 border-t border-gray-100 flex-shrink-0">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs md:text-sm text-gray-500 font-medium">Grand Total</span>
-                        <span class="text-lg md:text-xl font-extrabold text-gray-800">Rs. ${totalEarning}</span>
-                    </div>
-                    <button onclick="proceedToCheckout()"
-                        class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3 md:py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-blue-200 text-sm">
-                        <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        Proceed to Checkout
-                    </button>
-                </div>`;
+                        <div class="px-4 md:px-5 py-3 md:py-4 border-t border-gray-100 flex-shrink-0">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs md:text-sm text-gray-500 font-medium">Grand Total</span>
+                                <span class="text-lg md:text-xl font-extrabold text-gray-800">Rs. ${totalEarning}</span>
+                            </div>
+                            <button onclick="proceedToCheckout()"
+                                class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3 md:py-3.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-blue-200 text-sm">
+                                <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                Proceed to Checkout
+                            </button>
+                        </div>`;
 
             return html;
         }
@@ -960,7 +977,7 @@
         closeBtn.addEventListener('click', closeDrawer);
         overlay.addEventListener('click', closeDrawer);
 
-        form.addEventListener('submit', async function(e) {
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
             const payload = {
                 table_number: form.table_number.value,
@@ -1034,7 +1051,7 @@
 
 
         // QR download 
-        document.getElementById('downloadQRBtn').addEventListener('click', async function() {
+        document.getElementById('downloadQRBtn').addEventListener('click', async function () {
 
             showToast('Generating QR codes for your tables…', 'info');
 

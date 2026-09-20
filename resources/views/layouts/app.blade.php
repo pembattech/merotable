@@ -195,6 +195,10 @@ The <main> gets pt-16 on mobile to clear the fixed topbar height,
                     hour12: true
                 });
             }
+
+            function capitalize(s) {
+                return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+            }
         </script>
 
     </body>

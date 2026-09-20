@@ -195,20 +195,24 @@ class OrdersController extends Controller
             ->where('status', 'open')
             ->first();
 
-        $orderId = $order->id;
-
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No open order found for this table.',
+            ], 404);
+        }
 
         DB::transaction(function () use ($validated, $order, $staff) {
+
+            $hadPrintedBill = $order->bill_printed_at !== null;
 
             foreach ($validated['items'] as $itemData) {
 
                 $menuItem = MenuItem::findOrFail($itemData['menu_item_id']);
 
-                // 1️⃣ Add or update item
                 $orderItem = $order->orderItems()
                     ->where('menu_item_id', $menuItem->id)
                     ->first();
-
 
                 if ($orderItem) {
                     $orderItem->increment('quantity', $itemData['quantity']);
@@ -219,12 +223,9 @@ class OrdersController extends Controller
                         'quantity' => $itemData['quantity'],
                         'price' => $menuItem->price,
                         'status' => 'pending',
-
                     ]);
                 }
 
-
-                // 2️⃣ Log activity
                 OrderActivity::create([
                     'order_id' => $order->id,
                     'staff_id' => $staff->id,
@@ -238,7 +239,6 @@ class OrdersController extends Controller
                 ]);
             }
 
-            // 3️⃣ Recalculate total
             $order->update([
                 'total_amount' => $order->orderItems()
                     ->selectRaw('SUM(quantity * price) as total')
@@ -247,6 +247,17 @@ class OrdersController extends Controller
                 'bill_printed_total' => null,
             ]);
 
+            if ($hadPrintedBill) {
+                OrderActivity::create([
+                    'order_id' => $order->id,
+                    'staff_id' => $staff->id,
+                    'action' => 'bill_invalidated',
+                    'meta' => [
+                        'reason' => 'items_added_after_print',
+                    ],
+                ]);
+            }
+
             activityLog(
                 'order_items_added_by_staff',
                 'Staff added items to an existing order',
@@ -254,7 +265,7 @@ class OrdersController extends Controller
                     'restaurant_id' => $staff->restaurant_id,
                     'staff_id' => $staff->id,
                     'order_id' => $order->id,
-                    'items_added' => $validated['items']
+                    'items_added' => $validated['items'],
                 ]
             );
         });
@@ -263,8 +274,6 @@ class OrdersController extends Controller
             'success' => true,
             'message' => 'Items added successfully',
         ]);
-
-
     }
 
 
@@ -343,12 +352,12 @@ class OrdersController extends Controller
             ->whereHas(
                 'table',
                 fn($q) =>
-                $q->whereKey($tableId)
-                    ->whereHas(
-                        'restaurant',
-                        fn($r) =>
-                        $r->where('slug', $slug)
-                    )
+                    $q->whereKey($tableId)
+                        ->whereHas(
+                            'restaurant',
+                            fn($r) =>
+                                $r->where('slug', $slug)
+                        )
             )
             ->firstOrFail();
 
@@ -441,19 +450,19 @@ class OrdersController extends Controller
                 $text = match ($activity->action) {
 
                     'created' =>
-                    "created order",
+                        "created order",
 
                     'item_added' =>
-                    "added {$activity->meta['name']} x{$activity->meta['qty']}",
+                        "added {$activity->meta['name']} x{$activity->meta['qty']}",
 
                     'item_updated' =>
-                    "updated {$activity->meta['name']} qty ({$activity->meta['old_qty']} → {$activity->meta['new_qty']})",
+                        "updated {$activity->meta['name']} qty ({$activity->meta['old_qty']} → {$activity->meta['new_qty']})",
 
                     'cancelled' =>
-                    "cancelled order ({$activity->meta['reason']})",
+                        "cancelled order ({$activity->meta['reason']})",
 
                     default =>
-                    $activity->action,
+                        $activity->action,
                 };
 
                 return "{$time} — {$name}{$role} {$text}";
