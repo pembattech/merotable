@@ -514,7 +514,6 @@
 
             selectedTable = table;
             currentSettings = settings;
-            console.log(selectedTable)
             renderOrderItems(table);
             renderBillPrintedNotice(table);
 

@@ -72,7 +72,7 @@
             border: none !important;
             border-radius: 0 !important;
 
-            font-family: 'DejaVu Sans Mono', monospace !important;
+            /* font-family: 'DejaVu Sans Mono', monospace !important; */
 
 
         }
@@ -228,7 +228,7 @@
         document.getElementById('tTable').textContent = `Table: ${order.tableNumber}`;
         document.getElementById('tOrder').textContent = `Order: #mt-${order.id}`;
 
-        document.getElementById('tDate').textContent = `Date: ${formatDateTime(order.paidAt) || formatDateTime(order.createdAt) || ''}`;
+        document.getElementById('tDate').textContent = `Date: ${formatDateTime(order.createdAt) || ''}`;
 
         // Items — build string once, escape names, guard against bad numbers
         let html = '';
@@ -289,6 +289,8 @@
 
         // Set custom print filename
         document.title = `${invoiceData.restaurant.restaurantName}-${invoiceData.invoiceNumber}`;
+
+        console.log(invoiceData.order.createdAt)
 
         window.print();
 

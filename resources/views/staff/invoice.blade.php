@@ -372,6 +372,7 @@
     scrollEl.addEventListener('scroll', () => {
         if (invoiceData) {
             updateHint(invoiceData);
+            console.log(invoiceData)
         }
     });
 
