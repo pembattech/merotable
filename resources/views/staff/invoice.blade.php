@@ -46,53 +46,7 @@
         transition: opacity 0.2s;
     }
 
-    /* @media print {
-          body {
-              background: white;
-          }
-
-          .no-print {
-              display: none !important;
-          } */
-
-    /* On print, let all items expand naturally – no scroll cap */
-    /* .item-scroll {
-              max-height: none !important;
-              overflow: visible !important;
-          }
-
-          .scroll-hint {
-              display: none !important;
-          }
-
-          .print-only {
-              display: block !important;
-          }
-      } */
-    /*
-      .print-only {
-          display: none;
-      } */
-
-    @media print {
-
-        body * {
-            visibility: hidden;
-        }
-
-        #thermalReceipt,
-        #thermalReceipt * {
-            visibility: visible;
-        }
-
-        #thermalReceipt {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
-
-    }
+    
 </style>
 
 <div id="openInvoiceModal" class="animate-slide-up fixed inset-0 z-50 hidden items-end sm:items-center justify-center">
@@ -278,75 +232,9 @@
     </div>
 </div>
 
-<div id="thermalReceipt" class="hidden print:block text-xs font-mono text-black">
+@include('components.thermal_print')
 
-    <div class="w-[280px] mx-auto">
 
-        <!-- Header -->
-        <div class="text-center">
-            <h2 class="font-bold text-sm restroName"></h2>
-            <p class="restro-address"></p>
-            <p>Tel: <span class="restro-phone"></span></p>
-            <p>VAT: <span class="restro-vat"></span></p>
-        </div>
-
-        <div class="border-t border-dashed my-2"></div>
-
-        <!-- Info -->
-        <div class="text-[11px]">
-            <p>Invoice: <span class="invoice-number"></span></p>
-            <p>Table: <span class="table-number"></span></p>
-            <p>Order: #<span class="order-id"></span></p>
-            <p>Date: <span class="invoice-date"></span></p>
-        </div>
-
-        <div class="border-t border-dashed my-2"></div>
-
-        <!-- Items -->
-        <div>
-            <div class="flex justify-between font-bold">
-                <span>Item</span>
-                <span>Total</span>
-            </div>
-
-            <div id="thermalItems"></div>
-        </div>
-
-        <div class="border-t border-dashed my-2"></div>
-
-        <!-- Totals -->
-        <div class="text-[11px] space-y-1">
-            <div class="flex justify-between">
-                <span>Subtotal</span>
-                <span id="tSubtotal">Rs. 0</span>
-            </div>
-            <div class="flex justify-between">
-                <span>VAT (13%)</span>
-                <span id="tTax">Rs. 0</span>
-            </div>
-            <div class="flex justify-between">
-                <span>SC (10%)</span>
-                <span id="tSC">Rs. 0</span>
-            </div>
-
-            <div class="border-t border-dashed mt-2 pt-1 flex justify-between font-bold">
-                <span>Total</span>
-                <span id="tTotal">Rs. 0</span>
-            </div>
-        </div>
-
-        <div class="border-t border-dashed my-2"></div>
-
-        <!-- Footer -->
-        <div class="text-center text-[10px]">
-            <p>Payment:
-            <p class="payment-method uppercase"></p>
-            </p>
-            <p>*** Thank You ***</p>
-        </div>
-
-    </div>
-</div>
 <script>
     let invoiceData = null;
 
@@ -488,45 +376,4 @@
     });
 
 
-    // ── PDF download ──────────────────────────────────────────────
-    function downloadPDF() {
-        alert('PDF download – integrate with jsPDF or server-side PDF generation.');
-    }
-
-    function renderThermalReceipt(items) {
-        const container = document.getElementById('thermalItems');
-
-        let subtotal = 0;
-        container.innerHTML = '';
-
-        items.forEach(item => {
-            const total = item.quantity * item.price;
-            subtotal += total;
-
-            container.innerHTML += `
-            <div class="flex justify-between text-[11px]">
-                <span>${item.name} x${item.quantity}</span>
-                <span>${total}</span>
-            </div>
-        `;
-        });
-
-        document.getElementById('tSubtotal').textContent = `Rs. ${subtotal}`;
-        document.getElementById('tTax').textContent = `Rs. ${invoiceData.taxAmount}`;
-        document.getElementById('tSC').textContent = `Rs. ${invoiceData.serviceCharge}`;
-        document.getElementById('tTotal').textContent = `Rs. ${invoiceData.totalAmount}`;
-    }
-
-    function printThermal() {
-        if (!invoiceData) return;
-
-        const items = invoiceData.order.items.map(item => ({
-            name: item.menuItem || 'Item',
-            quantity: item.quantity,
-            price: item.price
-        }));
-
-        renderThermalReceipt(items);
-        window.print();
-    }
 </script>
