@@ -16,7 +16,12 @@
         body {
             margin: 0 !important;
             padding: 0 !important;
-            width: 210mm !important;
+
+            /* A4 width for thermal printers */
+            /* width: 210mm !important; */
+
+            /* Thermal printer width for 80mm paper */
+            width: 80mm !important;
             background: white !important;
         }
 
@@ -48,8 +53,10 @@
 
             display: block !important;
 
-            width: 210mm !important;
-            max-width: 210mm !important;
+            /* width: 210mm !important;
+            max-width: 210mm !important; */
+            width: 80mm !important;
+            max-width: 80mm !important;
 
             margin: 0 !important;
             padding: 5mm 8mm !important;
@@ -64,6 +71,8 @@
 
             border: none !important;
             border-radius: 0 !important;
+
+            font-family: 'DejaVu Sans Mono', monospace !important;
 
 
         }
@@ -109,10 +118,9 @@
 
 
 <div id="thermalReceipt" style="display:none;">
-    <div
-        style="font-family: 'DejaVu Sans Mono', monospace; font-size: 11px; line-height: 1.35; color: #000; width: 100%;">
+    <div style="font-size: 11px; line-height: 1.35; color: #000; width: 100%;">
 
-        <div style="text-align:center; margin-bottom:4px;">
+        <div style="text-align:center; margin-bottom:5px;">
             <div class="font-extrabold" style="font-size:14px; text-transform:uppercase;" id="tRestName"></div>
             <div style="font-size:10px;" id="tRestAddress"></div>
             <div style="font-size:10px;" id="tRestContact"></div>
@@ -120,31 +128,37 @@
             <div style="font-size:10px;" id="tRestVAT">VAT: #######</div>
         </div>
 
-        <div id="tInvoiceNo"></div>
-        <div id="tTable"></div>
+        <div style="margin-bottom:2px;" id="tInvoiceNo"></div>
+        <div style="margin-bottom:2px;" id="tTable"></div>
 
-        <div style="font-size:10px; margin-bottom:2px;" id="tOrder"></div>
-        <div style="font-size:10px; margin-bottom:2px;" id="tDate"></div>
+        <div style="margin-bottom:2px;" id="tOrder"></div>
+        <div style="margin-bottom:2px;" id="tDate"></div>
+        <div style="margin-bottom:2px;" id="tPaymentMethod"></div>
+        <div style="margin-bottom:2px;" id="tPaymentStatus"></div>
 
 
-        <hr style="border:none; border-top:1px dashed #000; margin:4px 0;">
+        <hr style="border:none; border-top:1px dashed #000; margin:6px 0;">
 
         <div id="itemScroll" class="item-scroll">
+            <div class="flex justify-between text-[11px]">
+                <span class="font-bold">Items</span>
+                <span class="font-bold">Amount</span>
+            </div>
             <div id="thermalItems"></div>
         </div>
 
         <hr style="border:none; border-top:1px dashed #000; margin:4px 0;">
 
-        <div style="display:flex; justify-content:space-between;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
             <span>Subtotal</span><span id="tSubtotal"></span>
         </div>
-        <div style="display:flex; justify-content:space-between; color:#000;" id="tDiscountRow">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 2px;" id="tDiscountRow">
             <span>Discount</span><span id="tDiscount"></span>
         </div>
-        <div style="display:flex; justify-content:space-between;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
             <span id="tTaxLabel">Tax</span><span id="tTax"></span>
         </div>
-        <div style="display:flex; justify-content:space-between;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
             <span id="tSCLabel">Service Charge</span><span id="tSC"></span>
         </div>
 
@@ -154,8 +168,8 @@
             <span>Grand Total</span><span id="tTotal"></span>
         </div>
 
-        <div style="text-align:center; margin-top:6px; font-size:10px;" id="tPaymentInfo"></div>
-        <div style="text-align:center; margin-top:2px; font-size:10px;">*** Thank You ***</div>
+
+        <div style="text-align:center; margin-top:12px; font-size:10px;">*** Thank You ***</div>
 
     </div>
 </div>
@@ -210,11 +224,11 @@
             : '';
 
         // Invoice meta
-        document.getElementById('tInvoiceNo').textContent = `Invoice: ${invoiceData.invoiceNumber}`;
+        document.getElementById('tInvoiceNo').textContent = `Invoice: ${invoiceData.invoiceNumber || ''}`;
         document.getElementById('tTable').textContent = `Table: ${order.tableNumber}`;
         document.getElementById('tOrder').textContent = `Order: #mt-${order.id}`;
 
-        document.getElementById('tDate').textContent = `Date: ${formatDateTime(order.paidAt) || order.formatDateTime(order.createdAt) || ''}`;
+        document.getElementById('tDate').textContent = `Date: ${formatDateTime(order.paidAt) || formatDateTime(order.createdAt) || ''}`;
 
         // Items — build string once, escape names, guard against bad numbers
         let html = '';
@@ -224,10 +238,6 @@
             const total = item.total != null ? Number(item.total) : qty * price;
 
             html += `
-            <div class="flex justify-between text-[11px]">
-                <span class="font-bold">Items</span>
-                <span class="font-bold">Amount</span>
-                </div>
             <div class="flex justify-between text-[11px]">
                 <span>${escapeHtml(item.menuItem || 'Item')} x${qty}</span>
                 <span>${total.toFixed(2)}</span>
@@ -256,8 +266,8 @@
 
         document.getElementById('tTotal').textContent = formatCurrency(order.totalAmount);
 
-        document.getElementById('tPaymentInfo').textContent =
-            `Paid via ${(order.paymentMethod || '').toUpperCase()} — ${order.paymentStatus || ''}`;
+        document.getElementById('tPaymentMethod').textContent = `Payment Mode: ${capitalize(order.paymentMethod) || ''}`;
+        document.getElementById('tPaymentStatus').textContent = `Payment Status: ${capitalize(invoiceData.invoiceNumber ? order.paymentStatus : 'Unpaid') || ''}`;
     }
 
     function printThermal() {
@@ -278,7 +288,7 @@
         const originalTitle = document.title;
 
         // Set custom print filename
-        document.title =`${invoiceData.restaurant.restaurantName}-${invoiceData.invoiceNumber}`;
+        document.title = `${invoiceData.restaurant.restaurantName}-${invoiceData.invoiceNumber}`;
 
         window.print();
 

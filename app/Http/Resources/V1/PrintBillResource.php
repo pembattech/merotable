@@ -56,6 +56,8 @@ class PrintBillResource extends JsonResource
 
                 'printedAt' => $this->bill_printed_at,
 
+                'createdAt' => $this->created_at,
+
                 'items' => $this->orderItems->map(function ($item) {
                     return [
                         'id' => $item->id,
