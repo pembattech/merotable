@@ -21,7 +21,7 @@
             <div class="text-center mb-3">
                 <p class="font-sans font-semibold text-sm">{{ $restaurant->name }}</p>
                 <p class="text-[11px] text-slate-400 mt-0.5">
-                    Table {{ $order->table->table_number }} &middot; Order #{{ $order->id }}
+                    Table {{ $order->table->table_number }} &middot; Order #mt-{{ $order->id }}
                 </p>
                 <p class="text-[11px] text-slate-400">
                     {{ $order->bill_printed_at?->format('d M Y, g:i A') ?? now()->format('d M Y, g:i A') }}

@@ -123,7 +123,7 @@
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Bill To</p>
                     <h3 class="font-bold text-gray-800 text-sm">Table <span class="table-number"></span></h3>
                     <p class="text-[11px] text-gray-500 leading-tight">
-                        Order #<span class="order-id"></span>
+                        Order #mt-<span class="order-id"></span>
                     </p>
                     <p class="text-[11px] text-gray-500 leading-tight">
                         <span class="invoice-date"></span>

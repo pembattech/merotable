@@ -411,6 +411,7 @@
         let selectedTable = null;
         let currentSettings = null;
         let selectedMethod = 'cash';
+        let checkoutTotal = 0;
 
         // ── Render tables ─────────────────────────────────────────
         async function renderTables() {
@@ -585,7 +586,7 @@
                                 <div class="flex justify-between items-start gap-2">
                                     <div class="flex-1 min-w-0">
                                         <p class="font-semibold text-gray-800 text-xs md:text-sm truncate">${item.name}</p>
-                                        <p class="text-xs text-gray-400 mt-0.5">Rs. ${item.price} × ${item.qty}${item.orderId ? ` (Order #${item.orderId})` : ''}</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Rs. ${item.price} × ${item.qty}${item.orderId ? ` (Order #mt-${item.orderId})` : ''}</p>
                                     </div>
                                     <p class="font-bold text-gray-800 text-xs md:text-sm flex-shrink-0">Rs. ${item.subTotal.toLocaleString()}</p>
                                 </div>`).join('');
@@ -626,6 +627,8 @@
                 completepaymentBtn.dataset.subtotal = subtotal;
                 completepaymentBtn.dataset.grandtotal = grandTotal;
             }
+
+            checkoutTotal = grandTotal.toFixed(2);
 
             document.getElementById('taxperc').textContent = `(${currentSettings.taxPercentage}%)`;
             document.getElementById('serviceperc').textContent = `(${currentSettings.serviceChargePercentage}%)`;

@@ -533,7 +533,7 @@
                     timelineHTML += `<div class="border border-green-200 bg-green-50 rounded-xl p-3 md:p-4 mb-2 ${ring}">
                                 <div class="flex items-start justify-between mb-3">
                                     <div>
-                                        <p class="font-bold text-gray-800 text-sm">Order #${order.id}</p>
+                                        <p class="font-bold text-gray-800 text-sm">Order #mt-${order.id}</p>
                                         <p class="text-xs text-gray-500 mt-1">${formatDateTime(order.createdAt)}</p>
                                     </div>
                                     <div class="text-right">
