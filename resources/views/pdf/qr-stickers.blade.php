@@ -182,7 +182,7 @@
                         <table class="parent-company">
                             <tr>
                                 <td>
-                                    <img class="logo" src="{{ public_path('storage/logo/merotable-logo-gray.png') }}" alt="Logo">
+                                    <img class="logo" src="{{ public_path('images/branding/merotable-logo.png') }}" alt="Logo">
                                 </td>
                                 {{-- <td class="parent-company-name">
                                     MeroTable
