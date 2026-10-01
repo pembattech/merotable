@@ -5,6 +5,29 @@
 @section('content')
 
     <style>
+        /* chart card */
+        .chart-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #e9eef5;
+            margin-bottom: 32px;
+        }
+
+        /* progress bar */
+        .prog-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e9eef5;
+            overflow: hidden;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
+        }
+
         /* ── Subscription pill ── */
         .subscription-pill {
             display: flex;
@@ -256,6 +279,47 @@
             color: #111827;
         }
 
+        /* ── Empty state ── */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px 16px;
+        }
+
+        .empty-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: #eff4ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .empty-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .empty-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .empty-desc {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+            max-width: 240px;
+            line-height: 1.5;
+        }
+
         /* ── Desktop overrides ── */
         @media (min-width: 768px) {
             .plan-tier {
@@ -375,14 +439,14 @@
         <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
             <p class="text-xs md:text-sm text-gray-500 font-medium">Occupied Tables</p>
             <h3 class="text-2xl md:text-3xl font-bold mt-1 md:mt-2">
-                <span id="totalOccupiedTables"></span>/<span id="totalTables"></span>
+                <span id="totalOccupiedTables">0</span>/<span id="totalTables">0</span>
             </h3>
             <p class="text-xs text-gray-400 mt-1 md:mt-2 font-bold">Standard Capacity</p>
         </div>
 
     </div>
 
-    {{-- ── Live Table Map ── --}}
+    {{-- ── Live Table Map (disabled) ── --}}
     {{-- <section class="mb-8 md:mb-10">
         <div class="flex justify-between items-center mb-4 md:mb-6">
             <h2 class="text-base md:text-xl font-bold text-gray-800">Live Table Map</h2>
@@ -411,47 +475,114 @@
                 <p class="mt-3 md:mt-4 text-[10px] md:text-xs font-bold text-gray-400">Available</p>
             </div>
 
-            <div class="bg-blue-600 text-white p-3 md:p-4 rounded-xl shadow-lg border-2 border-blue-700">
-                <div class="flex justify-between items-start">
-                    <span class="text-lg md:text-2xl font-black">T-03</span>
-                    <span
-                        class="text-[9px] md:text-[10px] bg-blue-800 px-1.5 md:px-2 py-0.5 rounded font-bold uppercase tracking-wider">
-                        Occupied
-                    </span>
-                </div>
-                <div class="mt-3 md:mt-4">
-                    <p class="text-[10px] md:text-xs opacity-80">Order Amount</p>
-                    <p class="text-sm md:text-base font-bold">Rs. 1,200</p>
-                </div>
-            </div>
-
-            <div class="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
-                <span class="text-lg md:text-2xl font-black text-gray-300">T-04</span>
-                <p class="mt-3 md:mt-4 text-[10px] md:text-xs font-bold text-gray-400">Available</p>
-            </div>
-
-            <div class="bg-white p-3 md:p-4 rounded-xl border border-gray-200">
-                <span class="text-lg md:text-2xl font-black text-gray-300">T-05</span>
-                <p class="mt-3 md:mt-4 text-[10px] md:text-xs font-bold text-gray-400">Available</p>
-            </div>
-
         </div>
     </section> --}}
 
-    {{-- ── Top Menu Items ── --}}
-    <section class="mb-8 md:mb-10">
-        <div class="flex justify-between items-center mb-4 md:mb-6">
-            <h2 class="text-base md:text-xl font-bold text-gray-800">Top Menu Items</h2>
+    {{-- ── Top Selling Items ── --}}
+    <div class="chart-card">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="font-bold text-gray-800 text-base">Top Selling Items</h3>
+                <p class="text-xs text-gray-400 mt-0.5">By revenue this week</p>
+            </div>
+            <div id="topModeToggle" class="flex gap-1 bg-gray-100 rounded-lg p-1">
+                <button onclick="setTopMode('revenue', this)"
+                    class="top-mode-btn active-top px-3 py-1 rounded-md text-xs font-semibold text-white bg-gray-800 transition">Revenue</button>
+                <button onclick="setTopMode('qty', this)"
+                    class="top-mode-btn px-3 py-1 rounded-md text-xs font-semibold text-gray-500 transition">Quantity</button>
+            </div>
         </div>
-        <div id="topMenuItems" class="top-items-container bg-white rounded-2xl shadow-sm border border-gray-100"></div>
-    </section>
+        <div class="space-y-3" id="topItems"></div>
+    </div>
 
-    {{-- TODO: Add Recent Orders,  Staff on Duty --}}
+    {{-- TODO: Add Recent Orders, Staff on Duty --}}
 
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             const token = localStorage.getItem('auth_token');
 
+            // ── Helpers ──
+            const toast = (msg, type) =>
+                typeof window.showToast === 'function' ? window.showToast(msg, type) : console.warn(msg);
+
+            const escapeHtml = (str) => String(str ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[c]));
+
+            const formatRs = (n) => 'Rs. ' + Number(n ?? 0).toLocaleString();
+
+            // TOP SELLING ITEMS (weekly)
+            let topMode = 'revenue';
+            const palette = ['#2563eb', '#0ea5e9', '#6366f1', '#06b6d4', '#a78bfa'];
+
+            let TOP_ITEMS = [];
+
+
+            // Must be global because the buttons use inline onclick=""
+            window.setTopMode = function (mode, btn) {
+                topMode = mode;
+                document.querySelectorAll('.top-mode-btn').forEach(b => {
+                    b.classList.remove('active-top', 'bg-gray-800', 'text-white');
+                    b.classList.add('text-gray-500');
+                });
+                btn.classList.add('active-top', 'bg-gray-800', 'text-white');
+                btn.classList.remove('text-gray-500');
+                renderTopItems();
+            };
+
+            function renderTopItems() {
+                const container = document.getElementById('topItems');
+                const toggle = document.getElementById('topModeToggle');
+
+                // ---- Empty state ----
+                if (!TOP_ITEMS || TOP_ITEMS.length === 0) {
+                    toggle.classList.add('hidden');
+                    container.innerHTML = `
+                                            <div class="empty-state">
+                                                <div class="empty-icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                         stroke="currentColor" stroke-width="1.8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="M3 3v18h18M7 15l4-4 3 3 5-6" />
+                                                    </svg>
+                                                </div>
+                                                <p class="empty-title">No sales yet this week</p>
+                                                <p class="empty-desc">Your best-selling items will show up here once orders start coming in.</p>
+                                            </div>`;
+                    return;
+                }
+
+                toggle.classList.remove('hidden');
+
+                // ---- Normal state ----
+                const key = topMode === 'revenue' ? 'revenue' : 'qty';
+                const sorted = [...TOP_ITEMS].sort((a, b) => b[key] - a[key]);
+                const maxVal = sorted[0][key] || 1; // avoid divide-by-zero
+
+                container.innerHTML = sorted.map((item, i) => `
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-xs font-bold text-gray-300 w-4">${i + 1}</span>
+                                            <div class="flex-1">
+                                                <div class="flex justify-between mb-1">
+                                                    <span class="text-sm font-semibold text-gray-700">${escapeHtml(item.name)}</span>
+                                                    <span class="text-sm font-bold text-gray-900">
+                                                        ${topMode === 'revenue' ? formatRs(item.revenue) : item.qty.toLocaleString() + ' sold'}
+                                                    </span>
+                                                </div>
+                                                <div class="prog-bar">
+                                                    <div class="prog-fill" style="width:${Math.round(item[key] / maxVal * 100)}%;background:${item.color};"></div>
+                                                </div>
+                                            </div>
+                                        </div>`).join('');
+            }
+
+            // ══════════════════════════════════════════════
+            // LOAD DASHBOARD DATA
+            // ══════════════════════════════════════════════
             async function loadRestro() {
                 try {
                     const res = await fetch(`/api/v1/owner/restaurant`, {
@@ -462,85 +593,65 @@
                         }
                     });
 
-                    const data = await res.json();
-
-                    if (!data.success) {
-                        showToast(data.message || 'Something went wrong ❌', 'error');
+                    if (res.status === 401) {
+                        window.location.href = '/login';
                         return;
                     }
 
-                    console.log('Restaurant Data:', data);
+                    const data = await res.json();
+
+                    if (!data.success) {
+                        toast(data.message || 'Something went wrong ❌', 'error');
+                        return;
+                    }
 
                     const subscription = data.data.activeSubscription;
 
-                    if (!subscription) return;
-
-                    // If no subscription or expired, redirect to pricing page
-                    if (!subscription || subscription.daysLeft <= 0) {
-                        window.location.href = "/pricing";
+                    // No subscription or expired -> pricing page
+                    if (!subscription || (subscription.daysLeft ?? 0) <= 0) {
+                        window.location.href = '/pricing';
                         return;
                     }
 
                     const planTier = subscription.plan?.name ?? 'No Plan';
-                    const expiryDays = subscription.daysLeft ?? 0;
+                    const expiryDays = parseInt(subscription.daysLeft) || 0;
 
-                    const activeOrders = data.data.activeOrders;
-                    const totalOccupiedTables = data.data.occupiedTables;
-                    const totalTables = data.data.tableCount;
+                    const todayRevenue = Number(data.data.todayRevenue ?? 0);
+                    const yesterdayRevenue = Number(data.data.yesterdayRevenue ?? 0);
+                    const changePercent = data.data.revenueChangePercent ?? 0;
+                    const isUp = todayRevenue >= yesterdayRevenue;
 
-                    const todayRevenue = data.data.todayRevenue ?? 0;
-                    const yesterdayRevenue = data.data.yesterdayRevenue;
-                    const revenueChangePercent = data.data.revenueChangePercent;
-                    const revenueTrend = todayRevenue >= yesterdayRevenue ? '↑' : '↓';
-
-                    // ---- Display Dashboard Values ----
+                    // ---- Dashboard values ----
                     document.getElementById('planTier').textContent = planTier;
-                    document.getElementById('expiryDays').textContent = parseInt(expiryDays) + " days";
-                    document.getElementById('totalActiveOrders').textContent = activeOrders;
-                    document.getElementById('totalOccupiedTables').textContent = totalOccupiedTables;
-                    document.getElementById('totalTables').textContent = totalTables;
+                    document.getElementById('expiryDays').textContent = expiryDays + ' days';
+                    document.getElementById('totalActiveOrders').textContent = data.data.activeOrders ?? 0;
+                    document.getElementById('totalOccupiedTables').textContent = data.data.occupiedTables ?? 0;
+                    document.getElementById('totalTables').textContent = data.data.tableCount ?? 0;
+                    document.getElementById('todayRevenue').textContent = formatRs(todayRevenue);
+                    document.getElementById('revenueChangePercent').textContent = changePercent + '%';
 
-                    document.getElementById('todayRevenue').textContent = "Rs. " + todayRevenue;
-                    document.getElementById('revenueChangePercent').textContent = revenueChangePercent +
-                        "%";
-                    document.getElementById('revenueTrend').textContent = revenueTrend;
+                    const trendEl = document.getElementById('revenueTrend');
+                    trendEl.textContent = isUp ? '↑' : '↓';
+                    const trendWrap = trendEl.parentElement;
+                    trendWrap.classList.toggle('text-green-600', isUp);
+                    trendWrap.classList.toggle('text-red-600', !isUp);
 
-                    // ---- Display Top Menu Items ----
-                    const topItemsContainer = document.getElementById('topMenuItems');
-                    topItemsContainer.innerHTML = ''; // clear previous items if any
-
-                    const topItems = data.data.topItems ?? [];
-                    if (topItems.length === 0) {
-                        topItemsContainer.innerHTML =
-                            '<p class="text-sm md:text-base text-gray-400 text-center py-6">No menu items sold today.</p>';
-                    } else {
-                        topItems.forEach((item, index) => {
-                            const div = document.createElement('div');
-                            div.classList.add('top-item-card');
-
-                            div.innerHTML = `
-            <div class="item-left">
-                <div class="item-rank">#${index + 1}</div>
-                <div>
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-orders">${item.total_orders} orders</div>
-                </div>
-            </div>
-            <div class="item-revenue">Rs. ${item.revenue}</div>
-        `;
-
-                            topItemsContainer.appendChild(div);
-                        });
-                    }
+                    // ---- Top menu items (today) ----
+                    TOP_ITEMS = data.data.topItems.map((it, i) => ({
+                        name: it.name,
+                        revenue: Number(it.revenue ?? 0),
+                        qty: Number(it.total_orders ?? 0),
+                        color: palette[i % palette.length]
+                    }));
+                    renderTopItems();
 
                 } catch (error) {
                     console.error('Error:', error);
-                    showToast('Network error ❌', 'error');
+                    toast('Network error ❌', 'error');
                 }
             }
 
             await loadRestro();
-
         });
     </script>
 
