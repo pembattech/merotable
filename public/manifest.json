@@ -8,12 +8,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/public/storage/logo/MEROTABLE-LOGO.png",
+      "src": "/public/storage/logo/merotable-logo-WHITE.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/public/storage/logo/MEROTABLE-LOGO.png",
+      "src": "/public/storage/logo/merotable-logo-WHITE.png",
       "sizes": "512x512",
       "type": "image/png"
     }
