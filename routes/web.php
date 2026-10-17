@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 Route::redirect('/', '/auth');
+Route::redirect('/login', '/auth');
 // Route::group('', function () {
 
 Route::get('/auth', function () {
@@ -91,3 +92,15 @@ Route::view('/offline', 'offline');
 
 // });
 
+
+// DEMO PAGES
+Route::prefix('reports')->group(function () {
+    // Your existing dashboard view (resources/views/financial-insights.blade.php)
+    // Route::view('financial-insights', 'financial-insights')->name('reports.financial-insights');
+ 
+    // Demo pages (resources/views/reports/*.blade.php)
+    Route::view('profit-loss', 'restaurant.partial.reports.profit-loss')->name('reports.profit-loss');
+    Route::view('sales-payments', 'restaurant.partial.reports.sales-payments')->name('reports.sales-payments');
+    Route::view('dues', 'restaurant.partial.reports.dues')->name('reports.dues');
+    Route::view('expenses', 'restaurant.partial.reports.expenses')->name('reports.expenses');
+});
