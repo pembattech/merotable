@@ -65,11 +65,11 @@
     $noFilter = $__env->hasSection('no_filter');
     // Adjust the paths to match your routes
     $tabs = [
-        ['label' => 'Overview', 'path' => 'reports/financial-insights'],
-        ['label' => 'Profit & Loss', 'path' => 'reports/profit-loss'],
-        ['label' => 'Sales & Payments', 'path' => 'reports/sales-payments'],
-        ['label' => 'Unpaid & Dues', 'path' => 'reports/dues'],
-        ['label' => 'Expenses', 'path' => 'reports/expenses'],
+        ['label' => 'Overview', 'path' => 'restaurant/reports'],
+        ['label' => 'Profit & Loss', 'path' => 'restaurant/reports/profit-loss'],
+        ['label' => 'Sales & Payments', 'path' => 'restaurant/reports/sales-payments'],
+        ['label' => 'Unpaid & Dues', 'path' => 'restaurant/reports/dues'],
+        ['label' => 'Expenses', 'path' => 'restaurant/reports/expenses'],
     ];
 @endphp
 
