@@ -20,8 +20,17 @@ class OrderResource extends JsonResource
             'createdAt' => $this->created_at,
             'totalAmount' => $this->total_amount,
             'itemsCount' => $this->orderItems->count(),
-            'billPrintedAt' => $this->bill_printed_at,
-            'billPrintedTotal' => $this->bill_printed_total,
+            
+            // Include only when not null
+            'billPrintedAt' => $this->when(
+                !is_null($this->bill_printed_at),
+                $this->bill_printed_at
+            ),
+
+            'billPrintedTotal' => $this->when(
+                !is_null($this->bill_printed_total),
+                $this->bill_printed_total
+            ),
 
 
             // ✅ Use Resource for order items

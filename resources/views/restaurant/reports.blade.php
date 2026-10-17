@@ -1,447 +1,417 @@
 @extends('layouts.app')
 
-@section('title', 'Report | ' . config('app.name'))
+@section('title', 'Menu | ' . config('app.name'))
 
 @section('content')
 
-    <!DOCTYPE html>
-    <html lang="en">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-sizing: border-box;
+        }
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Financial Insights – MeroTable</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-            * {
-                font-family: 'Plus Jakarta Sans', sans-serif;
-                box-sizing: border-box;
-            }
-
-            :root {
-                --blue: #2563eb;
-                --blue-light: #eff6ff;
-                --green: #16a34a;
-                --red: #dc2626;
-                --orange: #ea580c;
-                --purple: #7c3aed;
-            }
-
-            body {
+        /* body {
                 background: #f0f4f8;
+            } */
+
+        /* period toggle */
+        .period-btn {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.15s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .period-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .period-btn.active {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        /* cards */
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e9eef5;
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #e9eef5;
+        }
+
+        .report-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid #e9eef5;
+            transition: all 0.15s;
+            display: block;
+        }
+
+        .report-card:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .report-card:hover .arrow {
+            color: #2563eb;
+            transform: translateX(3px);
+        }
+
+        .arrow {
+            color: #cbd5e1;
+            transition: all 0.15s;
+        }
+
+        /* progress bar */
+        .prog-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e9eef5;
+            overflow: hidden;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .tx-row {
+            transition: background 0.12s;
+        }
+
+        .tx-row:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .date-input {
+            padding: 7px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #1f2937;
+            background: #fff;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px #dbeafe;
+        }
+
+        /* fade-in stagger */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
             }
 
-            /* period tab */
-            .period-btn {
-                padding: 6px 18px;
-                border-radius: 8px;
-                font-size: 0.85rem;
-                font-weight: 600;
-                color: #6b7280;
-                transition: all 0.15s;
-                cursor: pointer;
-                border: none;
-                background: transparent;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
 
-            .period-btn.active {
-                background: #1e293b;
-                color: #fff;
-            }
+        .fade-up {
+            opacity: 0;
+            animation: fadeUp 0.5s ease forwards;
+        }
 
-            /* stat card */
-            .stat-card {
-                background: #fff;
-                border-radius: 16px;
-                padding: 20px;
-                border: 1px solid #e9eef5;
-            }
+        .d1 {
+            animation-delay: 0.05s;
+        }
 
-            /* chart card */
-            .chart-card {
-                background: #fff;
-                border-radius: 16px;
-                padding: 24px;
-                border: 1px solid #e9eef5;
-            }
+        .d2 {
+            animation-delay: 0.10s;
+        }
 
-            /* heatmap cell */
-            .hm-cell {
-                border-radius: 4px;
-                transition: transform 0.1s;
-                cursor: default;
-            }
+        .d3 {
+            animation-delay: 0.15s;
+        }
 
-            .hm-cell:hover {
-                transform: scale(1.15);
-            }
+        .d4 {
+            animation-delay: 0.20s;
+        }
 
-            /* progress bar */
-            .prog-bar {
-                height: 6px;
-                border-radius: 3px;
-                background: #e9eef5;
-                overflow: hidden;
-            }
+        .d5 {
+            animation-delay: 0.25s;
+        }
 
-            .prog-fill {
-                height: 100%;
-                border-radius: 3px;
-                transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
-            }
+        .d6 {
+            animation-delay: 0.30s;
+        }
 
-            /* table row hover */
-            .tx-row {
-                transition: background 0.12s;
-            }
+        .d7 {
+            animation-delay: 0.35s;
+        }
 
-            .tx-row:hover {
-                background: #f8fafc;
-            }
+        .d8 {
+            animation-delay: 0.40s;
+        }
 
-            /* badge */
-            .badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 4px;
-                padding: 2px 10px;
-                border-radius: 999px;
-                font-size: 0.72rem;
-                font-weight: 700;
-            }
+        #content.is-loading {
+            opacity: 0.45;
+            pointer-events: none;
+        }
 
-            /* fade-in stagger */
-            @keyframes fadeUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(16px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-         
-
-            .d1 {
-                animation-delay: 0.05s;
-            }
-
-            .d2 {
-                animation-delay: 0.1s;
-            }
-
-            .d3 {
-                animation-delay: 0.15s;
-            }
-
-            .d4 {
-                animation-delay: 0.2s;
-            }
-
-            .d5 {
-                animation-delay: 0.25s;
-            }
-
-            .d6 {
-                animation-delay: 0.3s;
-            }
-
-            .d7 {
-                animation-delay: 0.35s;
-            }
-
-            .d8 {
-                animation-delay: 0.4s;
-            }
-
-            .d9 {
-                animation-delay: 0.45s;
-            }
-
-            .d10 {
-                animation-delay: 0.5s;
-            }
-        </style>
+        #content {
+            transition: opacity 0.2s;
+        }
+    </style>
     </head>
 
-    <body class="min-h-screen p-5 md:p-8">
+    @php
+        // Adjust these URLs to your real report routes (or swap url() for route())
+        $reportLinks = [
+            [
+                'title' => 'Profit & Loss',
+                'desc' => 'Income vs expenses, net profit',
+                'url' => url('reports/profit-loss'),
+                'color' => '#2563eb',
+                'bg' => '#eff6ff',
+                'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+            ],
+            [
+                'title' => 'Sales & Payments',
+                'desc' => 'Sales by payment method',
+                'url' => url('reports/sales-payments'),
+                'color' => '#16a34a',
+                'bg' => '#f0fdf4',
+                'icon' => 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'
+            ],
+            [
+                'title' => 'Unpaid Bills & Dues',
+                'desc' => 'Outstanding customer balances',
+                'url' => url('reports/dues'),
+                'color' => '#ea580c',
+                'bg' => '#fff7ed',
+                'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+            ],
+            [
+                'title' => 'Expenses',
+                'desc' => 'Spending by category',
+                'url' => url('reports/expenses'),
+                'color' => '#7c3aed',
+                'bg' => '#f5f3ff',
+                'icon' => 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'
+            ],
+        ];
+    @endphp
 
-        <!-- ══════════════════════════════════════════════════════
-         HEADER
-    ══════════════════════════════════════════════════════ -->
-        <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto">
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7 fade-up d1">
-                <div>
-                    <h1 class="text-2xl font-extrabold text-gray-900">Financial Insights</h1>
-                    <p class="text-sm text-gray-400 mt-1">Momo House · Last updated just now</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <!-- Period toggle -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-1 flex gap-1">
-                        <button class="period-btn active" onclick="setPeriod('weekly',this)">Weekly</button>
-                        <button class="period-btn" onclick="setPeriod('monthly',this)">Monthly</button>
-                        <button class="period-btn" onclick="setPeriod('yearly',this)">Yearly</button>
-                    </div>
-                    <!-- Export -->
-                    <button onclick="exportReport()"
-                        class="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        Export PDF
-                    </button>
-                </div>
+        <!-- HEADER -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 fade-up d1">
+            <div>
+                <h1 class="text-2xl font-extrabold text-gray-900">Financial Insights</h1>
+                <p class="text-sm text-gray-400 mt-1"><span id="restroName" class="restroName"></span> · Last updated just
+                    now</p>
             </div>
+            <button id="exportBtn" disabled
+                class="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export CSV
+            </button>
+        </div>
 
-            <!-- ══════════════════════════════════════════════════════
-           ROW 1 — KPI STAT CARDS
-      ══════════════════════════════════════════════════════ -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- DATE FILTER -->
+        <div
+            class="bg-white border border-gray-200 rounded-2xl p-3 mb-3 flex flex-col lg:flex-row lg:items-center gap-3 fade-up d2">
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-1 flex gap-1 overflow-x-auto" id="presets">
+                <button class="period-btn" data-preset="today">Today</button>
+                <button class="period-btn" data-preset="yesterday">Yesterday</button>
+                <button class="period-btn" data-preset="last7">7 Days</button>
+                <button class="period-btn" data-preset="last30">30 Days</button>
+                <button class="period-btn" data-preset="month">This Month</button>
+                <button class="period-btn" data-preset="lastMonth">Last Month</button>
+                <button class="period-btn" data-preset="custom">Custom</button>
+            </div>
+            <div class="flex-1"></div>
+            <div class="flex items-center gap-2">
+                <input type="date" id="dateFrom" class="date-input" aria-label="From date">
+                <span class="text-gray-400 text-sm">to</span>
+                <input type="date" id="dateTo" class="date-input" aria-label="To date">
+                <button id="applyBtn"
+                    class="hidden bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    Apply
+                </button>
+            </div>
+        </div>
 
-                <!-- Net Sales -->
-                <div class="stat-card fade-up d2">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Net Sales</p>
-                    <p class="text-2xl font-extrabold text-gray-900">Rs. 84,200</p>
-                    <div class="flex items-center gap-1.5 mt-2">
-                        <span class="badge" style="background:#dcfce7;color:#15803d;">↑ 8.2%</span>
-                        <span class="text-xs text-gray-400">vs last week</span>
+        <div id="reportMessage" class="text-xs text-gray-400 mb-4 min-h-[16px] px-1"></div>
+
+        <!-- DETAILED REPORT LINKS -->
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1 fade-up d2">Detailed reports
+        </p>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            @foreach ($reportLinks as $i => $r)
+                <a href="{{ $r['url'] }}" data-report-link class="report-card fade-up d{{ $i + 2 }}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style="background:{{ $r['bg'] }};">
+                            <svg class="h-5 w-5" fill="none" stroke="{{ $r['color'] }}" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $r['icon'] }}" />
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-bold text-gray-800 text-sm truncate">{{ $r['title'] }}</p>
+                            <p class="text-xs text-gray-400 truncate">{{ $r['desc'] }}</p>
+                        </div>
+                        <span class="arrow text-lg">→</span>
                     </div>
-                </div>
+                </a>
+            @endforeach
+        </div>
 
-                <!-- Avg Order Value -->
+        <div id="content">
+
+            <!-- KPI ROW 1 -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div class="stat-card fade-up d2">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Total Sales</p>
+                    <p class="text-2xl font-extrabold text-gray-900" id="kpiSales">—</p>
+                    <p class="text-xs text-gray-400 mt-2" id="kpiSalesHint"></p>
+                </div>
                 <div class="stat-card fade-up d3">
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Avg. Order Value</p>
-                    <p class="text-2xl font-extrabold text-gray-900">Rs. 620</p>
-                    <p class="text-xs text-gray-400 mt-2">Stable per table</p>
+                    <p class="text-2xl font-extrabold text-gray-900" id="kpiAov">—</p>
+                    <p class="text-xs text-gray-400 mt-2">Sales ÷ orders</p>
                 </div>
-
-                <!-- Total Orders -->
                 <div class="stat-card fade-up d4">
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Total Orders</p>
-                    <p class="text-2xl font-extrabold text-gray-900">1,402</p>
-                    <span class="badge mt-2" style="background:#dcfce7;color:#15803d;">Completed</span>
+                    <p class="text-2xl font-extrabold text-gray-900" id="kpiOrders">—</p>
+                    <span class="badge mt-2" id="kpiOrdersBadge" style="background:#dcfce7;color:#15803d;">—</span>
                 </div>
-
-                <!-- Cancellation Rate -->
                 <div class="stat-card fade-up d5">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Cancellation Rate</p>
-                    <p class="text-2xl font-extrabold text-gray-900">3.4%</p>
-                    <div class="flex items-center gap-1.5 mt-2">
-                        <span class="badge" style="background:#fee2e2;color:#dc2626;">↑ 0.6%</span>
-                        <span class="text-xs text-gray-400">vs last week</span>
-                    </div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Completion Rate</p>
+                    <p class="text-2xl font-extrabold text-gray-900" id="kpiRate">—</p>
+                    <p class="text-xs text-gray-400 mt-2" id="kpiRateHint"></p>
                 </div>
-
             </div>
 
-            <!-- ══════════════════════════════════════════════════════
-           ROW 2 — Additional KPIs
-      ══════════════════════════════════════════════════════ -->
+            <!-- KPI ROW 2 -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-
                 <div class="stat-card fade-up d3">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gross Sales</p>
-                    <p class="text-xl font-extrabold text-gray-900">Rs. 91,800</p>
-                    <p class="text-xs text-gray-400 mt-1">Before discounts</p>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Items Sold</p>
+                    <p class="text-xl font-extrabold text-gray-900" id="kpiItems">—</p>
+                    <p class="text-xs text-gray-400 mt-1" id="kpiItemsHint"></p>
                 </div>
-
                 <div class="stat-card fade-up d4">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Discounts Given</p>
-                    <p class="text-xl font-extrabold text-orange-500">− Rs. 4,800</p>
-                    <p class="text-xs text-gray-400 mt-1">Across 38 orders</p>
-                </div>
-
-                <div class="stat-card fade-up d5">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Tax Collected</p>
-                    <p class="text-xl font-extrabold text-gray-900">Rs. 2,800</p>
-                    <p class="text-xs text-gray-400 mt-1">13% VAT</p>
-                </div>
-
-                <div class="stat-card fade-up d6">
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Avg Items / Order</p>
-                    <p class="text-xl font-extrabold text-gray-900">3.2</p>
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <span class="badge" style="background:#dcfce7;color:#15803d;">↑ 0.4</span>
-                        <span class="text-xs text-gray-400">vs last week</span>
-                    </div>
+                    <p class="text-xl font-extrabold text-gray-900" id="kpiAvgItems">—</p>
+                    <p class="text-xs text-gray-400 mt-1">Across all orders</p>
                 </div>
-
+                <div class="stat-card fade-up d5">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Best Seller</p>
+                    <p class="text-xl font-extrabold text-gray-900 truncate" id="kpiTop">—</p>
+                    <p class="text-xs text-gray-400 mt-1" id="kpiTopHint"></p>
+                </div>
+                <div class="stat-card fade-up d6">
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Table Revenue</p>
+                    <p class="text-xl font-extrabold text-gray-900" id="kpiTable">—</p>
+                    <p class="text-xs text-gray-400 mt-1">Per-table total (may include tax/charges)</p>
+                </div>
             </div>
 
-            <!-- ══════════════════════════════════════════════════════
-           ROW 3 — REVENUE CHART + CATEGORY DONUT
-      ══════════════════════════════════════════════════════ -->
+            <!-- ROW 3: TREND + TIME OF DAY -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-
-                <!-- Revenue Trend Bar Chart (2/3) -->
                 <div class="chart-card lg:col-span-2 fade-up d4">
-                    <div class="flex items-center justify-between mb-5">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-base">Revenue Trend</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Daily revenue this week</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-xs">
-                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block"
-                                    style="background:#2563eb;"></span>This week</span>
-                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block"
-                                    style="background:#bfdbfe;"></span>Last week</span>
-                        </div>
+                    <div class="mb-5">
+                        <h3 class="font-bold text-gray-800 text-base">Revenue Trend</h3>
+                        <p class="text-xs text-gray-400 mt-0.5" id="trendSub">Revenue over the selected period</p>
                     </div>
                     <div style="height:240px;"><canvas id="revenueChart"></canvas></div>
                 </div>
 
-                <!-- Category Donut (1/3) -->
                 <div class="chart-card fade-up d5">
                     <div class="mb-4">
-                        <h3 class="font-bold text-gray-800 text-base">Category Breakdown</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Revenue by category</p>
+                        <h3 class="font-bold text-gray-800 text-base">Peak Hours</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Orders by time of day</p>
                     </div>
-                    <div style="height:170px;" class="mb-4"><canvas id="categoryChart"></canvas></div>
-                    <div class="space-y-2" id="categoryLegend"></div>
+                    <div style="height:170px;" class="mb-4"><canvas id="peakChart"></canvas></div>
+                    <div class="space-y-2" id="peakLegend"></div>
                 </div>
-
             </div>
 
-            <!-- ══════════════════════════════════════════════════════
-           ROW 4 — TOP ITEMS + DAY OF WEEK
-      ══════════════════════════════════════════════════════ -->
+            <!-- ROW 4: TOP ITEMS + TABLES -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-
-                <!-- Top Selling Items -->
                 <div class="chart-card fade-up d5">
                     <div class="flex items-center justify-between mb-5">
                         <div>
                             <h3 class="font-bold text-gray-800 text-base">Top Selling Items</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">By revenue this week</p>
+                            <p class="text-xs text-gray-400 mt-0.5">For the selected period</p>
                         </div>
                         <div class="flex gap-1 bg-gray-100 rounded-lg p-1">
-                            <button onclick="setTopMode('revenue',this)"
-                                class="top-mode-btn active-top px-3 py-1 rounded-md text-xs font-semibold text-white bg-gray-800 transition">Revenue</button>
-                            <button onclick="setTopMode('qty',this)"
+                            <button data-mode="revenue"
+                                class="top-mode-btn px-3 py-1 rounded-md text-xs font-semibold text-white bg-gray-800 transition">Revenue</button>
+                            <button data-mode="qty"
                                 class="top-mode-btn px-3 py-1 rounded-md text-xs font-semibold text-gray-500 transition">Quantity</button>
                         </div>
                     </div>
                     <div class="space-y-3" id="topItems"></div>
                 </div>
 
-                <!-- Day of Week -->
                 <div class="chart-card fade-up d6">
                     <div class="mb-5">
-                        <h3 class="font-bold text-gray-800 text-base">Day of Week Pattern</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Avg revenue per day</p>
-                    </div>
-                    <div style="height:220px;"><canvas id="dowChart"></canvas></div>
-                </div>
-
-            </div>
-
-            <!-- ══════════════════════════════════════════════════════
-           ROW 5 — HOURLY HEATMAP + PEAK HOURS
-      ══════════════════════════════════════════════════════ -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-
-                <!-- Heatmap (2/3) -->
-                <div class="chart-card lg:col-span-2 fade-up d6">
-                    <div class="flex items-center justify-between mb-5">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-base">Hourly Sales Heatmap</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Orders per hour by day</p>
-                        </div>
-                        <div class="flex items-center gap-2 text-xs text-gray-400">
-                            <span>Low</span>
-                            <div class="flex gap-0.5">
-                                <div class="w-4 h-4 rounded" style="background:#eff6ff;"></div>
-                                <div class="w-4 h-4 rounded" style="background:#bfdbfe;"></div>
-                                <div class="w-4 h-4 rounded" style="background:#60a5fa;"></div>
-                                <div class="w-4 h-4 rounded" style="background:#2563eb;"></div>
-                                <div class="w-4 h-4 rounded" style="background:#1e40af;"></div>
-                            </div>
-                            <span>High</span>
-                        </div>
-                    </div>
-                    <div id="heatmap" class="overflow-x-auto"></div>
-                </div>
-
-                <!-- Peak Hours Summary (1/3) -->
-                <div class="chart-card fade-up d7">
-                    <div class="mb-5">
-                        <h3 class="font-bold text-gray-800 text-base">Peak Hours</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Busiest time slots</p>
-                    </div>
-                    <div class="space-y-4" id="peakHours"></div>
-                </div>
-
-            </div>
-
-            <!-- ══════════════════════════════════════════════════════
-           ROW 6 — TABLE PERFORMANCE + STAFF INSIGHTS
-      ══════════════════════════════════════════════════════ -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-
-                <!-- Table Performance -->
-                <div class="chart-card fade-up d7">
-                    <div class="mb-5">
                         <h3 class="font-bold text-gray-800 text-base">Table Performance</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Revenue & turnover by table</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Revenue &amp; orders by table</p>
                     </div>
                     <div class="space-y-3" id="tablePerf"></div>
                 </div>
-
-                <!-- Staff Insights -->
-                <div class="chart-card fade-up d8">
-                    <div class="mb-5">
-                        <h3 class="font-bold text-gray-800 text-base">Staff Performance</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Orders handled this week</p>
-                    </div>
-                    <div class="space-y-3" id="staffPerf"></div>
-                </div>
-
             </div>
 
-            <!-- ══════════════════════════════════════════════════════
-           ROW 7 — CANCELLATION BREAKDOWN
-      ══════════════════════════════════════════════════════ -->
+            <!-- ROW 5: STATUS + TRANSACTIONS -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-
-                <div class="chart-card fade-up d8">
+                <div class="chart-card fade-up d7">
                     <div class="mb-4">
-                        <h3 class="font-bold text-gray-800 text-base">Cancellation Reasons</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">This week · 48 cancelled</p>
+                        <h3 class="font-bold text-gray-800 text-base">Order Status Split</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Orders in this period</p>
                     </div>
-                    <div style="height:160px;" class="mb-4"><canvas id="cancelChart"></canvas></div>
-                    <div class="space-y-2" id="cancelLegend"></div>
+                    <div style="height:160px;" class="mb-4"><canvas id="statusChart"></canvas></div>
+                    <div class="grid grid-cols-3 gap-2 text-center" id="statusSummary"></div>
                 </div>
 
-                <div class="chart-card lg:col-span-2 fade-up d9">
-                    <div class="flex items-center justify-between mb-5">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-base">Recent Transactions</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Latest orders today</p>
-                        </div>
-                        <button class="text-blue-600 text-sm font-semibold hover:text-blue-700 transition">View Full
-                            History →</button>
+                <div class="chart-card lg:col-span-2 fade-up d8">
+                    <div class="mb-5">
+                        <h3 class="font-bold text-gray-800 text-base">Recent Transactions</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Latest orders in this period</p>
                     </div>
-
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="border-b border-gray-100">
-                                    <th
-                                        class="text-left pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                    <th class="text-left pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                                         Order ID</th>
-                                    <th
-                                        class="text-left pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                                        Table</th>
-                                    <th
-                                        class="text-left pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                                    <th class="text-left pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                                         Items</th>
                                     <th
                                         class="text-right pb-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -455,995 +425,418 @@
                         </table>
                     </div>
                 </div>
-
             </div>
 
-            <!-- ══════════════════════════════════════════════════════
-           ROW 8 — PENDING vs COMPLETED + RUNNING TOTAL
-      ══════════════════════════════════════════════════════ -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-
-                <div class="chart-card fade-up d8">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800 text-base">Order Status Split</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Today's orders</p>
-                    </div>
-                    <div style="height:160px;" class="mb-4"><canvas id="statusChart"></canvas></div>
-                    <div class="grid grid-cols-3 gap-2 text-center" id="statusSummary"></div>
-                </div>
-
-                <div class="chart-card lg:col-span-2 fade-up d9">
-                    <div class="flex items-center justify-between mb-5">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-base">Monthly Running Total</h3>
-                            <p class="text-xs text-gray-400 mt-0.5">Cumulative revenue — are you on track?</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs text-gray-400">Month target</p>
-                            <p class="font-bold text-gray-800">Rs. 3,50,000</p>
-                        </div>
-                    </div>
-                    <div style="height:200px;"><canvas id="runningChart"></canvas></div>
-                </div>
-
-            </div>
-
-        </div><!-- /max-w -->
-
-        <!-- TOAST -->
-        <div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl bg-gray-900 text-white text-sm font-medium">
-                <svg class="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span id="toastMsg">Exported!</span>
-            </div>
         </div>
+    </div>
 
-        <script>
-            // ══════════════════════════════════════════════
-            // DATA
-            // ══════════════════════════════════════════════
-            const DATA = {
-                weekly: {
-                    revenue: [8200, 11400, 9800, 13600, 15200, 14800, 11200],
-                    revenuePrev: [7100, 10200, 8900, 12100, 13800, 13200, 10100],
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                },
-                monthly: {
-                    revenue: [62000, 71000, 58000, 84200, 91000, 88000, 79000, 95000, 101000, 88000, 76000, 84200],
-                    revenuePrev: [55000, 63000, 52000, 76000, 82000, 79000, 71000, 86000, 93000, 80000, 69000, 76000],
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                },
-                yearly: {
-                    revenue: [820000, 910000, 760000, 1040000, 980000],
-                    revenuePrev: [710000, 840000, 690000, 920000, 870000],
-                    labels: ['2020', '2021', '2022', '2023', '2024'],
-                }
-            };
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const CURRENCY = 'Rs.';
+        const API_URL = '/api/v1/owner/restaurant/reports/financial-reports';
+        const PALETTE = ['#2563eb', '#0ea5e9', '#6366f1', '#06b6d4', '#a78bfa', '#f59e0b', '#10b981', '#ec4899'];
+        const STATUS_COLORS = { completed: '#16a34a', pending: '#f59e0b', cancelled: '#ef4444' };
 
-            const CATEGORIES = [{
-                    name: 'Main Course',
-                    pct: 38,
-                    color: '#2563eb',
-                    revenue: 31996
-                },
-                {
-                    name: 'Appetizers',
-                    pct: 22,
-                    color: '#0ea5e9',
-                    revenue: 18524
-                },
-                {
-                    name: 'Beverages',
-                    pct: 18,
-                    color: '#06b6d4',
-                    revenue: 15156
-                },
-                {
-                    name: 'Specials',
-                    pct: 14,
-                    color: '#6366f1',
-                    revenue: 11788
-                },
-                {
-                    name: 'Desserts',
-                    pct: 8,
-                    color: '#a78bfa',
-                    revenue: 6736
-                },
-            ];
+        Chart.defaults.font.family = 'Plus Jakarta Sans';
+        Chart.defaults.color = '#9ca3af';
 
-            const TOP_ITEMS = [{
-                    name: 'Chicken Biryani',
-                    revenue: 18400,
-                    qty: 368,
-                    color: '#2563eb'
-                },
-                {
-                    name: 'Buff Momo',
-                    revenue: 14200,
-                    qty: 710,
-                    color: '#0ea5e9'
-                },
-                {
-                    name: 'Butter Chicken',
-                    revenue: 12600,
-                    qty: 252,
-                    color: '#6366f1'
-                },
-                {
-                    name: 'Masala Tea',
-                    revenue: 8200,
-                    qty: 1640,
-                    color: '#06b6d4'
-                },
-                {
-                    name: 'Dal Bhat Set',
-                    revenue: 7400,
-                    qty: 211,
-                    color: '#a78bfa'
-                },
-            ];
+        let currentReport = null;
+        let charts = {};
+        let topMode = 'revenue';
+        let topItemsData = [];
 
-            const DOW = {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                values: [8200, 11400, 9800, 13600, 15200, 14800, 11200],
-            };
+        /* ---------- helpers ---------- */
+        const pad = (n) => String(n).padStart(2, '0');
+        // Local (not UTC) date so "today" is correct for the user's timezone
+        const fmtDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-            const HEATMAP_HOURS = ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM',
-            '9PM'];
-            const HEATMAP_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const HEATMAP_DATA = [
-                [2, 3, 8, 18, 32, 28, 12, 9, 14, 22, 31, 28, 16],
-                [1, 2, 6, 15, 28, 24, 10, 7, 12, 19, 28, 25, 14],
-                [3, 4, 9, 20, 35, 30, 14, 10, 15, 24, 33, 30, 18],
-                [2, 3, 7, 17, 30, 27, 11, 8, 13, 21, 30, 27, 15],
-                [4, 5, 12, 24, 38, 34, 16, 12, 18, 28, 38, 35, 22],
-                [5, 7, 15, 28, 42, 40, 20, 15, 22, 32, 42, 40, 26],
-                [3, 4, 10, 20, 35, 32, 14, 10, 16, 24, 35, 32, 18],
-            ];
+        const money = (n) => `${CURRENCY} ${Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const parseLocalDate = (str) => { const [y, m, d] = str.split('-').map(Number); return new Date(y, m - 1, d); };
+        const kFmt = (v) => v >= 1000 ? `${CURRENCY} ${+(v / 1000).toFixed(1)}k` : `${CURRENCY} ${v}`;
 
-            const PEAK_HOURS = [{
-                    time: '1:00 PM – 2:30 PM',
-                    label: 'Lunch rush',
-                    orders: 42,
-                    pct: 100,
-                    color: '#2563eb'
-                },
-                {
-                    time: '7:00 PM – 9:00 PM',
-                    label: 'Dinner peak',
-                    orders: 38,
-                    pct: 90,
-                    color: '#6366f1'
-                },
-                {
-                    time: '12:00 – 1:00 PM',
-                    label: 'Pre-lunch',
-                    orders: 24,
-                    pct: 57,
-                    color: '#0ea5e9'
-                },
-                {
-                    time: '6:00 – 7:00 PM',
-                    label: 'Early dinner',
-                    orders: 19,
-                    pct: 45,
-                    color: '#a78bfa'
-                },
-            ];
+        function presetRange(name) {
+            const now = new Date();
+            const d = (o) => { const x = new Date(now); x.setDate(x.getDate() + o); return x; };
+            switch (name) {
+                case 'today': return [fmtDate(now), fmtDate(now)];
+                case 'yesterday': return [fmtDate(d(-1)), fmtDate(d(-1))];
+                case 'last7': return [fmtDate(d(-6)), fmtDate(now)];
+                case 'last30': return [fmtDate(d(-29)), fmtDate(now)];
+                case 'month': return [fmtDate(new Date(now.getFullYear(), now.getMonth(), 1)), fmtDate(now)];
+                case 'lastMonth': return [
+                    fmtDate(new Date(now.getFullYear(), now.getMonth() - 1, 1)),
+                    fmtDate(new Date(now.getFullYear(), now.getMonth(), 0))
+                ];
+                default: return null;
+            }
+        }
 
-            const TABLES = [{
-                    id: 'T-01',
-                    revenue: 9400,
-                    turnover: 14,
-                    avgTime: '42 min'
-                },
-                {
-                    id: 'T-03',
-                    revenue: 8800,
-                    turnover: 13,
-                    avgTime: '38 min'
-                },
-                {
-                    id: 'T-08',
-                    revenue: 8200,
-                    turnover: 12,
-                    avgTime: '44 min'
-                },
-                {
-                    id: 'T-12',
-                    revenue: 7600,
-                    turnover: 11,
-                    avgTime: '36 min'
-                },
-                {
-                    id: 'T-07',
-                    revenue: 7200,
-                    turnover: 11,
-                    avgTime: '39 min'
-                },
-                {
-                    id: 'T-05',
-                    revenue: 6400,
-                    turnover: 9,
-                    avgTime: '51 min'
-                },
-                {
-                    id: 'T-02',
-                    revenue: 5800,
-                    turnover: 8,
-                    avgTime: '47 min'
-                },
-                {
-                    id: 'T-11',
-                    revenue: 5200,
-                    turnover: 8,
-                    avgTime: '43 min'
-                },
-            ];
+        function setMessage(text, isError = false) {
+            const el = $('reportMessage');
+            el.textContent = text;
+            el.classList.toggle('text-red-500', isError);
+            el.classList.toggle('text-gray-400', !isError);
+        }
 
-            const STAFF = [{
-                    name: 'Ram Shrestha',
-                    role: 'Waiter',
-                    orders: 186,
-                    cancels: 4,
-                    revenue: 48200,
-                    color: '#2563eb'
-                },
-                {
-                    name: 'Sita Tamang',
-                    role: 'Waiter',
-                    orders: 164,
-                    cancels: 6,
-                    revenue: 41800,
-                    color: '#6366f1'
-                },
-                {
-                    name: 'Hari Poudel',
-                    role: 'Captain',
-                    orders: 142,
-                    cancels: 2,
-                    revenue: 38400,
-                    color: '#0ea5e9'
-                },
-                {
-                    name: 'Gita Rai',
-                    role: 'Waiter',
-                    orders: 128,
-                    cancels: 8,
-                    revenue: 32600,
-                    color: '#a78bfa'
-                },
-                {
-                    name: 'Bikash KC',
-                    role: 'Waiter',
-                    orders: 118,
-                    cancels: 3,
-                    revenue: 29800,
-                    color: '#06b6d4'
-                },
-                {
-                    name: 'Priya Sharma',
-                    role: 'Waiter',
-                    orders: 104,
-                    cancels: 5,
-                    revenue: 26400,
-                    color: '#f59e0b'
-                },
-            ];
+        function setLoading(on) {
+            $('applyBtn').disabled = on;
+            $('content').classList.toggle('is-loading', on);
+        }
 
-            const CANCEL_REASONS = [{
-                    reason: 'Changed mind',
-                    count: 18,
-                    color: '#ef4444'
-                },
-                {
-                    reason: 'Long wait time',
-                    count: 13,
-                    color: '#f97316'
-                },
-                {
-                    reason: 'Wrong item',
-                    count: 9,
-                    color: '#eab308'
-                },
-                {
-                    reason: 'Item unavailable',
-                    count: 8,
-                    color: '#a78bfa'
-                },
-            ];
+        // Keep selected date range when navigating to detailed report pages
+        function syncReportLinks(from, to) {
+            document.querySelectorAll('[data-report-link]').forEach((a) => {
+                const url = new URL(a.getAttribute('href'), window.location.origin);
+                url.searchParams.set('date_from', from);
+                url.searchParams.set('date_to', to);
+                a.href = url.toString();
+            });
+        }
 
-            const TRANSACTIONS = [{
-                    id: '#MT-8942',
-                    table: 'T-03',
-                    items: 'Buff Momo (2), Lemon Soda (1)',
-                    amount: 380,
-                    time: '14:20',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8941',
-                    table: 'T-08',
-                    items: 'Chicken Thakali (4), Lassi (4)',
-                    amount: 2400,
-                    time: '14:15',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8940',
-                    table: 'T-12',
-                    items: 'Masala Tea (6), Veg Pakoda (2)',
-                    amount: 560,
-                    time: '13:55',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8939',
-                    table: 'T-01',
-                    items: 'Butter Chicken (2), Garlic Naan (4)',
-                    amount: 1200,
-                    time: '13:48',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8938',
-                    table: 'T-05',
-                    items: 'Chicken Biryani (1)',
-                    amount: 450,
-                    time: '13:32',
-                    status: 'cancelled'
-                },
-                {
-                    id: '#MT-8937',
-                    table: 'T-07',
-                    items: 'Chef Special Thali (2), Mango Lassi (2)',
-                    amount: 1600,
-                    time: '13:10',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8936',
-                    table: 'T-02',
-                    items: 'Veg Momo (3), Sprite (2)',
-                    amount: 700,
-                    time: '12:58',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8935',
-                    table: 'T-11',
-                    items: 'Tandoori Platter (1), Butter Naan (3)',
-                    amount: 1050,
-                    time: '12:44',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8934',
-                    table: 'T-06',
-                    items: 'Dal Bhat Set (2), Masala Tea (2)',
-                    amount: 800,
-                    time: '12:30',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8933',
-                    table: 'T-09',
-                    items: 'Grilled Fish (1), Fried Rice (2), Cola (3)',
-                    amount: 1340,
-                    time: '12:18',
-                    status: 'cancelled'
-                },
-                {
-                    id: '#MT-8932',
-                    table: 'T-04',
-                    items: 'Chowmein Chicken (2), Spring Rolls (2)',
-                    amount: 900,
-                    time: '12:05',
-                    status: 'completed'
-                },
-                {
-                    id: '#MT-8931',
-                    table: 'T-10',
-                    items: 'Pizza Margherita (1), Garlic Bread (1)',
-                    amount: 720,
-                    time: '11:52',
-                    status: 'completed'
-                },
-            ];
+        /* ---------- data loading ---------- */
+        async function loadReport(from, to) {
+            from = from || $('dateFrom').value || getTodayDate();
+            to = to || $('dateTo').value || getTodayDate();
 
-            const STATUS_DATA = {
-                completed: 184,
-                pending: 12,
-                cancelled: 8
-            };
-
-            // Running total (cumulative through month)
-            const RUNNING = {
-                labels: Array.from({
-                    length: 15
-                }, (_, i) => `Feb ${i+1}`),
-                actual: [8200, 19400, 29100, 41800, 54600, 68200, 80100, 95400, 110200, 124800, 142100, 158800, 172400,
-                    189200, 207600
-                ],
-                target: [11666, 23333, 35000, 46666, 58333, 70000, 81666, 93333, 105000, 116666, 128333, 140000, 151666,
-                    163333, 175000
-                ],
-            };
-
-            // ══════════════════════════════════════════════
-            // CHART DEFAULTS
-            // ══════════════════════════════════════════════
-            Chart.defaults.font.family = 'Plus Jakarta Sans';
-            Chart.defaults.color = '#9ca3af';
-
-            let revenueChart, categoryChart, dowChart, cancelChart, statusChart, runningChart;
-            let currentPeriod = 'weekly';
-            let topMode = 'revenue';
-
-            // ══════════════════════════════════════════════
-            // REVENUE BAR CHART
-            // ══════════════════════════════════════════════
-            function initRevenueChart(period) {
-                const d = DATA[period];
-                const ctx = document.getElementById('revenueChart').getContext('2d');
-                if (revenueChart) revenueChart.destroy();
-                revenueChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: d.labels,
-                        datasets: [{
-                                label: 'This period',
-                                data: d.revenue,
-                                backgroundColor: '#2563eb',
-                                borderRadius: 6,
-                                borderSkipped: false
-                            },
-                            {
-                                label: 'Last period',
-                                data: d.revenuePrev,
-                                backgroundColor: '#bfdbfe',
-                                borderRadius: 6,
-                                borderSkipped: false
-                            },
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ` Rs. ${ctx.raw.toLocaleString()}`
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                border: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    color: '#f1f5f9'
-                                },
-                                border: {
-                                    display: false
-                                },
-                                ticks: {
-                                    callback: v => 'Rs. ' + (v / 1000) + 'k'
-                                }
-                            }
-                        }
-                    }
-                });
+            if (from > to) {
+                setMessage('"From" date cannot be after "To" date.', true);
+                return;
             }
 
-            // ══════════════════════════════════════════════
-            // CATEGORY DONUT
-            // ══════════════════════════════════════════════
-            function initCategoryChart() {
-                const ctx = document.getElementById('categoryChart').getContext('2d');
-                categoryChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: CATEGORIES.map(c => c.name),
-                        datasets: [{
-                            data: CATEGORIES.map(c => c.pct),
-                            backgroundColor: CATEGORIES.map(c => c.color),
-                            borderWidth: 0,
-                            hoverOffset: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '68%',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ` ${ctx.label}: ${ctx.raw}%`
-                                }
-                            }
-                        }
-                    }
+            $('dateFrom').value = from;
+            $('dateTo').value = to;
+            setLoading(true);
+            setMessage('Loading financial report...');
+
+            try {
+                const token = localStorage.getItem('auth_token');
+                const headers = { 'Accept': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const query = new URLSearchParams({ date_from: from, date_to: to });
+                const response = await fetch(`${API_URL}?${query}`, {
+                    method: 'GET', headers, credentials: 'same-origin'
                 });
 
-                const leg = document.getElementById('categoryLegend');
-                leg.innerHTML = CATEGORIES.map(c => `
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${c.color};"></div>
-        <span class="text-xs text-gray-600">${c.name}</span>
-      </div>
-      <span class="text-xs font-bold text-gray-800">${c.pct}%</span>
-    </div>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // TOP ITEMS
-            // ══════════════════════════════════════════════
-            function renderTopItems() {
-                const sorted = [...TOP_ITEMS].sort((a, b) =>
-                    topMode === 'revenue' ? b.revenue - a.revenue : b.qty - a.qty
-                );
-                const maxVal = sorted[0][topMode === 'revenue' ? 'revenue' : 'qty'];
-                document.getElementById('topItems').innerHTML = sorted.map((item, i) => `
-    <div class="flex items-center gap-3">
-      <span class="text-xs font-bold text-gray-300 w-4">${i+1}</span>
-      <div class="flex-1">
-        <div class="flex justify-between mb-1">
-          <span class="text-sm font-semibold text-gray-700">${item.name}</span>
-          <span class="text-sm font-bold text-gray-900">
-            ${topMode==='revenue' ? 'Rs. '+item.revenue.toLocaleString() : item.qty+' sold'}
-          </span>
-        </div>
-        <div class="prog-bar">
-          <div class="prog-fill" style="width:${Math.round(item[topMode==='revenue'?'revenue':'qty']/maxVal*100)}%;background:${item.color};"></div>
-        </div>
-      </div>
-    </div>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // DAY OF WEEK
-            // ══════════════════════════════════════════════
-            function initDowChart() {
-                const ctx = document.getElementById('dowChart').getContext('2d');
-                const maxV = Math.max(...DOW.values);
-                dowChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: DOW.labels,
-                        datasets: [{
-                            data: DOW.values,
-                            backgroundColor: DOW.values.map(v => {
-                                const ratio = v / maxV;
-                                if (ratio > 0.9) return '#1e40af';
-                                if (ratio > 0.7) return '#2563eb';
-                                if (ratio > 0.5) return '#60a5fa';
-                                return '#bfdbfe';
-                            }),
-                            borderRadius: 8,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ' Rs. ' + ctx.raw.toLocaleString()
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                border: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    color: '#f1f5f9'
-                                },
-                                border: {
-                                    display: false
-                                },
-                                ticks: {
-                                    callback: v => 'Rs. ' + (v / 1000) + 'k'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // ══════════════════════════════════════════════
-            // HEATMAP
-            // ══════════════════════════════════════════════
-            function renderHeatmap() {
-                const maxVal = Math.max(...HEATMAP_DATA.flat());
-                const colors = ['#eff6ff', '#bfdbfe', '#60a5fa', '#2563eb', '#1e40af'];
-
-                function getColor(v) {
-                    const ratio = v / maxVal;
-                    if (ratio < 0.2) return colors[0];
-                    if (ratio < 0.4) return colors[1];
-                    if (ratio < 0.6) return colors[2];
-                    if (ratio < 0.8) return colors[3];
-                    return colors[4];
+                const json = await response.json();
+                if (!response.ok || !json.data.success) {
+                    throw new Error(json.message || 'Unable to load financial report.');
                 }
 
-                let html = '<div style="display:grid;grid-template-columns:40px repeat(' + HEATMAP_HOURS.length +
-                    ',1fr);gap:3px;min-width:480px;">';
-                // header row
-                html += '<div></div>';
-                HEATMAP_HOURS.forEach(h => {
-                    html += `<div class="text-center text-xs text-gray-400 pb-1 font-medium">${h}</div>`;
-                });
-                // data rows
-                HEATMAP_DATA.forEach((row, di) => {
-                    html +=
-                        `<div class="text-xs text-gray-500 font-semibold flex items-center pr-1">${HEATMAP_DAYS[di]}</div>`;
-                    row.forEach(v => {
-                        const c = getColor(v);
-                        const textC = v / maxVal > 0.5 ? '#fff' : '#374151';
-                        html += `<div class="hm-cell flex items-center justify-center text-xs font-bold" title="${v} orders"
-        style="height:32px;background:${c};color:${textC};">${v}</div>`;
-                    });
-                });
-                html += '</div>';
-                document.getElementById('heatmap').innerHTML = html;
+                currentReport = json.data;
+
+                renderReport(currentReport, from, to);
+                syncReportLinks(from, to);
+                setMessage(`Report generated for ${from === to ? from : from + ' to ' + to}.`);
+            } catch (error) {
+                console.error(error);
+                setMessage(error.message, true);
+            } finally {
+                setLoading(false);
             }
+        }
 
-            // ══════════════════════════════════════════════
-            // PEAK HOURS
-            // ══════════════════════════════════════════════
-            function renderPeakHours() {
-                document.getElementById('peakHours').innerHTML = PEAK_HOURS.map(p => `
-    <div>
-      <div class="flex justify-between mb-1">
-        <div>
-          <p class="text-sm font-semibold text-gray-800">${p.time}</p>
-          <p class="text-xs text-gray-400">${p.label}</p>
-        </div>
-        <span class="text-sm font-bold" style="color:${p.color}">${p.orders} orders</span>
-      </div>
-      <div class="prog-bar">
-        <div class="prog-fill" style="width:${p.pct}%;background:${p.color};"></div>
-      </div>
-    </div>`).join('');
+        /* ---------- rendering ---------- */
+        function renderReport(data, from, to) {
+            const orders = data.orders || [];
+            const topItems = (data.topItems || []).map((t) => ({
+                // API nests item details inside `name`; handle both shapes
+                name: t.name?.name ?? t.name,
+                qty: Number(t.totalQuantity ?? t.name?.total_quantity ?? 0),
+                revenue: Number(t.revenue ?? t.name?.revenue ?? 0)
+            }));
+            const peak = data.peakHours || [];
+            const tables = data.tablePerformance || [];
+
+            const totalSales = orders.reduce((s, o) => s + Number(o.totalAmount || 0), 0);
+            const totalOrders = data.totalOrders ?? orders.length;
+            const completed = orders.filter((o) => o.status === 'completed').length;
+            const itemsSold = topItems.reduce((s, i) => s + i.qty, 0);
+            const itemsRevenue = topItems.reduce((s, i) => s + i.revenue, 0);
+            const tableRevenue = tables.reduce((s, t) => s + Number(t.totalRevenue || 0), 0);
+            const best = [...topItems].sort((a, b) => b.revenue - a.revenue)[0];
+
+            $('kpiSales').textContent = money(totalSales);
+            $('kpiSalesHint').textContent = `Items subtotal: ${money(itemsRevenue)}`;
+            $('kpiAov').textContent = money(totalOrders ? totalSales / totalOrders : 0);
+            $('kpiOrders').textContent = totalOrders;
+            $('kpiOrdersBadge').textContent = `${completed} completed`;
+            $('kpiRate').textContent = totalOrders ? `${((completed / totalOrders) * 100).toFixed(1)}%` : '—';
+            $('kpiRateHint').textContent = `${totalOrders - completed} not completed`;
+            $('kpiItems').textContent = itemsSold;
+            $('kpiItemsHint').textContent = `${topItems.length} unique items`;
+            $('kpiAvgItems').textContent = totalOrders ? (itemsSold / totalOrders).toFixed(1) : '—';
+            $('kpiTop').textContent = best ? best.name : '—';
+            $('kpiTopHint').textContent = best ? `${best.qty} sold · ${money(best.revenue)}` : '';
+            $('kpiTable').textContent = money(tableRevenue);
+
+            topItemsData = topItems;
+            renderTopItems();
+            renderTablePerf(tables);
+            renderPeak(peak);
+            renderStatus(orders);
+            renderTransactions(orders);
+            renderTrend(orders, from, to);
+            $('exportBtn').disabled = !orders.length;
+        }
+
+        function emptyState(msg) {
+            return `<p class="text-sm text-gray-400 text-center py-8">${msg}</p>`;
+        }
+
+        function renderTopItems() {
+            const key = topMode === 'revenue' ? 'revenue' : 'qty';
+            const sorted = [...topItemsData].sort((a, b) => b[key] - a[key]);
+            if (!sorted.length) { $('topItems').innerHTML = emptyState('No item sales in this period.'); return; }
+            const maxVal = sorted[0][key] || 1;
+            $('topItems').innerHTML = sorted.map((item, i) => `
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs font-bold text-gray-300 w-4">${i + 1}</span>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-sm font-semibold text-gray-700">${esc(item.name)}</span>
+                                            <span class="text-sm font-bold text-gray-900">${topMode === 'revenue' ? money(item.revenue) : item.qty + ' sold'}</span>
+                                        </div>
+                                        <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(item[key] / maxVal * 100)}%;background:${PALETTE[i % PALETTE.length]};"></div></div>
+                                    </div>
+                                </div>`).join('');
+        }
+
+        function renderTablePerf(tables) {
+            if (!tables.length) { $('tablePerf').innerHTML = emptyState('No table data.'); return; }
+            const sorted = [...tables].sort((a, b) => b.totalRevenue - a.totalRevenue);
+            const maxRev = sorted[0].totalRevenue || 1;
+            $('tablePerf').innerHTML = sorted.map((t) => `
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                                        <span class="text-xs font-bold text-blue-600">${esc(t.tableNumber)}</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between mb-1">
+                                            <span class="text-sm font-semibold text-gray-700">${money(t.totalRevenue)}</span>
+                                            <span class="text-xs text-gray-400">${t.totalOrders} order${t.totalOrders !== 1 ? 's' : ''}</span>
+                                        </div>
+                                        <div class="prog-bar"><div class="prog-fill" style="width:${Math.round(t.totalRevenue / maxRev * 100)}%;background:#2563eb;"></div></div>
+                                    </div>
+                                </div>`).join('');
+        }
+
+        function renderPeak(peak) {
+            const colors = ['#0ea5e9', '#2563eb', '#6366f1', '#a78bfa'];
+            const total = peak.reduce((s, p) => s + p.totalOrders, 0);
+            drawChart('peakChart', 'doughnut', {
+                labels: peak.map((p) => p.timeline),
+                datasets: [{ data: peak.map((p) => p.totalOrders), backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }]
+            }, { cutout: '68%', plugins: { legend: { display: false } } });
+
+            $('peakLegend').innerHTML = peak.map((p, i) => `
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:${colors[i % colors.length]};"></div>
+                                        <span class="text-xs text-gray-600">${esc(p.timeline)}</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-800">${p.totalOrders}
+                                        <span class="text-gray-400 font-normal">(${total ? Math.round(p.totalOrders / total * 100) : 0}%)</span></span>
+                                </div>`).join('');
+        }
+
+        function renderStatus(orders) {
+            const counts = {};
+            orders.forEach((o) => { counts[o.status] = (counts[o.status] || 0) + 1; });
+            const keys = Object.keys(counts);
+            const total = orders.length;
+            const colorOf = (k) => STATUS_COLORS[k] || '#94a3b8';
+
+            drawChart('statusChart', 'doughnut', {
+                labels: keys.map((k) => k.charAt(0).toUpperCase() + k.slice(1)),
+                datasets: [{ data: keys.map((k) => counts[k]), backgroundColor: keys.map(colorOf), borderWidth: 0, hoverOffset: 5 }]
+            }, { cutout: '70%', plugins: { legend: { display: false } } });
+
+            $('statusSummary').innerHTML = keys.length ? keys.map((k) => `
+                                <div>
+                                    <p class="text-lg font-extrabold" style="color:${colorOf(k)};">${counts[k]}</p>
+                                    <p class="text-xs text-gray-400 capitalize">${esc(k)}</p>
+                                    <p class="text-xs font-semibold text-gray-600">${Math.round(counts[k] / total * 100)}%</p>
+                                </div>`).join('') : '';
+        }
+
+        function renderTransactions(orders) {
+            if (!orders.length) {
+                $('txTable').innerHTML = `<tr><td colspan="4">${emptyState('No orders in this period.')}</td></tr>`;
+                return;
             }
+            const sorted = [...orders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 12);
+            $('txTable').innerHTML = sorted.map((o) => {
+                const ok = o.status === 'completed';
+                const dt = new Date(o.createdAt);
+                const items = (o.orderItems || []).map((i) => `${esc(i.menuItem)} (${i.quantity})`).join(', ');
+                return `
+                                <tr class="tx-row border-b border-gray-50">
+                                    <td class="py-3 pr-3 font-semibold text-blue-600 text-sm">${esc(o.id)}</td>
+                                    <td class="py-3 pr-3 text-gray-500 text-sm max-w-[220px] truncate" title="${items}">${items}</td>
+                                    <td class="py-3 pr-3 text-right font-bold text-gray-800 text-sm whitespace-nowrap">${money(o.totalAmount)}</td>
+                                    <td class="py-3 text-right">
+                                        <div class="flex items-center justify-end gap-2">
+                                            <span class="text-gray-400 text-sm whitespace-nowrap">${dt.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                                            <span class="badge" style="background:${ok ? '#dcfce7' : '#fee2e2'};color:${ok ? '#15803d' : '#dc2626'};">${esc(o.status)}</span>
+                                        </div>
+                                    </td>
+                                </tr>`;
+            }).join('');
+        }
 
-            // ══════════════════════════════════════════════
-            // TABLE PERFORMANCE
-            // ══════════════════════════════════════════════
-            function renderTablePerf() {
-                const maxRev = Math.max(...TABLES.map(t => t.revenue));
-                document.getElementById('tablePerf').innerHTML = TABLES.map(t => `
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-        <span class="text-xs font-bold text-blue-600">${t.id}</span>
-      </div>
-      <div class="flex-1">
-        <div class="flex justify-between mb-1">
-          <span class="text-sm font-semibold text-gray-700">Rs. ${t.revenue.toLocaleString()}</span>
-          <span class="text-xs text-gray-400">${t.turnover}x · avg ${t.avgTime}</span>
-        </div>
-        <div class="prog-bar">
-          <div class="prog-fill" style="width:${Math.round(t.revenue/maxRev*100)}%;background:#2563eb;"></div>
-        </div>
-      </div>
-    </div>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // STAFF PERFORMANCE
-            // ══════════════════════════════════════════════
-            function renderStaffPerf() {
-                const maxOrders = Math.max(...STAFF.map(s => s.orders));
-                document.getElementById('staffPerf').innerHTML = STAFF.map(s => `
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-        style="background:${s.color};">
-        ${s.name.split(' ').map(w=>w[0]).join('')}
-      </div>
-      <div class="flex-1 min-w-0">
-        <div class="flex justify-between mb-1">
-          <div class="min-w-0">
-            <span class="text-sm font-semibold text-gray-800">${s.name}</span>
-            <span class="text-xs text-gray-400 ml-1.5 bg-gray-100 px-1.5 py-0.5 rounded-md">${s.role}</span>
-          </div>
-          <div class="text-right flex-shrink-0 ml-2">
-            <span class="text-sm font-bold text-gray-800">${s.orders} orders</span>
-          </div>
-        </div>
-        <div class="flex justify-between items-center mb-1.5">
-          <span class="text-xs text-gray-400">Rs. ${s.revenue.toLocaleString()} revenue</span>
-          <span class="text-xs font-medium" style="color:#ef4444;">${s.cancels} cancel${s.cancels!==1?'s':''}</span>
-        </div>
-        <div class="prog-bar">
-          <div class="prog-fill" style="width:${Math.round(s.orders/maxOrders*100)}%;background:${s.color};"></div>
-        </div>
-      </div>
-    </div>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // CANCELLATION CHART
-            // ══════════════════════════════════════════════
-            function initCancelChart() {
-                const ctx = document.getElementById('cancelChart').getContext('2d');
-                cancelChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: CANCEL_REASONS.map(r => r.reason),
-                        datasets: [{
-                            data: CANCEL_REASONS.map(r => r.count),
-                            backgroundColor: CANCEL_REASONS.map(r => r.color),
-                            borderWidth: 0,
-                            hoverOffset: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '65%',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ` ${ctx.label}: ${ctx.raw}`
-                                }
-                            }
-                        }
-                    }
-                });
-
-                const total = CANCEL_REASONS.reduce((s, r) => s + r.count, 0);
-                document.getElementById('cancelLegend').innerHTML = CANCEL_REASONS.map(r => `
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-2.5 h-2.5 rounded-full" style="background:${r.color};"></div>
-        <span class="text-xs text-gray-600">${r.reason}</span>
-      </div>
-      <span class="text-xs font-bold text-gray-800">${r.count} <span class="text-gray-400 font-normal">(${Math.round(r.count/total*100)}%)</span></span>
-    </div>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // TRANSACTIONS TABLE
-            // ══════════════════════════════════════════════
-            function renderTransactions() {
-                document.getElementById('txTable').innerHTML = TRANSACTIONS.map(tx => `
-    <tr class="tx-row border-b border-gray-50">
-      <td class="py-3 pr-3 font-semibold text-blue-600 text-sm">${tx.id}</td>
-      <td class="py-3 pr-3 font-bold text-gray-800 text-sm">${tx.table}</td>
-      <td class="py-3 pr-3 text-gray-500 text-sm max-w-[160px] truncate">${tx.items}</td>
-      <td class="py-3 pr-3 text-right font-bold text-gray-800 text-sm">Rs. ${tx.amount.toLocaleString()}</td>
-      <td class="py-3 text-right">
-        <div class="flex items-center justify-end gap-2">
-          <span class="text-gray-400 text-sm">${tx.time}</span>
-          <span class="badge ${tx.status==='completed'?'':'opacity-70'}"
-            style="background:${tx.status==='completed'?'#dcfce7':'#fee2e2'};color:${tx.status==='completed'?'#15803d':'#dc2626'};">
-            ${tx.status}
-          </span>
-        </div>
-      </td>
-    </tr>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // STATUS DONUT
-            // ══════════════════════════════════════════════
-            function initStatusChart() {
-                const ctx = document.getElementById('statusChart').getContext('2d');
-                statusChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Completed', 'Pending', 'Cancelled'],
-                        datasets: [{
-                            data: [STATUS_DATA.completed, STATUS_DATA.pending, STATUS_DATA.cancelled],
-                            backgroundColor: ['#16a34a', '#f59e0b', '#ef4444'],
-                            borderWidth: 0,
-                            hoverOffset: 5
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '70%',
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ` ${ctx.label}: ${ctx.raw}`
-                                }
-                            }
-                        }
-                    }
-                });
-
-                const total = STATUS_DATA.completed + STATUS_DATA.pending + STATUS_DATA.cancelled;
-                document.getElementById('statusSummary').innerHTML = [{
-                        label: 'Completed',
-                        val: STATUS_DATA.completed,
-                        color: '#16a34a'
-                    },
-                    {
-                        label: 'Pending',
-                        val: STATUS_DATA.pending,
-                        color: '#f59e0b'
-                    },
-                    {
-                        label: 'Cancelled',
-                        val: STATUS_DATA.cancelled,
-                        color: '#ef4444'
-                    },
-                ].map(s => `
-    <div>
-      <p class="text-lg font-extrabold" style="color:${s.color};">${s.val}</p>
-      <p class="text-xs text-gray-400">${s.label}</p>
-      <p class="text-xs font-semibold text-gray-600">${Math.round(s.val/total*100)}%</p>
-    </div>`).join('');
-            }
-
-            // ══════════════════════════════════════════════
-            // RUNNING TOTAL LINE CHART
-            // ══════════════════════════════════════════════
-            function initRunningChart() {
-                const ctx = document.getElementById('runningChart').getContext('2d');
-                runningChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: RUNNING.labels,
-                        datasets: [{
-                                label: 'Actual',
-                                data: RUNNING.actual,
-                                borderColor: '#2563eb',
-                                backgroundColor: 'rgba(37,99,235,0.08)',
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 3,
-                                pointBackgroundColor: '#2563eb'
-                            },
-                            {
-                                label: 'Target',
-                                data: RUNNING.target,
-                                borderColor: '#d1d5db',
-                                borderDash: [6, 4],
-                                tension: 0,
-                                fill: false,
-                                pointRadius: 0
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ` Rs. ${ctx.raw.toLocaleString()}`
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                border: {
-                                    display: false
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    color: '#f1f5f9'
-                                },
-                                border: {
-                                    display: false
-                                },
-                                ticks: {
-                                    callback: v => 'Rs. ' + (v / 1000) + 'k'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // ══════════════════════════════════════════════
-            // PERIOD SWITCH
-            // ══════════════════════════════════════════════
-            function setPeriod(period, btn) {
-                currentPeriod = period;
-                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                initRevenueChart(period);
-            }
-
-            // ══════════════════════════════════════════════
-            // TOP MODE SWITCH
-            // ══════════════════════════════════════════════
-            function setTopMode(mode, btn) {
-                topMode = mode;
-                document.querySelectorAll('.top-mode-btn').forEach(b => {
-                    b.classList.remove('active-top', 'bg-gray-800', 'text-white');
-                    b.classList.add('text-gray-500');
-                });
-                btn.classList.add('active-top', 'bg-gray-800', 'text-white');
-                btn.classList.remove('text-gray-500');
-                renderTopItems();
-            }
-
-            // ══════════════════════════════════════════════
-            // EXPORT
-            // ══════════════════════════════════════════════
-            function exportReport() {
-                const toast = document.getElementById('toast');
-                document.getElementById('toastMsg').textContent = 'Preparing PDF export...';
-                toast.classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('toastMsg').textContent = 'Report exported!';
-                }, 1000);
-                setTimeout(() => toast.classList.add('hidden'), 3000);
-            }
-
-            // ══════════════════════════════════════════════
-            // INIT ALL
-            // ══════════════════════════════════════════════
-            function initAll() {
-                initRevenueChart('weekly');
-                initCategoryChart();
-                renderTopItems();
-                initDowChart();
-                renderHeatmap();
-                renderPeakHours();
-                renderTablePerf();
-                renderStaffPerf();
-                initCancelChart();
-                renderTransactions();
-                initStatusChart();
-                initRunningChart();
-            }
-
-            // Run immediately if DOM ready, otherwise wait
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initAll);
+        // One day → revenue by hour. Multiple days → revenue by day (gaps filled with 0).
+        function renderTrend(orders, from, to) {
+            let labels = [], values = [];
+            if (from === to) {
+                $('trendSub').textContent = 'Revenue by hour of day';
+                const byHour = Array(24).fill(0);
+                orders.forEach((o) => { byHour[new Date(o.createdAt).getHours()] += Number(o.totalAmount || 0); });
+                const hours = orders.map((o) => new Date(o.createdAt).getHours());
+                const lo = hours.length ? Math.max(0, Math.min(...hours) - 1) : 8;
+                const hi = hours.length ? Math.min(23, Math.max(...hours) + 1) : 20;
+                for (let h = lo; h <= hi; h++) {
+                    labels.push(new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: 'numeric' }));
+                    values.push(byHour[h]);
+                }
             } else {
-                initAll();
+                $('trendSub').textContent = 'Revenue by day';
+                const byDay = {};
+                orders.forEach((o) => {
+                    const k = fmtDate(new Date(o.createdAt));
+                    byDay[k] = (byDay[k] || 0) + Number(o.totalAmount || 0);
+                });
+                const end = parseLocalDate(to);
+                for (let d = parseLocalDate(from); d <= end; d.setDate(d.getDate() + 1)) {
+                    labels.push(d.toLocaleDateString([], { month: 'short', day: 'numeric' }));
+                    values.push(byDay[fmtDate(d)] || 0);
+                }
             }
-        </script>
-    </body>
 
-    </html>
+            drawChart('revenueChart', 'bar', {
+                labels,
+                datasets: [{ label: 'Revenue', data: values, backgroundColor: '#2563eb', borderRadius: 6, borderSkipped: false }]
+            }, {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (c) => ` ${money(c.raw)}` } }
+                },
+                scales: {
+                    x: { grid: { display: false }, border: { display: false } },
+                    y: { grid: { color: '#f1f5f9' }, border: { display: false }, beginAtZero: true, ticks: { callback: (v) => kFmt(v) } }
+                }
+            });
+        }
+
+        function drawChart(id, type, data, options = {}) {
+            if (charts[id]) charts[id].destroy();
+            charts[id] = new Chart($(id).getContext('2d'), {
+                type, data,
+                options: { responsive: true, maintainAspectRatio: false, ...options }
+            });
+        }
+
+        /* ---------- CSV export ---------- */
+        function exportCsv() {
+            if (!currentReport?.orders?.length) return;
+            const rows = [['Order', 'Created At', 'Status', 'Items', 'Total']];
+            currentReport.orders.forEach((o) => rows.push([
+                o.id, o.createdAt, o.status,
+                (o.orderItems || []).map((i) => `${i.menuItem} x${i.quantity}`).join('; '),
+                o.totalAmount
+            ]));
+            const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = `orders_${$('dateFrom').value}_${$('dateTo').value}.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        /* ---------- wiring ---------- */
+        function setActivePreset(name) {
+            document.querySelectorAll('#presets .period-btn').forEach((b) =>
+                b.classList.toggle('active', b.dataset.preset === name));
+        }
+
+        document.querySelectorAll('#presets .period-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const name = btn.dataset.preset;
+                setActivePreset(name);
+
+                // Show Apply button only for Custom preset
+                document.getElementById('applyBtn').classList.toggle(
+                    'hidden',
+                    name !== 'custom'
+                );
+
+                if (name === 'custom') {
+                    $('dateFrom').focus();
+                    return;
+                }
+
+                const [from, to] = presetRange(name);
+                loadReport(from, to);
+            });
+        });
+
+        ['dateFrom', 'dateTo'].forEach((id) =>
+            $(id).addEventListener('change', () => {
+                setActivePreset('custom');
+                $('applyBtn').classList.remove('hidden');
+            })
+        );
+
+
+        $('applyBtn').addEventListener('click', () => {
+            setActivePreset('custom');
+            loadReport($('dateFrom').value, $('dateTo').value);
+        });
+
+        $('exportBtn').addEventListener('click', exportCsv);
+
+        document.querySelectorAll('.top-mode-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                topMode = btn.dataset.mode;
+                document.querySelectorAll('.top-mode-btn').forEach((b) => {
+                    const on = b === btn;
+                    b.classList.toggle('bg-gray-800', on);
+                    b.classList.toggle('text-white', on);
+                    b.classList.toggle('text-gray-500', !on);
+                });
+                renderTopItems();
+            });
+        });
+
+        function init() {
+
+            // Set the restaurant name
+            document.getElementById('restroName').textContent = localStorage.getItem('user_name');
+
+            // Honor ?date_from & ?date_to so links from other report pages keep the range
+            const params = new URLSearchParams(window.location.search);
+            const today = getTodayDate();
+            const from = params.get('date_from') || today;
+            const to = params.get('date_to') || today;
+            $('dateFrom').max = $('dateTo').max = today;
+
+            const match = ['today', 'yesterday', 'last7', 'last30', 'month', 'lastMonth'].find((p) => {
+                const r = presetRange(p);
+                return r[0] === from && r[1] === to;
+            });
+            setActivePreset(match || 'custom');
+            loadReport(from, to);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+
+
+
 
 @endsection

@@ -18,6 +18,7 @@ use App\Http\Controllers\API\V1\SubscriptionController;
 use App\Http\Controllers\API\V1\AttendanceController;
 use App\Http\Controllers\API\V1\CustomerOrderController;
 use App\Http\Controllers\API\V1\InvoiceController;
+use App\Http\Controllers\API\V1\FinancialReportController;
 
 use App\Http\Controllers\API\V1\SuperAdmin\SAdminAuthController;
 use App\Http\Controllers\API\V1\SuperAdmin\DashboardController;
@@ -227,6 +228,14 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
             // Route::put('/{id}', 'updateInvoice');
             // Route::delete('/{id}', 'deleteInvoice');
         });
+
+        Route::prefix('reports')->controller(FinancialReportController::class)->group(function () {
+            Route::get(
+                '/financial-reports',
+                [FinancialReportController::class, 'index']
+            );
+        });
+
 
 
     });

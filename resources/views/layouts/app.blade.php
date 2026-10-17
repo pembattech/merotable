@@ -118,6 +118,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
+
+{{-- Importing Helper --}}
+@include('components.helper')
+
 {{--
 On mobile: body is a block column (flex-col) so the fixed topbar
 (rendered inside the sidebar include) sits above everything.
