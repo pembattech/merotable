@@ -1,3 +1,10 @@
+<style>
+    .logo {
+        object-fit: cover;
+    }
+</style>
+
+
 <script>
 
     function getTodayDate() {

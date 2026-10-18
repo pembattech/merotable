@@ -99,7 +99,7 @@
 
     <div class="card">
         <div class="logo">
-            <h1>MeroTable</h1>
+            <img style="width: 128px;" class="logo w-32" src="{{ asset('images/branding/merotable-logo-WHITE.png') }}" alt="Logo">
             <p>Super Admin Access</p>
         </div>
 
