@@ -276,6 +276,8 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/status', [OrdersController::class, 'updateOrderStatus']);
     Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
 
+    Route::put('/{slug}/table/{tableId}/{orderId}/complete',[OrdersController::class, 'completeOrder']);
+
     Route::post('/{restaurant:slug}/invoice', [InvoiceController::class, 'store'])->name('invoice.checkout');
 
     Route::post('/{restaurant:slug}/attendance/check-in', [AttendanceController::class, 'checkIn']);

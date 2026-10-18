@@ -1,5 +1,4 @@
 <style>
-
     #paymentNotes {
         height: 55px;
     }
@@ -221,7 +220,7 @@
 
     function selectMethod(btn, method) {
         document.getElementById('amountReceived').value = '';
-        
+
         // Remove active state from all buttons
         document.querySelectorAll('.method-btn').forEach(btn => {
             // console.log(btn)
@@ -396,53 +395,40 @@
 
     async function completeOrder(tableId, orderId) {
         try {
-            // 1. Update table status
-            const tableRes = await fetch(`/api/v1/staff/${url}/table/${tableId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: 'available'
-                })
-            });
+            const response = await fetch(
+                `/api/v1/staff/${url}/table/${tableId}/${orderId}/complete`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
 
-            const tableData = await tableRes.json();
+            const data = await response.json();
 
-            if (!tableData.success) {
-                showToast(tableData.message || 'Failed to update table status.', 'error');
+            if (!response.ok || !data.success) {
+                showToast(
+                    data.message || 'Failed to complete order.',
+                    'error'
+                );
                 return;
             }
 
-            // 2. Update order status
-            const orderRes = await fetch(`/api/v1/staff/${url}/table/${tableId}/${orderId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: 'completed'
-                })
-            });
+            showToast(data.message, 'success');
 
-            const orderData = await orderRes.json();
+            await fetchTables();
 
-            if (orderData.success) {
-                showToast(
-                    'Payment successful. Order closed and table is now available.',
-                    'success'
-                );
-            } else {
-                showToast(orderData.message || 'Failed to close order.', 'error');
-            }
-
+            // Refresh orders or other affected UI if needed.
         } catch (error) {
             console.error('Error completing order:', error);
-            showToast('Something went wrong. Please try again.', 'error');
+
+            showToast(
+                'Something went wrong. Please try again.',
+                'error'
+            );
         }
     }
 </script>

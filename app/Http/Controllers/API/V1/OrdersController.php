@@ -549,6 +549,121 @@ class OrdersController extends Controller
         ]);
     }
 
+
+    public function completeOrder(Request $request, string $slug, int $tableId, int $orderId)
+    {
+        $staff = auth('staff')->user();
+
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        return DB::transaction(function () use ($staff, $slug, $tableId, $orderId) {
+            // 1. Find and lock the table
+            $table = Table::whereKey($tableId)
+                ->where('restaurant_id', $staff->restaurant_id)
+                ->whereHas('restaurant', function ($query) use ($slug) {
+                    $query->where('slug', $slug);
+                })
+                ->lockForUpdate()
+                ->first();
+
+            if (!$table) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Table not found.',
+                ], 404);
+            }
+
+            // 2. Find and lock the order belonging to this table
+            $order = Order::whereKey($orderId)
+                ->where('table_id', $table->id)
+                ->whereHas('table', function ($query) use ($staff, $slug) {
+                    $query->where('restaurant_id', $staff->restaurant_id)
+                        ->whereHas('restaurant', function ($restaurant) use ($slug) {
+                            $restaurant->where('slug', $slug);
+                        });
+                })
+                ->lockForUpdate()
+                ->first();
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found.',
+                ], 404);
+            }
+
+            // 3. Prevent completing an already closed order
+            if ($order->status !== 'open') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only open orders can be completed.',
+                ], 422);
+            }
+
+            // 4. Update order status
+            $oldStatus = $order->status;
+
+            $order->update([
+                'status' => 'completed',
+            ]);
+
+            // 5. Update related order items
+            $order->orderItems()->update([
+                'status' => 'paid',
+            ]);
+
+            // 6. Record order activity
+            OrderActivity::create([
+                'order_id' => $order->id,
+                'staff_id' => $staff->id,
+                'action' => 'updated',
+                'meta' => [
+                    'from' => $oldStatus,
+                    'to' => 'completed',
+                ],
+            ]);
+
+            // 7. Release table only if no other open order exists
+            $hasOpenOrders = Order::where('table_id', $table->id)
+                ->where('status', 'open')
+                ->exists();
+
+            if (!$hasOpenOrders) {
+                $table->update([
+                    'status' => 'available',
+                ]);
+            }
+
+            // 8. Record application activity
+            activityLog(
+                'order_updated',
+                'Order completed',
+                [
+                    'order_id' => $order->id,
+                    'table_id' => $table->id,
+                    'status' => 'completed',
+                    'table_status' => $table->fresh()->status,
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order completed and table status updated successfully.',
+                'data' => [
+                    'order_id' => $order->id,
+                    'order_status' => $order->status,
+                    'table_id' => $table->id,
+                    'table_status' => $table->fresh()->status,
+                ],
+            ]);
+        });
+    }
+
 }
 
 
