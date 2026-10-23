@@ -1,938 +1,608 @@
-@extends('layouts.staff')
+<!doctype html>
+<html lang="en">
 
-@section('title', 'Take Order | ' . config('app.name'))
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Take Order · Chai Pasal</title>
+    <!-- Tailwind Play CDN: fine for a prototype. For production, install Tailwind and build your CSS. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] } } } };
+    </script>
+</head>
 
-@section('content')
-<style>
-    .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-</style>
-    <div class="">
-        <div class="max-w-7xl mx-auto">
+<body class="bg-slate-100 font-sans text-slate-900 antialiased">
 
-            <!-- Header -->
-            <div class="mb-6">
-                <h1 class="text-lg md:text-2xl font-extrabold text-gray-900">Take Order</h1>
-                <p class="text-xs md:text-sm text-gray-400 mt-0.5">Select items and assign to a table</p>
+    <!-- Top bar -->
+    <header class="flex flex-wrap items-center gap-x-8 gap-y-3 bg-[#131a2b] px-4 py-3 text-white sm:px-8">
+        <div class="flex items-center gap-4">
+            <div class="rounded-lg bg-white px-2.5 py-2 text-[11px] font-extrabold tracking-widest text-[#131a2b]">
+                MEROTABLE</div>
+            <div class="h-7 w-px bg-slate-600"></div>
+            <div class="text-lg font-semibold">Chai Pasal</div>
+        </div>
+        <nav class="mx-auto flex gap-7 text-[15px] font-semibold">
+            <a href="#" class="border-b-2 border-white py-1.5 text-white">Dashboard</a>
+            <a href="#" class="py-1.5 text-slate-300 hover:text-white">Billing</a>
+        </nav>
+        <div class="flex items-center gap-7">
+            <div class="text-right leading-tight">
+                <div class="text-[10px] font-semibold tracking-widest text-slate-300">LOGGED IN AS</div>
+                <div class="text-sm font-bold">Laxmi Tamang</div>
             </div>
+            <button class="min-h-11 px-1 text-sm font-semibold text-red-300 hover:text-red-200">Logout</button>
+        </div>
+    </header>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 pb-12 pt-7 sm:px-8">
 
-                <!-- LEFT: Menu & Categories (2/3 width) -->
-                <div class="lg:col-span-2 space-y-3 md:space-y-4">
+        <!-- Title row -->
+        <div class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight">Take Order</h1>
+                <p class="mt-1 text-sm text-slate-500">Choose how it is served, pick items and sizes, send to the
+                    kitchen.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <button id="resumeBtn" data-action="resume"
+                    class="hidden min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold hover:bg-slate-50"></button>
+                <div id="typeSwitch" role="group" aria-label="Order type"
+                    class="flex gap-1 rounded-2xl border border-slate-200 bg-white p-1"></div>
+            </div>
+        </div>
 
-                    <!-- Search Bar -->
-                    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4">
-                        <div class="relative">
-                            <input id="searchInput" type="text" placeholder="Search menu items..."
-                                class="w-full pl-10 pr-3 py-2 md:py-2.5 text-sm md:text-base outline-0 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                onkeyup="filterMenu()">
+        <!-- Toast -->
+        <div id="toast"></div>
 
-                            <svg class="absolute left-3 top-2.5 md:top-3 h-4 w-4 md:h-5 md:w-5 text-gray-400" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <div class="flex flex-col items-start gap-6 lg:flex-row">
+
+            <!-- LEFT -->
+            <div class="flex w-full min-w-0 flex-1 flex-col gap-5">
+                <section id="leftTop" class="rounded-2xl border border-slate-200 bg-white p-5"></section>
+
+                <section class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5">
+                    <div class="flex flex-wrap gap-3">
+                        <div class="relative flex min-w-[240px] flex-1 items-center">
+                            <svg class="pointer-events-none absolute left-3.5 h-[18px] w-[18px] text-slate-500"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7" />
+                                <path d="m20 20-3.5-3.5" />
                             </svg>
+                            <input id="search" type="text" aria-label="Search menu items"
+                                placeholder="Search menu items..."
+                                class="h-12 w-full rounded-xl border border-slate-300 bg-white pl-11 pr-3.5 text-[15px] placeholder:text-slate-500 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30">
                         </div>
+                        <button id="vegBtn" data-action="veg" aria-pressed="false"
+                            class="flex min-h-12 items-center gap-2.5 rounded-xl border px-4 text-sm font-bold"></button>
                     </div>
-
-                    <!-- Categories -->
-                    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-2 md:mb-3">Categories</h3>
-
-                        <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="categories"></div>
+                    <div id="chips" role="group" aria-label="Categories" class="flex gap-2 overflow-x-auto pb-1"></div>
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-extrabold">Menu items</h2>
+                        <span id="resultText" class="text-[13px] font-semibold text-slate-500"></span>
                     </div>
-
-                    <!-- Menu Items -->
-                    <div class="bg-white rounded-lg shadow-sm p-3 md:p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-3 md:mb-4">Menu Items</h3>
-
-                        <div id="menu"
-                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- RIGHT: Cart (1/3 width) -->
-                <div class="lg:col-span-1 space-y-4">
-                    <!-- Current Order Card -->
-                    <div class="bg-white rounded-lg shadow-sm p-5">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-gray-800">Current Order</h3>
-                            <span id="cartCount"
-                                class="bg-blue-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full">0</span>
-                        </div>
-
-                        <!-- Table Selection -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Select Table</label>
-                            <select id="tableSelect" onchange="onTableChange()"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-0">
-                                <option value="">Choose a table...</option>
-                            </select>
-                        </div>
-
-                        <!-- Cart Items -->
-                        <div class="border-t border-b border-gray-200 py-4 mb-4">
-                            <div id="cart" class="space-y-3 max-h-96 overflow-y-auto">
-                                <div class="text-center py-8 text-gray-400">
-                                    <svg class="mx-auto h-12 w-12 mb-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                    </svg>
-                                    <p class="text-sm">No items added</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Order Summary -->
-                        <div class="space-y-2 mb-4">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Subtotal</span>
-                                <span id="subtotal" class="font-semibold">Rs. 0</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Items</span>
-                                <span id="totalItems" class="font-semibold">0</span>
-                            </div>
-                            <div class="flex justify-between text-base font-bold pt-2 border-t">
-                                <span>Total</span>
-                                <span id="total" class="text-blue-600">Rs. 0</span>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="space-y-2">
-                            <button onclick="submitOrder()"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Place Order
-                            </button>
-                            <button onclick="clearCart()"
-                                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition duration-200">
-                                Clear Cart
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Previously Ordered Items Card -->
-                    <div id="previousOrdersCard" class="bg-white rounded-lg shadow-sm p-5 hidden">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-gray-800">Previous Orders</h3>
-                            <span class="text-xs text-gray-500">Table <span id="selectedTableNumber">-</span></span>
-                        </div>
-
-                        <div id="previousOrders" class="space-y-3 max-h-80 overflow-y-auto">
-                            <!-- Previous orders will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- ====== CANCEL ORDER MODAL ======  -->
-    <div id="cancelModal"
-    class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center">
-
-    <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onclick="closeCancelModal()"></div>
-
-    <!-- Modal Box -->
-    <div
-        class="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md mx-2 sm:mx-4 overflow-hidden animate-modal max-h-[90vh] flex flex-col">
-
-        <!-- Header -->
-        <div class="bg-red-500 px-4 sm:px-6 py-4 sm:py-5">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/20 rounded-full p-2">
-                    <svg class="h-5 w-5 sm:h-6 sm:w-6 text-white" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-white font-bold text-base sm:text-lg">Cancel Order</h2>
-                    <p class="text-red-100 text-xs sm:text-sm"
-                        id="cancelModalSubtitle">Order item</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Scrollable Content -->
-        <div class="p-4 sm:p-6 overflow-y-auto">
-
-            <!-- Reasons -->
-            <div class="mb-4 sm:mb-5">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
-                    Why is this order being cancelled?
-                </label>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2"
-                    id="reasonButtons">
-
-                    <button onclick="selectReason(this, 'Customer changed mind')"
-                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
-                        😕 Changed mind
-                    </button>
-
-                    <button onclick="selectReason(this, 'Item unavailable')"
-                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
-                        🚫 Item unavailable
-                    </button>
-
-                    <button onclick="selectReason(this, 'Wrong item ordered')"
-                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
-                        ❌ Wrong item
-                    </button>
-
-                    <button onclick="selectReason(this, 'Customer leaving')"
-                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
-                        🚶 Customer leaving
-                    </button>
-
-                    <button onclick="selectReason(this, 'Long waiting time')"
-                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
-                        ⏱️ Long wait time
-                    </button>
-
-                    <button onclick="selectReason(this, 'Other')"
-                        class="reason-btn text-left px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 hover:border-red-400 hover:bg-red-50 transition">
-                        📝 Other
-                    </button>
-                </div>
+                    <div id="grid" class="grid grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-3.5"></div>
+                </section>
             </div>
 
-            <!-- Notes -->
-            <div class="mb-5 sm:mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Additional notes
-                    <span class="text-gray-400 font-normal">(optional)</span>
-                </label>
+            <!-- RIGHT: current order -->
+            <aside
+                class="flex w-full flex-col rounded-2xl border border-slate-200 bg-white lg:sticky lg:top-4 lg:w-[400px] lg:flex-none">
+                <div class="flex flex-col gap-2 border-b border-slate-100 px-5 pb-3.5 pt-5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-[19px] font-extrabold">Current order</h2>
+                            <span id="count"
+                                class="flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-600 px-1.5 text-xs font-extrabold text-white">0</span>
+                        </div>
+                        <button id="clearBtn" data-action="clear"
+                            class="hidden min-h-11 px-1 text-sm font-bold text-red-600 hover:text-red-700">Clear
+                            all</button>
+                    </div>
+                    <div id="summary" class="text-[13px] font-semibold text-slate-500"></div>
+                </div>
 
-                <textarea id="cancelNotes" rows="3"
-                    placeholder="Add any extra details..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-400 focus:border-transparent resize-none">
-                </textarea>
-            </div>
+                <div id="lines" class="max-h-[380px] overflow-y-auto px-5"></div>
 
-            <!-- Error -->
-            <p id="cancelError"
-                class="text-red-500 text-xs mb-3 hidden">
-                Please select a reason before cancelling.
-            </p>
+                <div class="flex flex-col gap-3.5 border-t border-slate-100 px-5 py-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="orderNote" class="text-[13px] font-bold text-slate-700">Kitchen note for the whole
+                            order</label>
+                        <textarea id="orderNote" rows="2" placeholder="Allergies, serve together, birthday..."
+                            class="resize-y rounded-[10px] border border-slate-300 px-3 py-2.5 text-sm placeholder:text-slate-500 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="text-sm font-bold text-slate-700">Discount</span>
+                        <div class="flex items-center gap-2">
+                            <div class="flex overflow-hidden rounded-[10px] border border-slate-300">
+                                <button id="discPct" data-action="disc-mode" data-v="pct"
+                                    class="h-11 min-w-11 text-sm font-extrabold">%</button>
+                                <button id="discAmt" data-action="disc-mode" data-v="amt"
+                                    class="h-11 min-w-[52px] text-sm font-extrabold">Rs.</button>
+                            </div>
+                            <input id="disc" type="number" min="0" aria-label="Discount value" placeholder="0"
+                                class="h-11 w-[84px] rounded-[10px] border border-slate-300 px-2.5 text-right text-[15px] font-bold focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-x-5">
+                        <label class="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700"><input
+                                id="svc" type="checkbox" checked class="h-5 w-5 accent-blue-600"> Service charge
+                            10%</label>
+                        <label class="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700"><input
+                                id="vat" type="checkbox" checked class="h-5 w-5 accent-blue-600"> VAT 13%</label>
+                    </div>
+
+                    <div id="totals" class="flex flex-col gap-2 border-t border-slate-100 pt-3.5 text-sm"></div>
+                    <div id="hint"></div>
+
+                    <div class="flex gap-2.5">
+                        <button id="holdBtn" data-action="hold"
+                            class="flex min-h-[52px] items-center gap-2 rounded-xl border-[1.5px] border-slate-300 bg-white px-[18px] text-[15px] font-bold hover:bg-slate-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 disabled:hover:bg-slate-100">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                                <path d="M8 5v14M16 5v14" />
+                            </svg>Hold
+                        </button>
+                        <button id="sendBtn" data-action="send"
+                            class="flex min-h-[52px] flex-1 items-center justify-center gap-2.5 rounded-xl bg-blue-600 text-[15px] font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 disabled:hover:bg-slate-200">
+                            <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 12 20 4l-4 16-4-7-8-1z" />
+                            </svg>Send to kitchen
+                        </button>
+                    </div>
+                </div>
+            </aside>
         </div>
-
-        <!-- Sticky Buttons -->
-        <div class="p-4 border-t bg-white flex gap-2 sm:gap-3">
-            <button onclick="closeCancelModal()"
-                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm sm:text-base font-semibold py-2 rounded-lg transition">
-                Go Back
-            </button>
-
-            <button onclick="confirmCancel()"
-                class="flex-1 bg-red-500 hover:bg-red-600 text-white text-sm sm:text-base font-semibold py-2 rounded-lg transition flex items-center justify-center gap-2">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Cancel
-            </button>
-        </div>
-
-    </div>
-</div>
-
-    @include('staff.attendance')
-
-    <style>
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .animate-modal {
-            animation: modalIn 0.2s ease-out forwards;
-        }
-    </style>
-    </div>
-
-    </div>
-    </div>
-    </div>
+    </main>
 
     <script>
-        let cart = [];
-        let allMenuItems = [];
-        let activeCategory = '';
-        let selectedTableId = null;
+        /* ============================== SAMPLE DATA ============================== */
+        const CATEGORIES = ['All Items', 'Desserts', 'Drinks', 'Main Course', 'Momo', 'Rice & Noodles', 'Snacks', 'Starters'];
 
-        const slug = localStorage.getItem('restro_url');
-        const token = localStorage.getItem('auth_token');
+        // price = the "Full" / "Medium" price (or the only price when the item has no sizes)
+        // sizes: 'hf' = Half/Full, 'sml' = Small/Medium/Large, omitted = no size choice
+        const MENU = [
+            { id: 'bm', name: 'Buff Momo', cat: 'Momo', price: 170, veg: false, pop: true, sizes: 'hf' },
+            { id: 'cm', name: 'Chicken Momo', cat: 'Momo', price: 180, veg: false, sizes: 'hf' },
+            { id: 'vm', name: 'Veg Momo', cat: 'Momo', price: 150, veg: true, sizes: 'hf' },
+            { id: 'jm', name: 'Jhol Momo', cat: 'Momo', price: 210, veg: false, sizes: 'hf' },
+            { id: 'cc', name: 'Chicken Chowmein', cat: 'Rice & Noodles', price: 220, veg: false, pop: true, sizes: 'hf' },
+            { id: 'vc', name: 'Veg Chowmein', cat: 'Rice & Noodles', price: 180, veg: true, sizes: 'hf' },
+            { id: 'cfr', name: 'Chicken Fried Rice', cat: 'Rice & Noodles', price: 240, veg: false, sizes: 'hf' },
+            { id: 'efr', name: 'Egg Fried Rice', cat: 'Rice & Noodles', price: 200, veg: false, sizes: 'hf' },
+            { id: 'ccu', name: 'Chicken Curry', cat: 'Main Course', price: 350, veg: false, sizes: 'hf' },
+            { id: 'db', name: 'Dal Bhat Set', cat: 'Main Course', price: 300, veg: true },
+            { id: 'pbm', name: 'Paneer Butter Masala', cat: 'Main Course', price: 380, veg: true, sizes: 'hf' },
+            { id: 'cs', name: 'Chicken Sekuwa', cat: 'Starters', price: 330, veg: false, sizes: 'hf' },
+            { id: 'cch', name: 'Chicken Choila', cat: 'Starters', price: 290, veg: false, out: true },
+            { id: 'cor', name: 'Crispy Corn', cat: 'Starters', price: 220, veg: true, sizes: 'hf' },
+            { id: 'ff', name: 'French Fries', cat: 'Snacks', price: 160, veg: true, sizes: 'sml' },
+            { id: 'sc', name: 'Samosa Chaat', cat: 'Snacks', price: 90, veg: true },
+            { id: 'cw', name: 'Chicken Sandwich', cat: 'Snacks', price: 200, veg: false },
+            { id: 'vp', name: 'Veg Pakoda', cat: 'Snacks', price: 120, veg: true, sizes: 'hf' },
+            { id: 'mc', name: 'Masala Chai', cat: 'Drinks', price: 40, veg: true, pop: true, sizes: 'sml' },
+            { id: 'mt', name: 'Milk Tea', cat: 'Drinks', price: 35, veg: true, sizes: 'sml' },
+            { id: 'bc', name: 'Black Coffee', cat: 'Drinks', price: 70, veg: true, sizes: 'sml' },
+            { id: 'sl', name: 'Sweet Lassi', cat: 'Drinks', price: 120, veg: true, sizes: 'sml' },
+            { id: 'gj', name: 'Gulab Jamun', cat: 'Desserts', price: 90, veg: true },
+            { id: 'kh', name: 'Kheer', cat: 'Desserts', price: 100, veg: true },
+            { id: 'rm', name: 'Rasmalai', cat: 'Desserts', price: 130, veg: true }
+        ];
 
-        // ================= CATEGORY LOGIC =================
-        async function loadCategories() {
-            const res = await fetch(`/api/v1/staff/${slug}/categories`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+        const TABLES = [
+            { id: 'T1', seats: 2 }, { id: 'T2', seats: 2 }, { id: 'T3', seats: 4 }, { id: 'T4', seats: 4 },
+            { id: 'T5', seats: 4, reserved: true }, { id: 'T6', seats: 6 }, { id: 'T7', seats: 6 }, { id: 'T8', seats: 8 }
+        ];
 
-            const data = await res.json();
-            if (!data.success) {
-                showToast(data.message || 'Something went wrong ❌', 'error');
+        const SERVICE_RATE = 0.10, VAT_RATE = 0.13;
+
+        /* ================================ STATE ================================== */
+        const state = {
+            type: 'dine',            // 'dine' | 'take' | 'delivery'
+            table: null, guests: 2,
+            cat: 'All Items', q: '', vegOnly: false,
+            pick: {},                // selected size index per menu item id
+            cart: [],                // { key, id, name, size, price, qty, note }
+            noteOpen: null, discMode: 'pct',
+            cust: { name: '', phone: '', addr: '' },
+            held: [], toast: '',
+            // Sent orders per table (running bill). Sample data for T2 and T6.
+            orders: {
+                T2: [{
+                    n: 1, time: '12:40', status: 'Preparing', note: '', lines: [
+                        { name: 'Buff Momo', size: 'Full', qty: 2, price: 170, note: '' },
+                        { name: 'Masala Chai', size: 'Medium', qty: 2, price: 40, note: 'Less sugar' }]
+                }],
+                T6: [
+                    {
+                        n: 1, time: '12:15', status: 'Served', note: '', lines: [
+                            { name: 'Chicken Chowmein', size: 'Full', qty: 1, price: 220, note: '' },
+                            { name: 'Sweet Lassi', size: 'Medium', qty: 2, price: 120, note: '' }]
+                    },
+                    {
+                        n: 2, time: '12:48', status: 'New', note: 'Serve with extra plates', lines: [
+                            { name: 'French Fries', size: 'Large', qty: 1, price: 210, note: '' }]
+                    }
+                ]
+            }
+        };
+
+        /* =============================== HELPERS ================================= */
+        const $ = (id) => document.getElementById(id);
+        const fmt = (n) => 'Rs. ' + Math.round(n).toLocaleString('en-IN');
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const r5 = (n) => Math.round(n / 5) * 5;
+
+        function sizeList(m) {
+            if (m.out) return null;
+            if (m.sizes === 'hf') return [{ label: 'Half', price: r5(m.price * 0.6) }, { label: 'Full', price: m.price }];
+            if (m.sizes === 'sml') return [{ label: 'Small', price: r5(m.price * 0.8) }, { label: 'Medium', price: m.price }, { label: 'Large', price: r5(m.price * 1.3) }];
+            return null;
+        }
+        const selectedSize = (m) => { const l = sizeList(m); return l ? l[state.pick[m.id] ?? 1] : null; };
+        const tableOrders = (id) => state.orders[id] || [];
+        const isDine = () => state.type === 'dine';
+
+        function calc() {
+            const sub = state.cart.reduce((a, l) => a + l.price * l.qty, 0);
+            const count = state.cart.reduce((a, l) => a + l.qty, 0);
+            const dv = Math.max(0, Number($('disc').value || 0));
+            const disc = Math.round(state.discMode === 'pct' ? sub * Math.min(dv, 100) / 100 : Math.min(dv, sub));
+            const svc = $('svc').checked ? Math.round((sub - disc) * SERVICE_RATE) : 0;
+            const vat = $('vat').checked ? Math.round((sub - disc + svc) * VAT_RATE) : 0;
+            return { sub, count, disc, svc, vat, total: sub - disc + svc + vat };
+        }
+
+        function validation() {
+            if (!state.cart.length) return 'Add at least one item to place the order.';
+            if (isDine() && !state.table) return 'Choose a table to send this order.';
+            if (state.type === 'delivery' && (!state.cust.phone.trim() || !state.cust.addr.trim())) return 'Delivery needs a phone number and an address.';
+            return '';
+        }
+
+        function flash(msg) {
+            state.toast = msg; renderToast();
+            clearTimeout(flash.t);
+            flash.t = setTimeout(() => { state.toast = ''; renderToast(); }, 5000);
+        }
+
+        /* =============================== RENDERERS =============================== */
+        const STATUS_CLS = {
+            New: 'bg-blue-50 text-blue-800',
+            Preparing: 'bg-amber-100 text-amber-800',
+            Served: 'bg-emerald-50 text-emerald-800'
+        };
+
+        function renderType() {
+            const defs = [['dine', 'Dine-in'], ['take', 'Takeaway'], ['delivery', 'Delivery']];
+            $('typeSwitch').innerHTML = defs.map(([v, label]) => {
+                const on = state.type === v;
+                return `<button data-action="type" data-v="${v}" aria-pressed="${on}" class="min-h-11 rounded-[10px] px-5 text-sm font-bold ${on ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-slate-100'}">${label}</button>`;
+            }).join('');
+        }
+
+        function renderResume() {
+            const b = $('resumeBtn');
+            b.classList.toggle('hidden', !state.held.length);
+            b.classList.toggle('flex', !!state.held.length);
+            b.innerHTML = `<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>Resume held (${state.held.length})`;
+        }
+
+        function renderLeftTop() {
+            const el = $('leftTop');
+            if (!isDine()) {
+                const inp = 'h-12 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-[15px] placeholder:text-slate-500 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30';
+                const lbl = 'text-[13px] font-bold text-slate-700';
+                el.className = 'flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5';
+                el.innerHTML = `
+      <h2 class="text-base font-extrabold">Customer</h2>
+      <div class="flex flex-wrap gap-4">
+        <div class="flex min-w-[220px] flex-1 flex-col gap-1.5"><label for="cName" class="${lbl}">Name</label>
+          <input id="cName" data-field="name" type="text" placeholder="Customer name" value="${esc(state.cust.name)}" class="${inp}"></div>
+        <div class="flex min-w-[220px] flex-1 flex-col gap-1.5"><label for="cPhone" class="${lbl}">Phone</label>
+          <input id="cPhone" data-field="phone" type="tel" placeholder="98XXXXXXXX" value="${esc(state.cust.phone)}" class="${inp}"></div>
+      </div>
+      ${state.type === 'delivery' ? `<div class="flex flex-col gap-1.5"><label for="cAddr" class="${lbl}">Delivery address</label>
+        <input id="cAddr" data-field="addr" type="text" placeholder="Street, landmark, ward" value="${esc(state.cust.addr)}" class="${inp}"></div>` : ''}`;
                 return;
             }
 
-            let html = `
-        <button id="cat-all"
-            onclick="setActiveCategory('')"
-            class="cat-btn px-4 py-2 rounded-lg bg-blue-600 text-white font-medium text-sm whitespace-nowrap transition duration-200">
-            All Items
-        </button>
-    `;
+            const seatsOf = Object.fromEntries(TABLES.map((t) => [t.id, t.seats]));
+            const over = state.table && state.guests > seatsOf[state.table];
+            const tableBtns = TABLES.map((t) => {
+                const n = tableOrders(t.id).length, busy = n > 0, on = state.table === t.id;
+                let cls = 'border-slate-300 bg-white text-slate-900 hover:border-blue-600', sub = `${t.seats} seats`;
+                if (busy) { cls = on ? 'border-red-600 bg-red-600 text-white' : 'border-red-200 bg-red-50 text-red-800 hover:border-red-400'; sub = `${n} ${n === 1 ? 'order' : 'orders'}`; }
+                else if (t.reserved) { cls = 'cursor-not-allowed border-amber-200 bg-amber-50 text-amber-800'; sub = 'Reserved'; }
+                else if (on) cls = 'border-blue-600 bg-blue-600 text-white';
+                return `<button data-action="table" data-v="${t.id}" aria-pressed="${on}" ${t.reserved ? 'disabled' : ''} class="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl border-[1.5px] ${cls}">
+      <span class="text-[17px] font-extrabold">${t.id}</span><span class="text-xs font-semibold">${sub}</span></button>`;
+            }).join('');
 
-            data.data.forEach(cat => {
-                html += `
-            <button id="cat-${cat.id}"
-                onclick="setActiveCategory(${cat.id})"
-                class="cat-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 font-medium text-sm whitespace-nowrap hover:bg-gray-200 transition duration-200">
-                ${cat.name}
-            </button>`;
-            });
-
-            document.getElementById('categories').innerHTML = html;
-        }
-
-        // Highlight active category
-        function setActiveCategory(id = '') {
-            activeCategory = id;
-
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600', 'text-white');
-                btn.classList.add('bg-gray-100', 'text-gray-700');
-            });
-
-            const activeBtn = document.getElementById(`cat-${id || 'all'}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('bg-gray-100', 'text-gray-700');
-                activeBtn.classList.add('bg-blue-600', 'text-white');
+            const rounds = tableOrders(state.table);
+            let panel = '';
+            if (state.table && rounds.length) {
+                let tableTotal = 0;
+                const roundsHtml = rounds.map((o, i) => {
+                    let rt = 0;
+                    const lines = o.lines.map((l) => {
+                        rt += l.price * l.qty;
+                        return `<div class="flex items-start justify-between gap-3 text-sm">
+          <div class="min-w-0"><div class="font-bold">${l.qty} × ${esc(l.name)}
+            ${l.size ? `<span class="ml-1 rounded-md bg-slate-100 px-[7px] py-0.5 text-xs font-bold text-slate-700">${esc(l.size)}</span>` : ''}</div>
+            ${l.note ? `<div class="mt-0.5 text-xs font-semibold text-amber-800">Note: ${esc(l.note)}</div>` : ''}</div>
+          <div class="font-bold">${fmt(l.price * l.qty)}</div></div>`;
+                    }).join('');
+                    tableTotal += rt;
+                    return `<div class="flex flex-col gap-2.5 rounded-xl border border-slate-200 bg-white p-3.5">
+        <div class="flex flex-wrap items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2.5"><span class="text-[15px] font-extrabold">Round ${o.n}</span>
+            <span class="text-[13px] font-semibold text-slate-500">${esc(o.time)}</span>
+            <span class="rounded-full px-2.5 py-[3px] text-xs font-extrabold ${STATUS_CLS[o.status]}">${o.status}</span></div>
+          ${o.status !== 'Served' ? `<button data-action="serve" data-i="${i}" class="min-h-11 rounded-[10px] border border-slate-300 bg-white px-3.5 text-[13px] font-bold hover:bg-slate-50">Mark served</button>` : ''}
+        </div>
+        ${lines}
+        ${o.note ? `<div class="rounded-lg bg-amber-50 px-2.5 py-2 text-[13px] font-semibold text-amber-800">Kitchen note: ${esc(o.note)}</div>` : ''}
+        <div class="flex justify-between border-t border-slate-100 pt-2 text-sm font-extrabold"><span>Round total</span><span>${fmt(rt)}</span></div>
+      </div>`;
+                }).join('');
+                panel = `<div class="flex flex-col gap-3.5 rounded-2xl border-[1.5px] border-red-200 bg-red-50/40 p-4">
+      <div class="flex flex-wrap items-center justify-between gap-2.5">
+        <div><h3 class="text-base font-extrabold">Table ${esc(state.table)} · running orders</h3>
+          <div class="mt-0.5 text-[13px] font-semibold text-slate-500">${rounds.length} ${rounds.length === 1 ? 'round' : 'rounds'} · ${fmt(tableTotal)} before tax</div></div>
+        <button data-action="close-table" class="min-h-11 rounded-xl border-[1.5px] border-red-600 bg-white px-4 text-sm font-bold text-red-800 hover:bg-red-50">Close table (paid)</button>
+      </div>${roundsHtml}</div>`;
             }
 
-            loadMenu(id);
+            el.className = 'flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5';
+            el.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-4">
+        <h2 class="text-base font-extrabold">Table</h2>
+        <div class="flex flex-wrap gap-3.5 text-xs font-semibold text-slate-500">
+          <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-emerald-700"></span>Free</span>
+          <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-red-700"></span>Occupied</span>
+          <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-amber-600"></span>Reserved</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <span class="text-[13px] font-bold text-slate-700">Guests</span>
+        <div class="flex items-center overflow-hidden rounded-xl border border-slate-300">
+          <button data-action="guest" data-v="-1" aria-label="Fewer guests" class="flex h-11 w-11 items-center justify-center bg-white hover:bg-slate-50"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+          <div class="min-w-9 text-center text-base font-extrabold">${state.guests}</div>
+          <button data-action="guest" data-v="1" aria-label="More guests" class="flex h-11 w-11 items-center justify-center bg-white hover:bg-slate-50"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2.5">${tableBtns}</div>
+    ${over ? `<div role="status" class="rounded-[10px] bg-amber-50 px-3 py-2.5 text-[13px] font-semibold text-amber-800">${esc(state.table)} seats ${seatsOf[state.table]}, but you entered ${state.guests} guests. Pick a bigger table or join tables.</div>` : ''}
+    <div class="text-[13px] font-semibold text-slate-500">Tap an occupied table to see what it has ordered. New items you send will be added to its running bill.</div>
+    ${panel}`;
         }
 
-        // ================= MENU LOGIC =================
-        function showSkeleton() {
-            let skeleton = '';
-            for (let i = 0; i < 6; i++) {
-                skeleton += `
-        <div class="border border-gray-200 rounded-lg p-4 animate-pulse">
-            <div class="h-5 bg-gray-200 rounded mb-3"></div>
-            <div class="h-4 bg-gray-100 rounded w-2/3 mb-4"></div>
-            <div class="h-9 bg-gray-200 rounded"></div>
-        </div>`;
-            }
-            document.getElementById('menu').innerHTML = skeleton;
+        function filteredMenu() {
+            const q = state.q.trim().toLowerCase();
+            return MENU.filter((m) => (!state.vegOnly || m.veg) && (state.cat === 'All Items' || m.cat === state.cat) && (!q || m.name.toLowerCase().includes(q)));
         }
 
-        async function loadMenu(categoryId = '') {
-            showSkeleton();
+        function renderChips() {
+            const base = MENU.filter((m) => !state.vegOnly || m.veg);
+            $('chips').innerHTML = CATEGORIES.map((c) => {
+                const on = state.cat === c;
+                const n = c === 'All Items' ? base.length : base.filter((m) => m.cat === c).length;
+                return `<button data-action="cat" data-v="${esc(c)}" aria-pressed="${on}" class="flex min-h-11 flex-none items-center gap-2 rounded-xl border px-4 text-sm font-bold ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}">
+      ${esc(c)}<span class="rounded-full px-[7px] py-0.5 text-xs font-bold ${on ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-700'}">${n}</span></button>`;
+            }).join('');
+            const v = $('vegBtn');
+            v.setAttribute('aria-pressed', state.vegOnly);
+            v.className = 'flex min-h-12 items-center gap-2.5 rounded-xl border px-4 text-sm font-bold ' + (state.vegOnly ? 'border-emerald-700 bg-emerald-50 text-emerald-900' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50');
+            v.innerHTML = `<span class="flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border-[1.5px] border-emerald-700 bg-white"><span class="h-1.5 w-1.5 rounded-full bg-emerald-700"></span></span>Veg only`;
+        }
 
-            let url = `/api/v1/staff/${slug}/menu`;
-            if (categoryId) url += `?category_id=${categoryId}`;
-
-            const res = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            const data = await res.json();
-            if (!data.success) {
-                showToast(data.message || 'Something went wrong ❌', 'error');
+        function renderGrid() {
+            const items = filteredMenu();
+            $('resultText').textContent = `${items.length} ${items.length === 1 ? 'item' : 'items'}`;
+            if (!items.length) {
+                $('grid').innerHTML = `<div class="col-span-full py-10 text-center text-[15px] text-slate-500">No items match. Try a different word or category.</div>`;
                 return;
             }
-
-            allMenuItems = data.data;
-
-            renderMenu(allMenuItems);
-        }
-
-        function getCartQty(id) {
-            const item = cart.find(i => i.id === id);
-            return item ? item.qty : 0;
-        }
-
-        // Render menu items
-        function renderMenu(items) {
-            let html = '';
-
-            if (items.length === 0) {
-                html = `
-            <div class="col-span-2 text-center py-12 text-gray-400">
-                <svg class="mx-auto h-16 w-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
-                <p class="font-medium">No items found</p>
-                <p class="text-sm mt-1">Try adjusting your search or category filter</p>
-            </div>
-        `;
-            } else {
-                items.forEach(item => {
-                    const qty = getCartQty(item.id);
-
-                    html += `
-            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200 ${!item.isAvailable ? 'opacity-60' : ''}">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-gray-800 mb-1">${item.name}</h4>
-                        <p class="text-blue-600 font-bold text-lg">Rs. ${item.price}</p>
-                    </div>
-                    ${!item.isAvailable ? `
-                                                                                                    <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">Sold Out</span>
-                                                                                                ` : qty > 0 ? `
-                                                                                                    <span class="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">${qty} in cart</span>
-                                                                                                ` : ''}
-                </div>
-
-                ${
-                    !item.isAvailable
-                    ? `<button disabled
-                                                                                                        class="w-full bg-gray-300 text-gray-500 py-2.5 rounded-lg cursor-not-allowed font-medium">
-                                                                                                        Unavailable
-                                                                                                   </button>`
-                    : qty === 0
-                    ? `<button
-                                                                                                        class="w-full bg-gradient-to-br from-indigo-600 to-blue-600 text-white py-2.5 rounded-lg hover:ring-2 hover:ring-indigo-400 transition duration-200 font-medium flex items-center justify-center gap-2"
-                                                                                                        onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
-                                                                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                                                                        </svg>
-                                                                                                        Add to Cart
-                                                                                                   </button>`
-                    : `<div class="flex items-center justify-between gap-2">
-                                                                                                        <button onclick="updateQty(${item.id}, -1)"
-                                                                                                            class="flex-1 px-3 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition duration-200">
-                                                                                                            −
-                                                                                                        </button>
-
-                                                                                                        <span class="font-bold text-lg px-4">${qty}</span>
-
-                                                                                                        <button onclick="updateQty(${item.id}, 1)"
-                                                                                                            class="flex-1 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200">
-                                                                                                            +
-                                                                                                        </button>
-                                                                                                   </div>`
-                }
-            </div>`;
-                });
-            }
-
-            document.getElementById('menu').innerHTML = html;
-        }
-
-        // ================= CART LOGIC =================
-        function addToCart(id, name, price) {
-            const found = cart.find(i => i.id === id);
-            if (found) {
-                found.qty++;
-            } else {
-                cart.push({
-                    id,
-                    name,
-                    price,
-                    qty: 1
-                });
-            }
-
-            console.log(id, name, price)
-
-            renderCart();
-            renderMenu(allMenuItems); // Re-render menu to show updated quantities
-        }
-
-        function updateQty(id, change) {
-            const item = cart.find(i => i.id === id);
-            if (!item) return;
-
-            item.qty += change;
-
-            if (item.qty <= 0) {
-                cart = cart.filter(i => i.id !== id);
-            }
-
-            renderCart();
-            renderMenu(allMenuItems); // Re-render menu to show updated quantities
+            $('grid').innerHTML = items.map((m) => {
+                const sizes = sizeList(m), size = selectedSize(m);
+                const price = size ? size.price : m.price, label = size ? size.label : '';
+                const key = m.id + '|' + label;
+                const line = state.cart.find((l) => l.key === key);
+                const qty = line ? line.qty : 0;
+                const inAny = state.cart.some((l) => l.id === m.id);
+                const vegC = m.veg ? 'border-emerald-700' : 'border-red-700', vegD = m.veg ? 'bg-emerald-700' : 'bg-red-700';
+                const sizePills = sizes ? `<div role="group" aria-label="Choose size" class="flex gap-1.5">${sizes.map((z, i) => {
+                    const on = i === (state.pick[m.id] ?? 1);
+                    return `<button data-action="size" data-id="${m.id}" data-i="${i}" aria-pressed="${on}" class="flex min-h-12 flex-1 flex-col items-center justify-center gap-px rounded-[10px] border-[1.5px] px-0.5 py-1 ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-blue-600'}">
+        <span class="text-[13px] font-extrabold">${z.label}</span><span class="text-[11px] font-semibold">${fmt(z.price)}</span></button>`;
+                }).join('')}</div>` : '';
+                let action;
+                if (m.out) action = `<button disabled class="min-h-11 cursor-not-allowed rounded-xl bg-slate-100 text-sm font-bold text-slate-500">Unavailable</button>`;
+                else if (qty > 0) action = `<div class="flex items-center justify-between rounded-xl bg-blue-600/10">
+      <button data-action="dec" data-key="${m.id}|${label}" aria-label="Remove one" class="flex h-11 w-11 items-center justify-center text-blue-600"><svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+      <span class="text-base font-extrabold">${qty}</span>
+      <button data-action="add" data-id="${m.id}" aria-label="Add one more" class="flex h-11 w-11 items-center justify-center text-blue-600"><svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>`;
+                else action = `<button data-action="add" data-id="${m.id}" class="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white hover:bg-blue-700">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add</button>`;
+                return `<div class="flex flex-col gap-2.5 rounded-[14px] border-[1.5px] p-3.5 ${inAny && !m.out ? 'border-blue-600' : 'border-slate-200'} ${m.out ? 'bg-slate-50' : 'bg-white'}">
+      <div class="flex min-h-[22px] items-center gap-2">
+        <span class="flex h-3.5 w-3.5 flex-none items-center justify-center rounded-[3px] border-[1.5px] ${vegC}"><span class="h-1.5 w-1.5 rounded-full ${vegD}"></span></span>
+        ${m.pop && !m.out ? '<span class="rounded-md bg-amber-100 px-[7px] py-[3px] text-[11px] font-extrabold tracking-wide text-amber-800">POPULAR</span>' : ''}
+        ${m.out ? '<span class="rounded-md bg-red-50 px-[7px] py-[3px] text-[11px] font-extrabold tracking-wide text-red-800">SOLD OUT</span>' : ''}
+      </div>
+      <div class="min-h-[42px] text-base font-bold leading-snug">${esc(m.name)}</div>
+      <div class="text-[17px] font-extrabold text-blue-600">${fmt(price)}</div>
+      ${sizePills}${action}</div>`;
+            }).join('');
         }
 
         function renderCart() {
-            let html = '';
-            let subtotal = 0;
-            let totalItems = 0;
+            const c = calc();
+            $('count').textContent = c.count;
+            $('clearBtn').classList.toggle('hidden', !state.cart.length);
+            $('summary').textContent = isDine()
+                ? `Dine-in · ${state.table ? 'Table ' + state.table : 'No table yet'} · ${state.guests} ${state.guests === 1 ? 'guest' : 'guests'}`
+                : (state.type === 'take' ? 'Takeaway' : 'Delivery') + (state.cust.name.trim() ? ' · ' + state.cust.name.trim() : '');
 
-            if (cart.length === 0) {
-                document.getElementById('cart').innerHTML = `
-            <div class="text-center py-8 text-gray-400">
-                <svg class="mx-auto h-12 w-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                <p class="text-sm">No items added</p>
-            </div>
-        `;
-            } else {
-                cart.forEach(i => {
-                    const itemTotal = i.price * i.qty;
-                    subtotal += itemTotal;
-                    totalItems += i.qty;
-
-                    html += `
-            <div class="flex justify-between items-start gap-3 pb-3 border-b border-gray-100 last:border-0">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800 text-sm">${i.name}</p>
-                    <p class="text-xs text-gray-500 mt-1">Rs. ${i.price} × ${i.qty}</p>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1 bg-gray-100 rounded-lg">
-                        <button onclick="updateQty(${i.id}, -1)"
-                            class="px-2 py-1 hover:bg-gray-200 rounded-l-lg transition">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-                            </svg>
-                        </button>
-                        <span class="px-2 font-semibold text-sm min-w-[24px] text-center">${i.qty}</span>
-                        <button onclick="updateQty(${i.id}, 1)"
-                            class="px-2 py-1 hover:bg-gray-200 rounded-r-lg transition">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" />
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="font-bold text-sm text-gray-800 min-w-[60px] text-right">Rs. ${itemTotal}</p>
-                </div>
-            </div>`;
-                });
-
-                document.getElementById('cart').innerHTML = html;
-            }
-
-            // Update summary
-            document.getElementById('cartCount').textContent = totalItems;
-            document.getElementById('subtotal').textContent = `Rs. ${subtotal}`;
-            document.getElementById('total').textContent = `Rs. ${subtotal}`;
-            document.getElementById('totalItems').textContent = totalItems;
-        }
-
-        function clearCart() {
-            if (cart.length === 0) return;
-
-            if (confirm('Are you sure you want to clear the cart?')) {
-                cart = [];
-                renderCart();
-                renderMenu(allMenuItems);
-            }
-        }
-
-        // ================= SEARCH BAR =================
-        function filterMenu() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = allMenuItems.filter(i => i.name.toLowerCase().includes(q));
-            renderMenu(filtered);
-        }
-
-        // ================= TABLES =================
-        async function loadTables() {
-            const res = await fetch(`/api/v1/staff/${slug}/tables`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
-            if (!data.success) {
-                showToast(data.message || 'Something went wrong ❌', 'error');
+            if (!state.cart.length) {
+                $('lines').innerHTML = `<div class="flex flex-col items-center gap-2.5 py-9 text-center text-slate-500">
+      <svg class="h-11 w-11 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8zM9 8a3 3 0 0 1 6 0"/></svg>
+      <div class="text-[15px] font-bold">No items added</div><div class="text-[13px]">Tap Add on any menu item to start.</div></div>`;
                 return;
             }
-
-            let html = '<option value="">Choose a table...</option>';
-            data.data.forEach(t => {
-                html += `<option value="${t.id}">Table ${t.table_number}</option>`;
-            });
-            document.getElementById('tableSelect').innerHTML = html;
+            const chip = 'min-h-9 rounded-full border border-slate-300 bg-white px-3 text-[13px] font-semibold text-slate-700 hover:bg-slate-50';
+            $('lines').innerHTML = state.cart.map((l) => {
+                const open = state.noteOpen === l.key;
+                return `<div class="flex flex-col gap-2 border-b border-slate-100 py-3.5">
+      <div class="flex items-center gap-2.5">
+        <div class="min-w-0 flex-1"><div class="text-[15px] font-bold leading-snug">${esc(l.name)}</div>
+          <div class="text-[13px] text-slate-500">${l.size ? esc(l.size) + ' · ' : ''}${fmt(l.price)} each</div></div>
+        <div class="flex items-center overflow-hidden rounded-xl border border-slate-300">
+          <button data-action="dec" data-key="${esc(l.key)}" aria-label="Remove one" class="flex h-10 w-10 items-center justify-center bg-white hover:bg-slate-50"><svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+          <span class="min-w-7 text-center font-extrabold">${l.qty}</span>
+          <button data-action="inc" data-key="${esc(l.key)}" aria-label="Add one more" class="flex h-10 w-10 items-center justify-center bg-white hover:bg-slate-50"><svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+        <div class="w-[78px] text-right text-[15px] font-extrabold">${fmt(l.price * l.qty)}</div>
+      </div>
+      <div class="flex items-center justify-between">
+        <button data-action="note-toggle" data-key="${esc(l.key)}" class="flex min-h-11 items-center gap-1.5 text-[13px] font-bold text-blue-600 hover:text-blue-700">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"/></svg>${l.note ? 'Edit note' : 'Add note'}</button>
+        <button data-action="rm" data-key="${esc(l.key)}" aria-label="Remove item" class="flex h-11 w-11 items-center justify-center text-red-600 hover:text-red-700"><svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+      </div>
+      ${l.note && !open ? `<div class="rounded-lg bg-amber-50 px-2.5 py-2 text-[13px] font-semibold text-amber-800">Note: ${esc(l.note)}</div>` : ''}
+      ${open ? `<div class="flex flex-col gap-2">
+        <input data-field="line-note" data-key="${esc(l.key)}" type="text" aria-label="Item note" placeholder="e.g. less spicy, no onion" value="${esc(l.note)}" class="h-11 rounded-[10px] border border-slate-300 px-3 text-sm placeholder:text-slate-500 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/30">
+        <div class="flex flex-wrap gap-2">
+          ${['Less spicy', 'Extra spicy', 'No onion'].map((t) => `<button data-action="quick" data-key="${esc(l.key)}" data-v="${t}" class="${chip}">${t}</button>`).join('')}
+        </div></div>` : ''}
+    </div>`;
+            }).join('');
         }
 
-        // ================= TABLE CHANGE HANDLER =================
-        function onTableChange() {
-            const tableId = parseInt(document.getElementById('tableSelect').value);
-            selectedTableId = tableId;
-
-
-            if (!tableId) {
-                document.getElementById('previousOrdersCard').classList.add('hidden');
-                return;
-            }
-
-            document.getElementById('selectedTableNumber').textContent = `T${tableId}`;
-
-            // Load previous orders for this table
-            loadPreviousOrders(tableId);
+        function renderTotals() {
+            const c = calc(), hint = validation();
+            const row = (a, b, cls = '') => `<div class="flex justify-between font-semibold text-slate-500"><span>${a}</span><span class="font-bold ${cls || 'text-slate-900'}">${b}</span></div>`;
+            $('totals').innerHTML = row('Subtotal', fmt(c.sub))
+                + (c.disc > 0 ? row('Discount', '- ' + fmt(c.disc), 'text-emerald-700') : '')
+                + ($('svc').checked ? row('Service charge', fmt(c.svc)) : '')
+                + ($('vat').checked ? row('VAT', fmt(c.vat)) : '')
+                + `<div class="mt-1 flex items-baseline justify-between border-t-2 border-slate-900 pt-3"><span class="text-[17px] font-extrabold">Total</span><span class="text-2xl font-extrabold text-blue-600">${fmt(c.total)}</span></div>`;
+            $('hint').innerHTML = hint ? `<div role="status" class="rounded-[10px] bg-amber-50 px-3 py-2.5 text-[13px] font-semibold text-amber-800">${esc(hint)}</div>` : '';
+            $('sendBtn').disabled = !!hint;
+            $('holdBtn').disabled = !state.cart.length;
+            $('count').textContent = c.count;
         }
 
-        async function loadPreviousOrders(tableId) {
-
-            try {
-
-                const response = await fetch(
-                    `/api/v1/staff/${slug}/order/table/${tableId}`, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${token}`,
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (!data.items || data.items.length === 0) {
-                    document.getElementById('previousOrdersCard').classList.add('hidden');
-                    return;
-                }
-
-                document.getElementById('previousOrdersCard').classList.remove('hidden');
-
-                let html = '';
-                data.items.forEach((order, index) => {
-                    if (order.item_status === 'cancelled') {
-
-                        html += `
-            <div class="border border-gray-200 rounded-lg p-3 bg-gray-50 opacity-60">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-500 text-sm line-through">${order.name}</p>
-                        <p class="text-xs text-gray-400 mt-1">Rs. ${order.price} × ${order.quantity}</p>
-                    </div>
-                    <span class="bg-red-100 text-red-500 text-xs font-semibold px-2 py-1 rounded">Cancelled</span>
-                </div>
-                ${order.cancelReason ? `<p class="text-xs text-gray-400 mt-2 italic">Reason: ${order.cancelReason}</p>` : ''}
-            </div>`;
-                        return;
-                    }
-
-                    // TODO: add more status color
-                    order.item_status === 'served' ?
-                        'bg-green-100 text-green-700' :
-                        'bg-orange-100 text-orange-700';
-
-
-                    // Only allow cancellation for non-served items
-                    const canCancel = order.item_status !== 'served';
-
-
-                    html += `
-        <div class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition">
-            <div class="flex justify-between items-start mb-2">
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800 text-sm">${order.name}</p>
-                    <p class="text-xs text-gray-500 mt-1">Rs. ${order.price} × ${order.quantity} = Rs. ${order.price * order.quantity}</p>
-                </div>
-                <span class="${order.item_status} text-xs font-semibold px-2 py-1 rounded capitalize">
-                    ${order.item_status}
-                </span>
-            </div>
-            <div class="flex justify-between items-center">
-                <p class="text-xs text-gray-400">${order.time}</p>
-                <div class="flex items-center gap-2">
-                    <button
-                        onclick="reorderItem(${order.menu_item_id}, '${order.name.replace(/'/g, "\\'")}', ${order.price}, this)"
-                        class="text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition">
-                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Reorder
-                    </button>
-                    ${canCancel ? `
-                                                                        <span class="text-gray-300">|</span>
-                                                                        <button
-                                                                            onclick="openCancelModal(${selectedTableId}, ${index}, '${order.name.replace(/'/g, "\\'")}')"
-                                                                            class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition">
-                                                                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                            </svg>
-                                                                            Cancel
-                                                                        </button>` : ''}
-                </div>
-            </div>
-        </div>`;
-                });
-
-                document.getElementById('previousOrders').innerHTML = html;
-
-            } catch (error) {
-                console.error('Failed to fetch order:', error);
-            }
-
+        function renderDiscMode() {
+            const on = 'bg-blue-600 text-white', off = 'bg-white text-slate-700 hover:bg-slate-50';
+            $('discPct').className = 'h-11 min-w-11 text-sm font-extrabold ' + (state.discMode === 'pct' ? on : off);
+            $('discAmt').className = 'h-11 min-w-[52px] text-sm font-extrabold ' + (state.discMode === 'amt' ? on : off);
         }
 
-        function reorderItem(id, name, price) {
-            addToCart(id, name, price);
-
-            // Show feedback
-            const btn = event.target.closest('button');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<svg class="h-3 w-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-    </svg>`;
-
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-            }, 500);
+        function renderToast() {
+            $('toast').innerHTML = state.toast ? `<div role="status" class="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">
+    <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>
+    <span class="flex-1">${esc(state.toast)}</span>
+    <button data-action="dismiss" aria-label="Dismiss" class="flex h-11 w-11 items-center justify-center"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>` : '';
         }
 
+        function renderAll() { renderType(); renderResume(); renderLeftTop(); renderChips(); renderGrid(); renderCart(); renderTotals(); renderDiscMode(); renderToast(); }
 
-        // ================= CANCEL ORDER MODAL =================
-        let cancelContext = {
-            tableId: null,
-            orderIndex: null
+        /* ================================ ACTIONS ================================ */
+        function addItem(id) {
+            const m = MENU.find((x) => x.id === id), s = selectedSize(m);
+            const size = s ? s.label : '', price = s ? s.price : m.price, key = id + '|' + size;
+            const l = state.cart.find((x) => x.key === key);
+            if (l) l.qty++; else state.cart.push({ key, id, name: m.name, size, price, qty: 1, note: '' });
+        }
+        function decItem(key) {
+            const l = state.cart.find((x) => x.key === key);
+            if (!l) return;
+            if (l.qty > 1) l.qty--; else state.cart = state.cart.filter((x) => x.key !== key);
+        }
+        const refreshOrder = () => { renderGrid(); renderCart(); renderTotals(); };
+        const freshOrder = () => {
+            state.cart = []; state.noteOpen = null; state.guests = 2;
+            state.cust = { name: '', phone: '', addr: '' };
+            $('orderNote').value = ''; $('disc').value = '';
         };
-        let selectedReason = '';
 
-        function openCancelModal(tableId, orderIndex, itemName) {
-            cancelContext = {
-                tableId,
-                orderIndex
-            };
-            selectedReason = '';
-
-            document.getElementById('cancelModalSubtitle').textContent = itemName;
-            document.getElementById('cancelNotes').value = '';
-            document.getElementById('cancelError').classList.add('hidden');
-
-            // Reset reason buttons
-            document.querySelectorAll('.reason-btn').forEach(btn => {
-                btn.classList.remove('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
-                btn.classList.add('border-gray-200', 'text-gray-700');
-            });
-
-            const modal = document.getElementById('cancelModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeCancelModal() {
-            const modal = document.getElementById('cancelModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            cancelContext = {
-                tableId: null,
-                orderIndex: null
-            };
-            selectedReason = '';
-        }
-
-        function selectReason(btn, reason) {
-            selectedReason = reason;
-            document.getElementById('cancelError').classList.add('hidden');
-
-            document.querySelectorAll('.reason-btn').forEach(b => {
-                b.classList.remove('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
-                b.classList.add('border-gray-200', 'text-gray-700');
-            });
-
-            btn.classList.add('border-red-400', 'bg-red-50', 'text-red-700', 'font-semibold');
-            btn.classList.remove('border-gray-200', 'text-gray-700');
-        }
-
-        function confirmCancel() {
-            if (!selectedReason) {
-                document.getElementById('cancelError').classList.remove('hidden');
-                return;
-            }
-
-            const notes = document.getElementById('cancelNotes').value.trim();
-            const fullReason = notes ? `${selectedReason} — ${notes}` : selectedReason;
-
-            const {
-                tableId,
-                orderIndex
-            } = cancelContext;
-            if (tableId && orderIndex !== null && PREVIOUS_ORDERS[tableId]) {
-                PREVIOUS_ORDERS[tableId][orderIndex].cancelled = true;
-                PREVIOUS_ORDERS[tableId][orderIndex].cancelReason = fullReason;
-            }
-
-            closeCancelModal();
-            loadPreviousOrders(tableId);
-            showToast('Order item cancelled', 'error');
-        }
-
-        // ================= SUBMIT ORDER =================
-        async function submitOrder() {
-            const tableId = document.getElementById('tableSelect').value;
-
-
-
-            if (!tableId) {
-                alert('Please select a table');
-                return;
-            }
-
-            if (cart.length === 0) {
-                alert('Cart is empty. Please add items before placing order.');
-                return;
-            }
-
-            const total = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-
-            const res = await fetch(`/api/v1/staff/${slug}/table/${tableId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!res.ok) {
-                throw new Error(`Failed to retrieve T${tableId} status`);
-                showToast(`Failed to retrieve T${tableId} status!`, 'error');
-
-            }
-
-            const data = await res.json();
-            console.log(data)
-
-            if (data.tableStatus === 'occupied') {
-                // Table has active order → find that order id, then call addItem
-                await addItemsToExistingOrder(tableId, total);
-            } else if (data.tableStatus === 'available') {
-                // Fresh table → call store
-                await createNewOrder(tableId, total);
-            } else {
-                alert('reserved');
-            }
-
-            loadPreviousOrders(tableId);
-        }
-
-        async function addItemsToExistingOrder(tableId, total) {
-            try {
-                const res = await fetch(`/api/v1/staff/${slug}/add-items`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        table_id: tableId,
-                        items: cart.map(i => ({
-                            menu_item_id: i.id,
-                            quantity: i.qty
-                        }))
-                    })
+        const actions = {
+            type: (d) => { state.type = d.v; renderType(); renderLeftTop(); renderCart(); renderTotals(); },
+            table: (d) => { state.table = state.table === d.v ? null : d.v; renderLeftTop(); renderCart(); renderTotals(); },
+            guest: (d) => { state.guests = Math.min(20, Math.max(1, state.guests + Number(d.v))); renderLeftTop(); renderCart(); },
+            cat: (d) => { state.cat = d.v; renderChips(); renderGrid(); },
+            veg: () => { state.vegOnly = !state.vegOnly; renderChips(); renderGrid(); },
+            size: (d) => { state.pick[d.id] = Number(d.i); renderGrid(); },
+            add: (d) => { addItem(d.id); refreshOrder(); },
+            // re-adds the same size and price already on the cart line
+            inc: (d) => { const l = state.cart.find((x) => x.key === d.key); if (l) l.qty++; refreshOrder(); },
+            dec: (d) => { decItem(d.key); refreshOrder(); },
+            rm: (d) => { state.cart = state.cart.filter((l) => l.key !== d.key); state.noteOpen = null; refreshOrder(); },
+            'note-toggle': (d) => { state.noteOpen = state.noteOpen === d.key ? null : d.key; renderCart(); },
+            quick: (d) => { const l = state.cart.find((x) => x.key === d.key); if (l) l.note = d.v; renderCart(); },
+            clear: () => { state.cart = []; state.noteOpen = null; refreshOrder(); },
+            'disc-mode': (d) => { state.discMode = d.v; renderDiscMode(); renderTotals(); },
+            serve: (d) => { tableOrders(state.table)[Number(d.i)].status = 'Served'; renderLeftTop(); },
+            'close-table': () => { const t = state.table; delete state.orders[t]; state.table = null; renderLeftTop(); renderCart(); renderTotals(); flash(`Table ${t} closed and freed.`); },
+            hold: () => {
+                if (!state.cart.length) return;
+                state.held.push({
+                    type: state.type, table: state.table, guests: state.guests, cart: state.cart, discMode: state.discMode,
+                    orderNote: $('orderNote').value, disc: $('disc').value, cust: { ...state.cust }
                 });
-
-                if (!res.ok) {
-                    throw new Error('Failed to place order');
-                    showToast(`Failed to place order for T${tableId}!`, 'error');
-
+                state.table = null; freshOrder(); renderAll();
+                flash('Order held. Tap Resume held to bring it back.');
+            },
+            resume: () => {
+                if (state.cart.length) { flash('Hold or send the current order first, then resume.'); return; }
+                const h = state.held.pop();
+                Object.assign(state, { type: h.type, table: h.table, guests: h.guests, cart: h.cart, discMode: h.discMode, cust: h.cust, noteOpen: null });
+                $('orderNote').value = h.orderNote; $('disc').value = h.disc; renderAll();
+            },
+            send: () => {
+                if (validation()) return;
+                const c = calc();
+                let where = state.type === 'delivery' ? 'delivery' : 'takeaway', keep = null;
+                if (isDine()) {
+                    const prev = tableOrders(state.table);
+                    state.orders[state.table] = prev.concat([{
+                        n: prev.length + 1, status: 'New', note: $('orderNote').value.trim(),
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+                        lines: state.cart.map((l) => ({ name: l.name, size: l.size, qty: l.qty, price: l.price, note: l.note }))
+                    }]);
+                    where = 'Table ' + state.table; keep = state.table;
                 }
-
-                // Success
-                cart = [];
-                renderCart();
-                renderMenu(allMenuItems);
-                document.getElementById('tableSelect').value = '';
-
-                showToast(`Order placed for T${tableId}! Total: Rs. ${total}`, 'success');
-
-            } catch (error) {
-
-                showToast(`Failed to place order for T${tableId}!`, 'error');
-                console.error('Order error:', error);
-            }
-        }
-
-
-        async function createNewOrder(tableId, total) {
-            try {
-                const res = await fetch(`/api/v1/staff/${slug}/orders`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        table_id: tableId,
-                        items: cart.map(i => ({
-                            menu_item_id: i.id,
-                            quantity: i.qty
-                        }))
-                    })
-                });
-
-                if (!res.ok) {
-                    throw new Error('Failed to place order');
-                    showToast(`Failed to place order for T${tableId}!`, 'error');
-
-                }
-
-                // Success
-                cart = [];
-                renderCart();
-                renderMenu(allMenuItems);
-                document.getElementById('tableSelect').value = '';
-
-                showToast(`Order placed for T${tableId}! Total: Rs. ${total}`, 'success');
-
-            } catch (error) {
-
-                showToast(`Failed to place order for T${tableId}!`, 'error');
-                console.error('Order error:', error);
-            }
-        }
-
-        // ================= INITIAL LOAD =================
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCategories();
-            loadMenu();
-            loadTables();
+                state.table = keep; freshOrder(); renderAll();
+                flash(`Sent to kitchen: ${c.count} ${c.count === 1 ? 'item' : 'items'} for ${where} (${fmt(c.total)}).`);
+            },
+            dismiss: () => { state.toast = ''; renderToast(); }
+        };
+        /* ================================ EVENTS ================================= */
+        document.addEventListener('click', (e) => {
+            const b = e.target.closest('[data-action]');
+            if (b && !b.disabled && actions[b.dataset.action]) actions[b.dataset.action](b.dataset);
         });
+        document.addEventListener('input', (e) => {
+            const t = e.target, f = t.dataset.field;
+            if (t.id === 'search') { state.q = t.value; renderChips(); renderGrid(); }
+            else if (t.id === 'disc') renderTotals();
+            else if (f === 'line-note') { const l = state.cart.find((x) => x.key === t.dataset.key); if (l) l.note = t.value; }
+            else if (f) { state.cust[f] = t.value; if (f === 'name') renderCart(); renderTotals(); }
+        });
+        document.addEventListener('change', (e) => { if (e.target.id === 'svc' || e.target.id === 'vat') renderTotals(); });
 
-        // Load on page ready
-        loadCategories();
-        loadMenu();
-        loadTables();
+        renderAll();
     </script>
-@endsection
+</body>
+
+</html>

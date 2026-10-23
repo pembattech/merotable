@@ -376,7 +376,7 @@
     </style>
 
     {{-- ── Header ── --}}
-    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8">
+    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8 fade-up d1">
         <h1 class="text-lg md:text-2xl font-extrabold text-gray-800">Restaurant Overview</h1>
 
         <div class="flex items-center gap-2 flex-wrap">
@@ -419,7 +419,7 @@
     </header>
 
     {{-- ── Stat cards ── --}}
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10 fade-up d2">
 
         <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
             <p class="text-xs md:text-sm text-gray-500 font-medium">Today's Revenue</p>
@@ -479,7 +479,7 @@
     </section> --}}
 
     {{-- ── Top Selling Items ── --}}
-    <div class="chart-card">
+    <div class="chart-card fade-up d3">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h3 class="font-bold text-gray-800 text-base">Top Selling Items</h3>

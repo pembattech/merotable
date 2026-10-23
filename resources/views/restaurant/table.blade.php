@@ -286,7 +286,7 @@
     </style>
 
     {{-- ── Header ── --}}
-    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8">
+    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8 fade-up d1">
         <h1 class="text-lg md:text-2xl font-extrabold text-gray-800">Table Overview</h1>
 
         <div class="flex items-center gap-2 flex-wrap">
@@ -307,7 +307,7 @@
         </div>
     </header>
 
-    <div class="filter-wrapper">
+    <div class="filter-wrapper fade-up d2">
         <div class="slider" id="filterSlider"></div>
         <button onclick="setFilter('all', this)" class="table-status-btn active">All</button>
         <button onclick="setFilter('available', this)" class="table-status-btn">Available</button>
@@ -316,7 +316,7 @@
     </div>
 
     {{-- ── Tables Grid ── --}}
-    <section>
+    <section class="fade-up d4">
         <div id="tablesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
     </section>
 

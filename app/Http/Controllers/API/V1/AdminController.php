@@ -70,7 +70,6 @@ class AdminController extends Controller
         // }
 
 
-        // TODO: Understand transactions more deeply
         DB::transaction(function () use ($restaurant) {
 
             $restaurant->update(attributes: [
@@ -98,38 +97,6 @@ class AdminController extends Controller
                     'table_number' => 'T' . $i,
                 ]);
             }
-
-            // Auto-create default menu categories for the restaurant after approval.
-            // This reads category names from config/default_categories.php,
-            // converts them into database-ready arrays,
-            // and saves them using the restaurant–category relationship
-            // so each category is automatically linked to this restaurant.
-            $categories = collect(config('default_categories'))->map(fn($name) => [
-                'name' => $name
-            ])->toArray();
-
-            $restaurantCategories = $restaurant->categories()->createMany($categories);
-
-
-            // Seed sample menu items
-            $sampleItems = config('sample_menu_items');
-
-            foreach ($restaurantCategories as $category) {
-
-                if (!isset($sampleItems[$category->name])) {
-                    continue;
-                }
-
-                foreach ($sampleItems[$category->name] as $item) {
-                    $restaurant->menuItems()->create([
-                        'category_id' => $category->id,
-                        'name' => $item['name'],
-                        'price' => $item['price'],
-                        'is_available' => true,
-                    ]);
-                }
-            }
-
 
             // TODO
             /**

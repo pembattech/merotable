@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ asset('images/branding/merotable-logo-WHITE.png') }}" type="image/x-icon">
-    {{-- <img class="logo h-8 w-8 object-contain" src="{{ asset('images/branding/merotable-logo-WHITE.png') }}" alt="Logo"> --}}
+    {{-- <img class="logo h-8 w-8 object-contain" src="{{ asset('images/branding/merotable-logo-WHITE.png') }}"
+        alt="Logo"> --}}
 
     {{-- @include('components.pwa') --}}
 
@@ -73,7 +74,7 @@
             color: #9ca3af;
         }
 
-        @keyframes slideUp {
+        /* @keyframes slideUp {
             from {
                 opacity: 0;
                 transform: translateY(24px) scale(0.98);
@@ -87,30 +88,86 @@
 
         .animate-slide-up {
             animation: slideUp 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        } */
+
+        /* fade-in stagger */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            opacity: 0;
+            animation: fadeUp 0.5s ease forwards;
         }
 
         .d1 {
-            animation-delay: .04s
+            animation-delay: 0.05s;
         }
 
         .d2 {
-            animation-delay: .08s
+            animation-delay: 0.10s;
         }
 
         .d3 {
-            animation-delay: .12s
+            animation-delay: 0.15s;
         }
 
         .d4 {
-            animation-delay: .16s
+            animation-delay: 0.20s;
         }
 
         .d5 {
-            animation-delay: .20s
+            animation-delay: 0.25s;
         }
 
         .d6 {
-            animation-delay: .24s
+            animation-delay: 0.30s;
+        }
+
+        .d7 {
+            animation-delay: 0.35s;
+        }
+
+        .d8 {
+            animation-delay: 0.40s;
+        }
+
+        /* Hide the page until initialization is complete */
+        #pageContent {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition:
+                opacity 0.4s ease,
+                transform 0.4s ease,
+                visibility 0.4s;
+        }
+
+        #pageContent.page-loaded {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Accessibility: respect reduced-motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+
+            #pageContent,
+            .fade-up {
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                animation: none;
+                transition: none;
+            }
         }
     </style>
 
@@ -133,7 +190,7 @@ The <main> gets pt-16 on mobile to clear the fixed topbar height,
 
         @include('layouts.sidebar')
 
-        <main class="flex-1 overflow-y-auto p-6 md:p-8 pt-20 md:pt-8">
+        <main class="pageContent flex-1 overflow-y-auto p-6 md:p-8 pt-20 md:pt-8">
             @yield('content')
         </main>
 
@@ -148,11 +205,17 @@ The <main> gets pt-16 on mobile to clear the fixed topbar height,
 
         <script>
             function showToast(message, type = 'success') {
-                console.log(message, type)
+                console.log(message, type);
+
                 const toast = document.getElementById('toast');
                 const box = document.getElementById('toastBox');
                 const icon = document.getElementById('toastIcon');
                 const msg = document.getElementById('toastMsg');
+
+                if (!toast || !box || !icon || !msg) {
+                    console.error('Toast elements not found.');
+                    return;
+                }
 
                 const styles = {
                     success: {
@@ -170,18 +233,34 @@ The <main> gets pt-16 on mobile to clear the fixed topbar height,
                     info: {
                         bg: 'bg-blue-500',
                         icon: 'i'
-                    },
+                    }
                 };
-                const s = styles[type] || styles.success;
 
-                box.className =
-                    `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px] ${s.bg}`;
-                icon.textContent = s.icon;
+                const style = styles[type] || styles.success;
+
+                // Remove previous background colors.
+                box.classList.remove(
+                    'bg-green-600',
+                    'bg-red-500',
+                    'bg-orange-500',
+                    'bg-blue-500'
+                );
+
+                // Apply the correct background and layout classes.
+                box.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium min-w-[260px] ${style.bg}`;
+
+                icon.textContent = style.icon;
                 msg.textContent = message;
 
                 toast.classList.remove('hidden');
+
+                // Clear the previous timeout.
                 clearTimeout(toast._timer);
-                toast._timer = setTimeout(() => toast.classList.add('hidden'), 3000);
+
+                // Hide the toast after 3 seconds.
+                toast._timer = setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
             }
 
 

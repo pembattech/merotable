@@ -212,16 +212,30 @@ class RestaurantController extends Controller
     // }
 
 
+
     public function getMenuItems(Restaurant $restaurant)
     {
-        $menuItems = $restaurant->menuItems()->with('restaurant', 'category')->get();
+        $menuItems = $restaurant->menuItems()
+            ->with([
+                'category',
+                'sizes' => function ($query) {
+                    $query->orderBy('sort_order')
+                        ->orderBy('id');
+                },
+                'restaurant',
+            ])
+            ->latest()
+            ->get();
 
         return response()->json([
             'success' => true,
-            'category_count' => $restaurant->categories()->count(),
-            'total_item_count' => $menuItems->count(),
-            'active_item_count' => $menuItems->where('is_available', 1)->count(),
-            'menu' => AdminMenuItemResource::collection($menuItems)
+            'menu' => $menuItems
+            // 'category_count' => $restaurant->categories()->count(),
+            // 'total_item_count' => $menuItems->count(),
+            // 'active_item_count' => $menuItems
+            //     ->where('is_available', true)
+            //     ->count(),
+            // 'menu' => AdminMenuItemResource::collection($menuItems),
         ]);
     }
 
@@ -395,7 +409,7 @@ class RestaurantController extends Controller
             ->whereHas(
                 'order',
                 fn($q) =>
-                $q->where('restaurant_id', $restaurantId)
+                    $q->where('restaurant_id', $restaurantId)
             )
             ->latest()
             ->paginate(50);

@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             SuperAdminUserSeeder::class,
             FeatureSeeder::class,
             PlanSeeder::class,
+            RestaurantSeeder::class, // DEMO PROPOSE ONLY
         ]);
     }
 }

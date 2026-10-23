@@ -5,16 +5,6 @@
 @section('content')
 
     <style>
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.35s ease both; }
-        .d1 { animation-delay: .04s } .d2 { animation-delay: .08s }
-        .d3 { animation-delay: .12s } .d4 { animation-delay: .16s }
-        .d5 { animation-delay: .20s } .d6 { animation-delay: .24s }
-        .d7 { animation-delay: .28s } .d8 { animation-delay: .32s }
-
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px) scale(0.98); }
             to   { opacity: 1; transform: translateY(0) scale(1); }

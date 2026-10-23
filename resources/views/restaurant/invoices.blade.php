@@ -168,7 +168,7 @@
     </head>
 
     <!-- ── HEADER ── -->
-    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8">
+    <header class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8 fade-up d1">
 
         <div>
             <h1 class="text-lg md:text-2xl font-extrabold text-gray-800">

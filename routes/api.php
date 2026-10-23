@@ -210,6 +210,7 @@ Route::middleware(['auth:sanctum', 'isRestaurantAuthenticated'])->prefix('v1/own
         Route::patch('/update-menu/{menuItem}', [MenuController::class, 'update']);
         Route::patch('/menu/{menuItem}/availability', [MenuController::class, 'updateAvailability']);
         Route::get('/menu/{menuItem}', [MenuController::class, 'show']);
+        Route::post('/menu/import', [MenuController::class, 'importMenu']);
 
         // Not Implement!
         Route::post('/add-category', [CategoryController::class, 'store']);

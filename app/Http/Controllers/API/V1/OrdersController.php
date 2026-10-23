@@ -132,7 +132,8 @@ class OrdersController extends Controller
         $order = Order::with('orderItems.menuItem', 'table')
             ->where('table_id', $tableId)
             ->where('restaurant_id', $staff->restaurant_id)
-            ->where('status', 'open') // only active orders
+            // ->where('status', 'open') // only active orders
+            ->latest('created_at')
             ->first();
 
 
