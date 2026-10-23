@@ -1,0 +1,101 @@
+category,name,price,is_vegetarian,is_popular,is_available,has_sizes,size_type,sizes
+Starters,Veg Soup,120,true,false,true,false,,
+Starters,Chicken Soup,150,false,false,true,false,,
+Starters,Chicken Sekuwa,330,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":190},{""name"":""Full"",""code"":""full"",""price"":330}]"
+Starters,Crispy Corn,220,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":220}]"
+Starters,Mushroom Choila,380,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":220},{""name"":""Full"",""code"":""full"",""price"":380}]"
+Starters,Chicken Choila,120,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":70},{""name"":""Full"",""code"":""full"",""price"":120}]"
+Starters,Buff Choila,150,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":90},{""name"":""Full"",""code"":""full"",""price"":150}]"
+Starters,Pork Sekuwa,320,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":190},{""name"":""Full"",""code"":""full"",""price"":320}]"
+Starters,Paneer Chilli,440,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":260},{""name"":""Full"",""code"":""full"",""price"":440}]"
+Starters,Chicken Chilli,370,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":220},{""name"":""Full"",""code"":""full"",""price"":370}]"
+Starters,Buff Chilli,170,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":170}]"
+Starters,Veg Spring Roll,400,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":240},{""name"":""Full"",""code"":""full"",""price"":400}]"
+Starters,Chicken Spring Roll,360,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":210},{""name"":""Full"",""code"":""full"",""price"":360}]"
+Starters,Garlic Bread,350,true,false,true,false,,
+Starters,Garlic Bread with Cheese,130,true,true,true,false,,
+Starters,Mutton Sekuwa,210,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":210}]"
+Starters,Prawn Tempura,390,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":230},{""name"":""Full"",""code"":""full"",""price"":390}]"
+Starters,Fish Tareko,180,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Starters,Hot & Sour Soup,370,true,false,true,false,,
+Starters,Chicken Hot & Sour Soup,350,false,false,true,false,,
+Starters,Manchow Soup,380,true,false,true,false,,
+Starters,Chicken Manchow Soup,380,false,false,true,false,,
+Starters,Clear Soup,350,true,false,true,false,,
+Starters,Egg Soup,250,false,false,true,false,,
+Momo,Veg Momo,150,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":90},{""name"":""Full"",""code"":""full"",""price"":150}]"
+Momo,Chicken Momo,180,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Momo,Buff Momo,170,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":170}]"
+Momo,Pork Momo,200,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":200}]"
+Momo,Mutton Momo,250,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":150},{""name"":""Full"",""code"":""full"",""price"":250}]"
+Momo,Paneer Momo,220,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":220}]"
+Momo,Jhol Momo Veg,190,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":110},{""name"":""Full"",""code"":""full"",""price"":190}]"
+Momo,Jhol Momo,210,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":210}]"
+Momo,Jhol Momo Buff,220,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":220}]"
+Momo,C-Momo Veg,180,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Momo,C-Momo Chicken,140,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":80},{""name"":""Full"",""code"":""full"",""price"":140}]"
+Momo,C-Momo Buff,160,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":90},{""name"":""Full"",""code"":""full"",""price"":160}]"
+Momo,Kothey Momo Veg,180,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Momo,Kothey Momo Chicken,160,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":90},{""name"":""Full"",""code"":""full"",""price"":160}]"
+Momo,Kothey Momo Buff,230,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":230}]"
+Momo,Fried Momo Veg,230,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":230}]"
+Momo,Fried Momo Chicken,240,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":140},{""name"":""Full"",""code"":""full"",""price"":240}]"
+Momo,Open Momo Veg,230,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":230}]"
+Momo,Open Momo Chicken,210,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":210}]"
+Momo,Steam Cheese Momo,180,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Main Course,Chicken Curry,350,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":210},{""name"":""Full"",""code"":""full"",""price"":350}]"
+Main Course,Paneer Curry,300,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":180},{""name"":""Full"",""code"":""full"",""price"":300}]"
+Main Course,Dal Bhat Set,300,true,true,true,false,,
+Main Course,Dal Bhat Set Chicken,430,false,true,true,false,,
+Main Course,Dal Bhat Set Mutton,560,false,true,true,false,,
+Main Course,Dal Bhat Set Fish,370,false,false,true,false,,
+Main Course,Mutton Curry,300,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":180},{""name"":""Full"",""code"":""full"",""price"":300}]"
+Main Course,Fish Curry,430,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":250},{""name"":""Full"",""code"":""full"",""price"":430}]"
+Main Course,Mix Veg Curry,360,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":210},{""name"":""Full"",""code"":""full"",""price"":360}]"
+Main Course,Aloo Gobi Curry,300,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":180},{""name"":""Full"",""code"":""full"",""price"":300}]"
+Main Course,Kadai Paneer,320,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":190},{""name"":""Full"",""code"":""full"",""price"":320}]"
+Main Course,Butter Chicken,580,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":340},{""name"":""Full"",""code"":""full"",""price"":580}]"
+Main Course,Chicken Tikka Masala,260,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":150},{""name"":""Full"",""code"":""full"",""price"":260}]"
+Main Course,Shahi Paneer,500,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":300},{""name"":""Full"",""code"":""full"",""price"":500}]"
+Main Course,Egg Curry,270,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":160},{""name"":""Full"",""code"":""full"",""price"":270}]"
+Main Course,Pork Curry,550,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":330},{""name"":""Full"",""code"":""full"",""price"":550}]"
+Main Course,Palak Paneer,480,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":280},{""name"":""Full"",""code"":""full"",""price"":480}]"
+Main Course,Aloo Tama,440,true,true,true,false,,
+Main Course,Gundruk Bhat Set,450,true,false,true,false,,
+Main Course,Chicken Biryani,520,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":310},{""name"":""Full"",""code"":""full"",""price"":520}]"
+Main Course,Veg Biryani,460,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":270},{""name"":""Full"",""code"":""full"",""price"":460}]"
+Main Course,Mutton Biryani,300,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":180},{""name"":""Full"",""code"":""full"",""price"":300}]"
+Main Course,Egg Biryani,540,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":320},{""name"":""Full"",""code"":""full"",""price"":540}]"
+Rice & Noodles,Veg Fried Rice,200,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":200}]"
+Rice & Noodles,Chicken Chowmein,220,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":220}]"
+Rice & Noodles,Chicken Fried Rice,240,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":140},{""name"":""Full"",""code"":""full"",""price"":240}]"
+Rice & Noodles,Veg Chowmein,180,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Rice & Noodles,Buff Chowmein,210,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":210}]"
+Rice & Noodles,Egg Chowmein,270,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":160},{""name"":""Full"",""code"":""full"",""price"":270}]"
+Rice & Noodles,Mix Chowmein,190,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":110},{""name"":""Full"",""code"":""full"",""price"":190}]"
+Rice & Noodles,Buff Fried Rice,260,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":150},{""name"":""Full"",""code"":""full"",""price"":260}]"
+Rice & Noodles,Egg Fried Rice,220,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":130},{""name"":""Full"",""code"":""full"",""price"":220}]"
+Rice & Noodles,Mix Fried Rice,300,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":180},{""name"":""Full"",""code"":""full"",""price"":300}]"
+Rice & Noodles,Thukpa Veg,190,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":110},{""name"":""Full"",""code"":""full"",""price"":190}]"
+Rice & Noodles,Thukpa Chicken,250,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":150},{""name"":""Full"",""code"":""full"",""price"":250}]"
+Rice & Noodles,Thukpa Buff,250,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":150},{""name"":""Full"",""code"":""full"",""price"":250}]"
+Rice & Noodles,Schezwan Veg Fried Rice,170,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":170}]"
+Rice & Noodles,Schezwan Chicken Fried Rice,180,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":180}]"
+Rice & Noodles,Schezwan Veg Noodles,250,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":150},{""name"":""Full"",""code"":""full"",""price"":250}]"
+Rice & Noodles,Schezwan Chicken Noodles,270,false,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":160},{""name"":""Full"",""code"":""full"",""price"":270}]"
+Rice & Noodles,American Chop Suey,240,false,false,true,false,,
+Rice & Noodles,Chinese Chop Suey,200,false,false,true,false,,
+Rice & Noodles,Singapore Noodles Veg,200,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":120},{""name"":""Full"",""code"":""full"",""price"":200}]"
+Snacks,French Fries,160,true,true,true,true,sml,"[{""name"":""Small"",""code"":""small"",""price"":95},{""name"":""Medium"",""code"":""medium"",""price"":160},{""name"":""Large"",""code"":""large"",""price"":215}]"
+Snacks,Veg Pakoda,100,true,false,true,false,,
+Snacks,Samosa Chaat,90,true,false,true,false,,
+Snacks,Chicken Sandwich,200,false,false,true,false,,
+Snacks,Club Sandwich,130,false,true,true,false,,
+Snacks,Veg Sandwich,80,true,false,true,false,,
+Snacks,Cheese Balls,170,true,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":100},{""name"":""Full"",""code"":""full"",""price"":170}]"
+Snacks,Chicken Nuggets,120,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":70},{""name"":""Full"",""code"":""full"",""price"":120}]"
+Snacks,Chicken Wings,120,false,true,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":70},{""name"":""Full"",""code"":""full"",""price"":120}]"
+Snacks,Onion Rings,120,true,false,true,true,hf,"[{""name"":""Half"",""code"":""half"",""price"":70},{""name"":""Full"",""code"":""full"",""price"":120}]"
+Snacks,Puri Tarkari,160,true,true,true,false,,
+Snacks,Aloo Chop,240,true,false,true,false,,
+Snacks,Paneer Pakoda,160,true,false,true,false,,
