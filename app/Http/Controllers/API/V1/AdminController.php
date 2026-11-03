@@ -98,6 +98,10 @@ class AdminController extends Controller
                 ]);
             }
 
+            $restaurant->update([
+                'is_new' => false,
+            ]);
+
             // TODO
             /**
              * (Optional)

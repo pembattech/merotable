@@ -30,6 +30,10 @@ class Restaurant extends Authenticatable
         'password'
     ];
 
+    protected $casts = [
+        'is_new' => 'boolean',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -81,12 +85,12 @@ class Restaurant extends Authenticatable
         return $this->hasMany(User::class);
     }
 
-     public function staffAttendances()
+    public function staffAttendances()
     {
         return $this->hasMany(StaffAttendance::class);
     }
 
-      public function invoices()
+    public function invoices()
     {
         return $this->hasMany(Invoice::class);
     }
