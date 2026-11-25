@@ -191,25 +191,27 @@ class SARestaurantController extends Controller
 
             $restaurantCategories = $restaurant->categories()->createMany($categories);
 
+            // ----------------- DEPRICATED -----------------
+            // // Seed sample menu items
+            // $sampleItems = config('sample_menu_items');
 
-            // Seed sample menu items
-            $sampleItems = config('sample_menu_items');
+            // foreach ($restaurantCategories as $category) {
 
-            foreach ($restaurantCategories as $category) {
+            //     if (!isset($sampleItems[$category->name])) {
+            //         continue;
+            //     }
 
-                if (!isset($sampleItems[$category->name])) {
-                    continue;
-                }
+            //     foreach ($sampleItems[$category->name] as $item) {
+            //         $restaurant->menuItems()->create([
+            //             'category_id' => $category->id,
+            //             'name' => $item['name'],
+            //             'price' => $item['price'],
+            //             'is_available' => true,
+            //         ]);
+            //     }
+            // }
 
-                foreach ($sampleItems[$category->name] as $item) {
-                    $restaurant->menuItems()->create([
-                        'category_id' => $category->id,
-                        'name' => $item['name'],
-                        'price' => $item['price'],
-                        'is_available' => true,
-                    ]);
-                }
-            }
+            // ----------------- XXX -----------------
 
 
             // TODO

@@ -8,103 +8,219 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\MenuItem;
+use App\Models\MenuItemSize;
 use App\Models\OrderActivity;
 use App\Models\Restaurant;
 use App\Models\Table;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 
 class OrdersController extends Controller
 {
+
+
     public function store(Request $request)
     {
         $staff = auth('staff')->user();
 
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
 
+        // Validate request
         $validated = $request->validate([
-            'table_id' => 'required|integer|exists:tables,id',
+            'id' => [
+                'required',
+                'integer',
+                Rule::exists('tables', 'id')
+                    ->where('restaurant_id', $staff->restaurant_id),
+            ],
+
+            'note' => 'nullable|string|max:2000',
+
             'items' => 'required|array|min:1',
-            'items.*.menu_item_id' => 'required|integer|exists:menu_items,id',
+
+            'items.*.menu_item_id' => [
+                'required',
+                'integer',
+                Rule::exists('menu_items', 'id')
+                    ->where('restaurant_id', $staff->restaurant_id),
+            ],
+
+            'items.*.menu_item_size_id' => 'nullable|integer',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.note' => 'nullable|string|max:1000',
         ]);
 
+        return DB::transaction(function () use ($validated, $staff) {
 
-        return DB::transaction(function () use ($request, $staff) {
-
-            $occupiedTable = Table::where('id', $request->table_id)
-                ->where('restaurant_id', $staff->restaurant_id)
-                ->where('status', 'occupied')
+            // Find and lock restaurant table
+            $table = Table::where('restaurant_id', $staff->restaurant_id)
+                ->where('id', $validated['id'])
                 ->lockForUpdate()
                 ->first();
 
-            if ($occupiedTable) {
+            if (!$table) {
                 return response()->json([
-                    'message' => 'This table already has an active order',
-                    'table_name' => $occupiedTable->table_name ?? $occupiedTable->id,
+                    'success' => false,
+                    'message' => 'Table not found.',
+                ], 404);
+            }
 
+            // Check table status
+            if ($table->status !== 'available') {
+                return response()->json([
+                    'success' => false,
+                    'message' => $table->status === 'occupied'
+                        ? 'This table already has an active order.'
+                        : 'This table is currently reserved.',
+                    'table_number' => $table->table_number,
+                    'table_status' => $table->status,
                 ], 409);
             }
 
+            // Double-check active orders
+            $activeOrder = Order::where('restaurant_id', $staff->restaurant_id)
+                ->where('table_id', $table->id)
+                ->where('status', 'open')
+                ->exists();
 
+            if ($activeOrder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This table already has an active order.',
+                    'table_number' => $table->table_number,
+                ], 409);
+            }
+
+            // Fetch restaurant menu items
+            $menuItems = MenuItem::where('restaurant_id', $staff->restaurant_id)
+                ->whereIn(
+                    'id',
+                    collect($validated['items'])->pluck('menu_item_id')
+                )
+                ->get()
+                ->keyBy('id');
+
+            $orderItems = [];
+            $total = 0;
+
+            // Prepare order items
+            foreach ($validated['items'] as $item) {
+
+                $menuItem = $menuItems->get($item['menu_item_id']);
+
+                if (!$menuItem || !$menuItem->is_available) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Menu item is currently unavailable.',
+                        'item_name' => $menuItem?->name,
+                    ], 422);
+                }
+
+                $size = null;
+
+                // Items with sizes
+                if ($menuItem->has_sizes) {
+
+                    if (empty($item['menu_item_size_id'])) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Please select a size for this item.',
+                            'item_name' => $menuItem->name,
+                        ], 422);
+                    }
+
+                    $size = MenuItemSize::where('id', $item['menu_item_size_id'])
+                        ->where('menu_item_id', $menuItem->id)
+                        ->where('is_available', true)
+                        ->first();
+
+                    if (!$size) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Selected size is unavailable or invalid.',
+                            'item_name' => $menuItem->name,
+                        ], 422);
+                    }
+
+                    $price = (float) $size->price;
+
+                } else {
+
+                    // Items without sizes
+                    if (!empty($item['menu_item_size_id'])) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'This menu item does not have sizes.',
+                            'item_name' => $menuItem->name,
+                        ], 422);
+                    }
+
+                    $price = (float) $menuItem->price;
+                }
+
+                $quantity = $item['quantity'];
+                $subtotal = round($price * $quantity, 2);
+
+                $total += $subtotal;
+
+                // Prepare item data
+                $orderItems[] = [
+                    'menu_item_id' => $menuItem->id,
+
+                    'menu_item_size_id' => $size?->id,
+                    'size_name' => $size?->name,
+                    'size_code' => $size?->code,
+
+                    'kot_number' => 1,
+
+                    'quantity' => $quantity,
+                    'price' => $price,
+                    'subtotal' => $subtotal,
+
+                    'note' => $item['note'] ?? null,
+                    'status' => 'pending',
+                ];
+            }
 
             // Create order
             $order = Order::create([
                 'restaurant_id' => $staff->restaurant_id,
-                'table_id' => $request->table_id,
-                'total_amount' => 0,
+                'table_id' => $table->id,
+                'total_amount' => round($total, 2),
+                'status' => 'open',
+                'note' => $validated['note'] ?? null,
             ]);
 
-            $total = 0;
-
-
-            foreach ($request->items as $item) {
-
-                $menuItem = MenuItem::where('id', $item['menu_item_id'])
-                    ->where('restaurant_id', $staff->restaurant_id)
-                    ->first();
-
-                if (!$menuItem) {
-                    return response()->json([
-                        'message' => 'Menu item not found',
-                        'item_name' => 'Unknown item'
-                    ], 404);
-                }
-
-                if (!$menuItem->is_available) {
-                    return response()->json([
-                        'message' => 'Menu item is currently unavailable',
-                        'item_name' => $menuItem->name
-                    ], 422);
-                }
-
-
-                $lineTotal = $menuItem->price * $item['quantity'];
-                $total += $lineTotal;
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'menu_item_id' => $menuItem->id,
-                    'quantity' => $item['quantity'],
-                    'price' => $menuItem->price,
-                ]);
+            // Create order items
+            foreach ($orderItems as $item) {
+                $order->orderItems()->create($item);
             }
 
+            // Mark table occupied
+            $table->update([
+                'status' => 'occupied',
+            ]);
+
+            // Order activity
             OrderActivity::create([
                 'order_id' => $order->id,
                 'staff_id' => $staff->id,
                 'action' => 'created',
-                'meta' => '{
-                "table_id": ' . $request->table_id . ',
-                "items_count": ' . count($request->items) . '
-            }',
+                'meta' => json_encode([
+                    'table_number' => $table->table_number,
+                    'kot_number' => 1,
+                    'items_count' => count($orderItems),
+                ]),
             ]);
 
-            $order->update(['total_amount' => $total]);
-
-            $order->table()->update([
-                'status' => 'occupied'
-            ]);
-
+            // Activity log
             activityLog(
                 'order_created_by_staff',
                 'Staff created a new order',
@@ -112,153 +228,520 @@ class OrdersController extends Controller
                     'restaurant_id' => $staff->restaurant_id,
                     'staff_id' => $staff->id,
                     'order_id' => $order->id,
-                    'table_id' => $order->table_id
+                    'table_id' => $table->id,
+                    'table_number' => $table->table_number,
+                    'kot_number' => 1,
                 ]
             );
 
             return response()->json([
-                'message' => 'Order placed successfully',
+                'success' => true,
+                'message' => 'Order placed successfully.',
                 'order_id' => $order->id,
-                'total' => $total,
+                'table_number' => $table->table_number,
+                'kot_number' => 1,
+                'total' => round($total, 2),
+                'status' => $order->status,
             ], 201);
         });
     }
 
+
     public function getOrderByTable(Request $request)
     {
         $staff = auth('staff')->user();
-        $tableId = $request->tableId;
 
-        $order = Order::with('orderItems.menuItem', 'table')
-            ->where('table_id', $tableId)
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        $tableId = $request->route('tableId');
+
+        $validated = validator([
+            'tableId' => $tableId,
+        ], [
+            'tableId' => 'required|integer',
+        ])->validate();
+
+        $order = Order::with([
+            'orderItems.menuItem',
+            'orderItems.menuItemSize',
+            'table',
+        ])
+            ->where('table_id', $validated['tableId'])
             ->where('restaurant_id', $staff->restaurant_id)
-            // ->where('status', 'open') // only active orders
+            ->where('status', 'open')
             ->latest('created_at')
             ->first();
 
-
         if (!$order) {
             return response()->json([
+                'success' => true,
                 'message' => 'No active order for this table',
-                'items' => 0,
-            ], 200);
+                'order_id' => null,
+                'table_name' => null,
+                'table_status' => null,
+                'kots' => [],
+                'total' => 0,
+                'status' => null,
+                'order_note' => '',
+            ]);
         }
 
+        // Group order items by KOT number
+        $kots = $order->orderItems
+            ->groupBy('kot_number')
+            ->sortKeys()
+            ->map(function ($items, $kotNumber) use ($order) {
+
+                // Determine overall KOT status
+                $statuses = $items->pluck('status')
+                    ->filter()
+                    ->map(fn($status) => strtolower($status));
+
+                if ($statuses->isNotEmpty() && $statuses->every(fn($status) => $status === 'served')) {
+                    $kotStatus = 'Served';
+                } elseif ($statuses->contains('preparing')) {
+                    $kotStatus = 'Preparing';
+                } else {
+                    $kotStatus = 'New';
+                }
+
+                // Get earliest item creation time
+                $createdAt = $items->min('created_at');
+
+                return [
+                    'n' => (int) $kotNumber,
+
+                    'time' => $createdAt
+                        ? $createdAt->format('H:i')
+                        : null,
+
+                    'status' => $kotStatus,
+
+                    // This is currently the order-level note.
+                    'note' => $order->note ?? '',
+
+                    'lines' => $items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'name' => $item->menuItem->name ?? 'Unknown',
+                            'size' => $item->menuItemSize?->name,
+                            'qty' => (int) $item->quantity,
+                            'price' => (float) $item->price,
+                            'note' => $item->note ?? '',
+                        ];
+                    })->values(),
+                ];
+            })
+            ->values();
+
         return response()->json([
+            'success' => true,
+
             'order_id' => $order->id,
             'table_name' => $order->table->table_number ?? null,
             'table_status' => $order->table->status ?? null,
-            'items' => $order->orderItems->map(function ($item) {
-                return [
-                    'menu_item_id' => $item->menu_item_id,
-                    'name' => $item->menuItem->name ?? 'Unknown',
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'item_status' => $item->status,
-                    'line_total' => $item->quantity * $item->price,
-                    'time' => $item->created_at->diffForHumans(),
-                ];
-            }),
-            'total' => $order->total_amount,
+
+            'kots' => $kots,
+
+            'total' => (float) $order->total_amount,
             'status' => $order->status,
+            'order_note' => $order->note ?? '',
         ]);
     }
-
 
     public function fetchOrders(Request $request)
     {
         $staff = auth('staff')->user();
 
-        $orders = Order::with('orderItems.menuItem')
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        $orders = Order::with([
+            'orderItems.menuItem',
+            'orderItems.menuItemSize',
+            'table',
+        ])
             ->where('restaurant_id', $staff->restaurant_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->where('status', 'open')
+            ->latest('created_at')
+            ->get()
+            ->groupBy('table_id')
+            ->map(fn($tableOrders) => $tableOrders->first());
+
+        $ordersByTable = [];
+        $orderDetails = [];
+
+        foreach ($orders as $order) {
+            $ordersByTable[$order->table_id] = $this->formatOrderKots($order);
+
+            $orderDetails[$order->table_id] = [
+                'order_id' => $order->id,
+                'table_id' => $order->table_id,
+                'table_name' => $order->table->table_number ?? null,
+                'table_status' => $order->table->status ?? null,
+                'total' => (float) $order->total_amount,
+                'status' => $order->status,
+                'order_note' => $order->note ?? '',
+            ];
+        }
 
         return response()->json([
-            'orders' => $orders
-        ], 200);
+            'success' => true,
+            'orders' => $ordersByTable,
+            'order_details' => $orderDetails,
+        ]);
     }
+
+    private function formatOrderKots(Order $order)
+    {
+        return $order->orderItems
+            ->groupBy('kot_number')
+            ->sortKeys()
+            ->map(function ($items, $kotNumber) use ($order) {
+
+                $statuses = $items->pluck('status')
+                    ->filter()
+                    ->map(fn($status) => strtolower($status));
+
+                if (
+                    $statuses->isNotEmpty() &&
+                    $statuses->every(fn($status) => $status === 'served')
+                ) {
+                    $kotStatus = 'Served';
+                } elseif ($statuses->contains('preparing')) {
+                    $kotStatus = 'Preparing';
+                } else {
+                    $kotStatus = 'New';
+                }
+
+                $createdAt = $items->sortBy('created_at')->first()?->created_at;
+
+                return [
+                    'n' => (int) $kotNumber,
+                    'time' => $createdAt?->format('H:i'),
+                    'status' => $kotStatus,
+                    'note' => $order->note ?? '',
+
+                    'lines' => $items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'name' => $item->menuItem->name ?? 'Unknown',
+                            'size' => $item->menuItemSize?->name,
+                            'qty' => (int) $item->quantity,
+                            'price' => (float) $item->price,
+                            'note' => $item->note ?? '',
+                        ];
+                    })->values(),
+                ];
+            })
+            ->values();
+    }
+
+
+
 
     public function addItem(Request $request)
     {
-        $validated = $request->validate([
-            'table_id' => 'required|integer|exists:tables,id',
-            'items' => 'required|array|min:1',
-            'items.*.menu_item_id' => 'required|integer|exists:menu_items,id',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
-
         $staff = auth('staff')->user();
-        $restaurantId = $staff->restaurant->id;
 
-        $order = Order::where('table_id', $validated['table_id'])
-            ->where('restaurant_id', $restaurantId)
-            ->where('status', 'open')
-            ->first();
-
-        if (!$order) {
+        if (!$staff) {
             return response()->json([
                 'success' => false,
-                'message' => 'No open order found for this table.',
-            ], 404);
+                'message' => 'Unauthenticated.',
+            ], 401);
         }
 
-        DB::transaction(function () use ($validated, $order, $staff) {
+        // Validate request
+        $validated = $request->validate([
+            'id' => [
+                'required',
+                'integer',
+                Rule::exists('tables', 'id')
+                    ->where('restaurant_id', $staff->restaurant_id),
+            ],
+
+            'note' => 'nullable|string|max:2000',
+
+            'items' => 'required|array|min:1',
+
+            'items.*.menu_item_id' => [
+                'required',
+                'integer',
+                Rule::exists('menu_items', 'id')
+                    ->where('restaurant_id', $staff->restaurant_id),
+            ],
+
+            'items.*.menu_item_size_id' => 'nullable|integer',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.note' => 'nullable|string|max:1000',
+        ]);
+
+        return DB::transaction(function () use ($validated, $staff) {
+
+            // Find and lock table
+            $table = Table::where('id', $validated['id'])
+                ->where('restaurant_id', $staff->restaurant_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$table) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Table not found.',
+                ], 404);
+            }
+
+            // Find and lock open order
+            $order = Order::where('table_id', $table->id)
+                ->where('restaurant_id', $staff->restaurant_id)
+                ->where('status', 'open')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No open order found for this table.',
+                ], 404);
+            }
 
             $hadPrintedBill = $order->bill_printed_at !== null;
 
+            // Generate one new KOT number for this submission
+            $nextKotNumber = ((int) $order->orderItems()
+                ->max('kot_number')) + 1;
+
+
+            // Fetch menu items
+            $menuItems = MenuItem::where('restaurant_id', $staff->restaurant_id)
+                ->whereIn(
+                    'id',
+                    collect($validated['items'])->pluck('menu_item_id')
+                )
+                ->get()
+                ->keyBy('id');
+
+            $itemsAdded = [];
+
             foreach ($validated['items'] as $itemData) {
 
-                $menuItem = MenuItem::findOrFail($itemData['menu_item_id']);
+                $menuItem = $menuItems->get($itemData['menu_item_id']);
 
-                $orderItem = $order->orderItems()
-                    ->where('menu_item_id', $menuItem->id)
-                    ->first();
+                if (!$menuItem || !$menuItem->is_available) {
+                    throw ValidationException::withMessages([
+                        'items' => [
+                            'Menu item ' . ($menuItem?->name ?? 'selected') .
+                            ' is currently unavailable.',
+                        ],
+                    ]);
+                }
+
+                $size = null;
+
+                // Handle menu items with sizes
+                if ($menuItem->has_sizes) {
+
+                    if (empty($itemData['menu_item_size_id'])) {
+                        throw ValidationException::withMessages([
+                            'items' => [
+                                'Please select a size for ' . $menuItem->name,
+                            ],
+                        ]);
+                    }
+
+                    $size = MenuItemSize::where(
+                        'id',
+                        $itemData['menu_item_size_id']
+                    )
+                        ->where('menu_item_id', $menuItem->id)
+                        ->where('is_available', true)
+                        ->first();
+
+                    if (!$size) {
+                        throw ValidationException::withMessages([
+                            'items' => [
+                                'Selected size is unavailable or invalid for ' .
+                                $menuItem->name,
+                            ],
+                        ]);
+                    }
+
+                    $price = (float) $size->price;
+
+                } else {
+
+                    if (!empty($itemData['menu_item_size_id'])) {
+                        throw ValidationException::withMessages([
+                            'items' => [
+                                $menuItem->name . ' does not have sizes.',
+                            ],
+                        ]);
+                    }
+
+                    $price = (float) $menuItem->price;
+                }
+
+                $quantity = (int) $itemData['quantity'];
+
+                $addedSubtotal = round($price * $quantity, 2);
+
+                $note = $itemData['note'] ?? null;
+
+                // Find matching item ONLY inside current KOT
+                $orderItemQuery = $order->orderItems()
+                    ->where('kot_number', $nextKotNumber)
+                    ->where('menu_item_id', $menuItem->id);
+
+                if ($size) {
+                    $orderItemQuery->where(
+                        'menu_item_size_id',
+                        $size->id
+                    );
+                } else {
+                    $orderItemQuery->whereNull('menu_item_size_id');
+                }
+
+                // Match note as well
+                if ($note === null) {
+                    $orderItemQuery->whereNull('note');
+                } else {
+                    $orderItemQuery->where('note', $note);
+                }
+
+                $orderItem = $orderItemQuery->first();
 
                 if ($orderItem) {
-                    $orderItem->increment('quantity', $itemData['quantity']);
+
+                    // Increase quantity within the same KOT
+                    $orderItem->quantity += $quantity;
+
+                    // Explicitly preserve KOT number
+                    $orderItem->kot_number = $nextKotNumber;
+
+                    $orderItem->subtotal = round(
+                        $orderItem->quantity * (float) $orderItem->price,
+                        2
+                    );
+
+                    $orderItem->save();
+
                 } else {
+
+                    // Create new order item
                     $orderItem = $order->orderItems()->create([
-                        'order_id' => $order->id,
                         'menu_item_id' => $menuItem->id,
-                        'quantity' => $itemData['quantity'],
-                        'price' => $menuItem->price,
+
+                        'menu_item_size_id' => $size?->id,
+                        'size_name' => $size?->name,
+                        'size_code' => $size?->code,
+
+                        // KOT number
+                        'kot_number' => $nextKotNumber,
+
+                        'quantity' => $quantity,
+                        'price' => $price,
+                        'subtotal' => $addedSubtotal,
+
+                        'note' => $note,
+
                         'status' => 'pending',
                     ]);
                 }
 
+                // Record activity
                 OrderActivity::create([
                     'order_id' => $order->id,
                     'staff_id' => $staff->id,
                     'action' => 'item_added',
+
                     'meta' => [
+                        'kot_number' => $nextKotNumber,
+                        'order_item_id' => $orderItem->id,
                         'menu_item_id' => $menuItem->id,
+                        'menu_item_size_id' => $size?->id,
+
                         'name' => $menuItem->name,
-                        'quantity' => $itemData['quantity'],
-                        'price' => $menuItem->price,
+                        'size_name' => $size?->name,
+
+                        // Newly added quantity
+                        'quantity' => $quantity,
+
+                        // Total quantity after addition
+                        'total_quantity' => $orderItem->quantity,
+
+                        'price' => $price,
+
+                        // Newly added subtotal
+                        'subtotal' => $addedSubtotal,
+
+                        // Updated order item subtotal
+                        'line_total' => $orderItem->subtotal,
+
+                        'note' => $note,
                     ],
                 ]);
+
+                $itemsAdded[] = [
+                    'order_item_id' => $orderItem->id,
+                    'menu_item_id' => $menuItem->id,
+                    'name' => $menuItem->name,
+                    'size_name' => $size?->name,
+
+                    'quantity' => $quantity,
+                    'total_quantity' => $orderItem->quantity,
+
+                    'price' => $price,
+                    'subtotal' => $addedSubtotal,
+                    'line_total' => $orderItem->subtotal,
+
+                    'kot_number' => $orderItem->kot_number,
+                ];
             }
 
-            $order->update([
-                'total_amount' => $order->orderItems()
-                    ->selectRaw('SUM(quantity * price) as total')
-                    ->value('total'),
-                'bill_printed_at' => null,
-                'bill_printed_total' => null,
-            ]);
+            // Update general order note only when supplied
+            if (array_key_exists('note', $validated)) {
+                $order->note = $validated['note'];
+            }
 
+            // Recalculate total using stored subtotals
+            $total = $order->orderItems()
+                ->where('status', '!=', 'cancelled')
+                ->sum('subtotal');
+
+            $order->total_amount = round($total, 2);
+
+            // Invalidate previously printed bill
+            if ($hadPrintedBill) {
+                $order->bill_printed_at = null;
+                $order->bill_printed_total = null;
+            }
+
+            $order->save();
+
+            // Record bill invalidation
             if ($hadPrintedBill) {
                 OrderActivity::create([
                     'order_id' => $order->id,
                     'staff_id' => $staff->id,
                     'action' => 'bill_invalidated',
+
                     'meta' => [
                         'reason' => 'items_added_after_print',
+                        'kot_number' => $nextKotNumber,
                     ],
                 ]);
             }
 
+            // Activity log
             activityLog(
                 'order_items_added_by_staff',
                 'Staff added items to an existing order',
@@ -266,15 +749,21 @@ class OrdersController extends Controller
                     'restaurant_id' => $staff->restaurant_id,
                     'staff_id' => $staff->id,
                     'order_id' => $order->id,
-                    'items_added' => $validated['items'],
+                    'kot_number' => $nextKotNumber,
+                    'items_added' => $itemsAdded,
                 ]
             );
-        });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Items added successfully',
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Items added successfully.',
+                'order_id' => $order->id,
+                'table_number' => $table->table_number,
+                'kot_number' => $nextKotNumber,
+                'total' => round($total, 2),
+                'items_added' => $itemsAdded,
+            ]);
+        });
     }
 
 

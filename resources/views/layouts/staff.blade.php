@@ -5,29 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {{-- @include('components.pwa') --}}
+    <title>@yield('title', 'My Laravel App')</title>
 
-    <script src="{{ asset('js/api.js') }}"></script>
-    <script>
-        apiTest();
-    </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- @include('components.pwa') --}}
 
     <style>
         body {
             display: none;
         }
-    </style>
 
-    <script src="{{ asset('js/auth-guard.js') }}"></script>
-    <script>
-        requireAuth();
-    </script>
-
-    <title>@yield('title', 'My Laravel App')</title>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <style>
         /* ── Scrollbar ── */
         ::-webkit-scrollbar {
             width: 8px;
@@ -182,8 +170,7 @@
                 <span class="ham-line"></span>
             </button>
 
-            <img class="logo w-20" src="{{ asset('images/branding/merotable-logo-WHITE.png') }}"
-                alt="Logo">
+            <img class="logo w-20" src="{{ asset('images/branding/merotable-logo-WHITE.png') }}" alt="Logo">
             <div class="hidden md:block h-6 w-px bg-gray-700"></div>
             <p class="restroName hidden md:block text-sm md:text-lg font-medium text-gray-200 truncate max-w-[160px]">
                 loading…</p>
@@ -346,7 +333,12 @@
 
         // Close on Escape key
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && menuOpen) closeMobileMenu();
+            if (
+                e.key === 'Escape' &&
+                mobileMenuPanel.classList.contains('open')
+            ) {
+                closeMobileMenu();
+            }
         });
 
         // ── User / restro info ─────────────────────────────────────
@@ -424,7 +416,21 @@
         function capitalize(s) {
             return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
         }
+
     </script>
+
+    {{-- Core JavaScript --}}
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script src="{{ asset('js/auth-guard.js') }}"></script>
+
+    <script>
+        apiTest();
+        requireAuth();
+    </script>
+
+    {{-- Page-specific JavaScript --}}
+    @stack('scripts')
+
 
 </body>
 

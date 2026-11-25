@@ -33,7 +33,7 @@ return new class extends Migration {
 
             $table->decimal('bill_printed_total', 10, 2)->nullable();
 
-            $table->text('remarks')->nullable();
+            $table->text('note')->nullable();
 
             $table->timestamps();
 

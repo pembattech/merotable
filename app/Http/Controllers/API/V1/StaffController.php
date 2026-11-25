@@ -20,7 +20,12 @@ class StaffController extends Controller
             ->when($request->category_id, function ($q) use ($request) {
                 $q->where('category_id', $request->category_id);
             })
-            ->with('category:id,name')
+            ->with([
+                'category:id,name',
+                'sizes' => function ($q) {
+                    $q->orderBy('sort_order');
+                },
+            ])
             ->orderBy('name')
             ->get();
 
@@ -58,7 +63,7 @@ class StaffController extends Controller
         $staff = auth('staff')->user();
         $restaurant = $staff->restaurant;
 
-        $tables = $restaurant->tables()->select('id', 'table_number', 'status')->orderBy('id')->get();
+        $tables = $restaurant->tables()->select('id', 'table_number', 'status', 'area_name')->orderBy('id')->get();
 
         return response()->json([
             'success' => true,

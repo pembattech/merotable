@@ -34,8 +34,14 @@ class MenuItemSize extends Model
     /**
      * The menu item associated with this size.
      */
-    public function menuItem(): BelongsTo
+    public function menuItem()
     {
         return $this->belongsTo(MenuItem::class);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
 }

@@ -15,12 +15,23 @@ class RestaurantSetting extends Model
         'delivery_charge',
         'currency'
     ];
-    
-    
-public function restaurant()
-{
-    return $this->belongsTo(Restaurant::class);
-}
+
+
+    protected function casts(): array
+    {
+        return [
+            'tax_enabled' => 'boolean',
+            'tax_percentage' => 'decimal:2',
+            'service_charge_enabled' => 'boolean',
+            'service_charge_percentage' => 'decimal:2',
+            'delivery_charge' => 'decimal:2',
+        ];
+    }
+
+    public function restaurant()
+    {
+        return $this->belongsTo(Restaurant::class);
+    }
 
 
 }

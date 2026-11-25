@@ -249,6 +249,8 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     // Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->post('/orders', [OrdersController::class, 'store']);
     // Route::middleware(['isRestaurantAuthenticated', 'isRestaurantVerified'])->get('/orders', [OrdersController::class, 'fetchOrders']);
 
+    Route::get('/settings', [RestaurantSettingController::class, 'show']);
+
 
     Route::get('/{restaurant:slug}/menu', [StaffController::class, 'getStaffMenu']);
     Route::get('/{restaurant:slug}/categories', [StaffController::class, 'fetchPublicCategories']);
@@ -273,11 +275,12 @@ Route::middleware(['auth:sanctum'])->prefix('v1/staff')->group(function () {
     Route::get('/{restaurant:slug}/orders/{order}/bill', [OrdersController::class, 'showBill'])->name('orders.bill');
 
 
+    Route::get('/{restaurant:slug}/orders/open', [OrdersController::class, 'fetchOrders']);
     Route::get('/{restaurant:slug}/order/table/{tableId}', [OrdersController::class, 'getOrderByTable']);
     Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/status', [OrdersController::class, 'updateOrderStatus']);
     Route::get('/orders/{order}/activities', [OrdersController::class, 'activityTimeline']);
 
-    Route::put('/{slug}/table/{tableId}/{orderId}/complete',[OrdersController::class, 'completeOrder']);
+    Route::put('/{restaurant:slug}/table/{tableId}/{orderId}/complete', [OrdersController::class, 'completeOrder']);
 
     Route::post('/{restaurant:slug}/invoice', [InvoiceController::class, 'store'])->name('invoice.checkout');
 

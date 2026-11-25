@@ -94,17 +94,38 @@ class TableController extends Controller
     {
         $staff = auth('staff')->user();
 
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
 
-        $tables = Table::where('id', $tableId)
-            // ->where('restaurant_id', $staff->restaurant_id)
+        // Ensure staff belongs to the requested restaurant
+        if ($staff->restaurant_id !== $restaurant->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized restaurant access.',
+            ], 403);
+        }
+
+        // Find table belonging to this restaurant
+        $table = Table::where('id', $tableId)
+            ->where('restaurant_id', $restaurant->id)
             ->first();
+
+        if (!$table) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Table not found.',
+            ], 404);
+        }
 
         return response()->json([
             'success' => true,
-            'tableStatus' => $tables->status,
+            'tableStatus' => $table->status
         ]);
     }
-
 
     public function fetchTables(Request $request)
     {

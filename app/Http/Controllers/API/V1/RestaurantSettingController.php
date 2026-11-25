@@ -13,7 +13,22 @@ class RestaurantSettingController extends Controller
     // Get current restaurant settings
     public function show(Request $request)
     {
+        // Check restaurant owner authentication
         $restaurant = auth('restaurant')->user();
+
+        // If not owner, check staff authentication
+        if (!$restaurant) {
+            $staff = auth('staff')->user();
+
+            $restaurant = $staff?->restaurant;
+        }
+
+        if (!$restaurant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Restaurant not found.'
+            ], 404);
+        }
 
         $settings = $restaurant->setting;
 
